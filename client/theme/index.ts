@@ -1,12 +1,14 @@
 import { extendTheme } from "@chakra-ui/react";
-import global  from "@/theme/global";
 import fonts from "@/theme/fonts";
+import heading from "@/theme/components/heading"
+import textStyles from "@/theme/textStyles";
 
 const theme = extendTheme({
-  styles: {
-    global,
+  components: {
+    Heading: heading,
   },
   fonts,
+  textStyles,
 });
 
 export default theme;

@@ -6,7 +6,8 @@ const manrope = Manrope({
 });
 
 const fonts = {
-  body: manrope,
+  body: manrope.style.fontFamily,
+  heading: manrope.style.fontFamily,
 };
 
 export default fonts;
