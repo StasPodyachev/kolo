@@ -10,15 +10,15 @@ interface IProps {
 
 const SidebarLink = ({ icon, title, to }: IProps) => {
   return (
-    <Box
-      p="16px 18px"
-      borderRadius="2px"
-      transition="all .3s"
-      opacity={0.7}
-      _hover={{ bg: "gray.600", cursor: "pointer", opacity: 1 }}
-      data-group
-    >
-      <Link href={to}>
+    <Link href={to}>
+      <Box
+        p="16px 18px"
+        borderRadius="2px"
+        transition="all .3s"
+        opacity={0.7}
+        _hover={{ bg: "gray.600", cursor: "pointer", opacity: 1 }}
+        data-group
+      >
         <HStack spacing="8px">
           {icon}
           <Text
@@ -29,8 +29,8 @@ const SidebarLink = ({ icon, title, to }: IProps) => {
             {title}
           </Text>
         </HStack>
-      </Link>
-    </Box>
+      </Box>
+    </Link>
   );
 };
 

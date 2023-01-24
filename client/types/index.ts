@@ -22,3 +22,34 @@ export interface IBidsTableData {
   date: string;
   bid: number;
 };
+
+export interface INotaryBlocks {
+  title: string;
+  value: number | string;
+};
+
+export interface INotaryTableData {
+  address: string;
+  balance: number;
+};
+
+export interface IVotesParameters {
+  title: string;
+  value: string;
+};
+
+export interface IVotesItem {
+  image?: string;
+  title: string;
+  address: string;
+  lastPrice: number;
+  bids: number;
+  saleEnds: string;
+  description: string;
+  isFirstItem: boolean;
+};
+
+export interface IDepositAndWithdrawButton {
+  title: string;
+  isDepositBtn: boolean;
+}
