@@ -1,12 +1,12 @@
 import {NextPage} from "next";
 import {Box, Heading, Text} from "@chakra-ui/react";
 
-const Home: NextPage = () => {
+const Dashboard: NextPage = () => {
   return (
     <Box>
-      <Heading variant="h1">Hello kolo</Heading>
-      <Text>Me here</Text>
+      <Heading variant="h1">Dashboard</Heading>
+      <Text>Dashboard</Text>
     </Box>
   )
 }
-export default Home;
+export default Dashboard;

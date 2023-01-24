@@ -23,7 +23,7 @@ const SidebarLink = ({ icon, title, to }: IProps) => {
           {icon}
           <Text
             textStyle="mediumText"
-            color="gray.500"
+            color="white"
             _groupHover={{ color: "white" }}
           >
             {title}
