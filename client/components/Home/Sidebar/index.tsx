@@ -1,5 +1,4 @@
 import { NextPage } from "next";
-import Image from "next/image";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { LogoIcon } from "@/icons";
@@ -11,6 +10,7 @@ import {
   FaqIcon,
 } from "@/icons";
 import SidebarLink from "./SidebarLink";
+import { navLinks } from "@/constants/shared";
 
 const navList = [
   {
