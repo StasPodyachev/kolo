@@ -17,7 +17,7 @@ contract Factory is IFactory, StoreDeployer, Ownable {
             "Factory: Store already exist"
         );
 
-        storeAddress = deploy(address(this), msg.sender);
+        storeAddress = deploy(address(this));
         stores[msg.sender] = storeAddress;
 
         emit StoreCreated(storeAddress, msg.sender);
@@ -25,5 +25,9 @@ contract Factory is IFactory, StoreDeployer, Ownable {
 
     function addDeal(uint256 dealId) external {
         deals[dealId] = msg.sender;
+    }
+
+    function getStore(address wallet) external view returns (address store) {
+        store = stores[wallet];
     }
 }

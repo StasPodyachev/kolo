@@ -6,5 +6,5 @@ interface IStore {
 
     function depositBuyer(uint256 dealId, address buyer) external payable;
 
-    function withdrawBuyer() external;
+    function withdrawBuyer(uint256 dealId, address buyer) external;
 }

@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 import "./interfaces/IAuctionFile.sol";
 import "./interfaces/IStore.sol";
+import "./interfaces/IFactory.sol";
 
-contract AuctionFile is IAuctionFile {
+contract AuctionFile is IAuctionFile, Ownable {
     IFactory public _factory;
 
     uint256 public _periodDelivery = 2 days;
@@ -16,28 +19,34 @@ contract AuctionFile is IAuctionFile {
 
     uint256 id;
 
-    function setPeriodDelivery(uint256 value) external payable onlyOwner {
+    function setPeriodDelivery(uint256 value) external onlyOwner {
         _periodDelivery = value;
     }
 
-    function setPeriodDispute(uint256 value) external payable onlyOwner {
+    function setPeriodDispute(uint256 value) external onlyOwner {
         _periodDispute = value;
     }
 
-    function setFactory(IFactory factory) external onlyOwner {
-        _factory = factory;
+    function setColletoralPercent(uint256 value) external onlyOwner {
+        _colletoralPercent = value;
+    }
+
+    function setFactory(address factory) external onlyOwner {
+        _factory = IFactory(factory);
     }
 
     function create(
-        string name,
-        string description,
+        string calldata name,
+        string calldata description,
         uint256 priceStart,
         uint256 priceForceStop,
         uint256 price,
         uint256 dateExpire
     ) external payable returns (uint256 dealId) {
+        address storeAddress = _factory.getStore(msg.sender);
+
         require(
-            _factory.stores[msg.sender] != address(0),
+            storeAddress != address(0),
             "AuctionFile: Caller does not have a store"
         );
 
@@ -61,16 +70,20 @@ contract AuctionFile is IAuctionFile {
 
         _factory.addDeal(id);
 
-        address storeAddress = _factory.stores[msg.sender];
         IStore(storeAddress).createDeal{value: msg.value}(id);
 
         emit DealCreated(dealId, msg.sender);
     }
 
     function bid(uint256 dealId) external payable {
-        AuctionFileParams file = files[dealId];
+        AuctionFileParams memory file = files[dealId];
 
         require(file.price != 0, "AuctionFile: Id not found");
+        require(
+            file.status == AuctionStatus.OPEN,
+            "AuctionFile: Auction is not open"
+        );
+
         require(
             file.seller != msg.sender,
             "AuctionFile: Seller cannot be a buyer"
@@ -85,7 +98,7 @@ contract AuctionFile is IAuctionFile {
 
         //check priceForceStop
 
-        address storeAddress = _factory.stores[file.seller];
+        address storeAddress = _factory.getStore(file.seller);
         IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
         file.lastBid = currentBid;
@@ -95,7 +108,7 @@ contract AuctionFile is IAuctionFile {
     }
 
     function cancel(uint256 dealId) external payable {
-        AuctionFileParams file = files[dealId];
+        AuctionFileParams memory file = files[dealId];
 
         require(file.price != 0, "AuctionFile: Id not found");
         require(
@@ -112,21 +125,24 @@ contract AuctionFile is IAuctionFile {
         emit DealCanceled(dealId, msg.sender);
     }
 
-    function finalize(uint256 dealId) external {}
-
     function dispute(uint256 dealId) external payable {
-        AuctionFileParams file = files[dealId];
+        AuctionFileParams memory file = files[dealId];
 
         require(file.price != 0, "AuctionFile: Id not found");
         require(file.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
 
-        // check collatoral
+        require(
+            msg.value == (file.price * _colletoralPercent) / 1e18,
+            "AuctionFile: Wrong colletoral"
+        );
 
-        address storeAddress = _factory.stores[file.seller];
+        address storeAddress = _factory.getStore(file.seller);
         IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
         file.status = AuctionStatus.DISPUTE;
 
         //chose notary
     }
+
+    function finalize(uint256 dealId) external {}
 }

@@ -20,5 +20,10 @@ contract Store is IStore, Ownable {
         buyers[dealId][buyer] += msg.value;
     }
 
-    function withdrawBuyer() external {}
+    function withdrawBuyer(uint256 dealId, address buyer) external {
+        // TODO: security
+        // TODO: Transfer
+
+        buyers[dealId][buyer] = 0;
+    }
 }
