@@ -6,7 +6,6 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { filecoinHyperspace } from "wagmi/chains";
-import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { ChakraProvider } from "@chakra-ui/react";
 import { AppProps } from "next/app";
@@ -20,7 +19,6 @@ const { chains, provider } = configureChains(
       : []),
   ],
   [
-    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_REACT_APP_ALCHEMY_KEY }),
     publicProvider(),
   ]
 );
