@@ -22,7 +22,6 @@ const SideBar: NextPage = () => {
       <Flex flexDir="column" gap="8px" mt="52px">
         {navLinks.map((navLink) => (
           <SidebarLink
-            key={navLink.title}
             icon={navLink.icon}
             title={navLink.title}
             to={navLink.url}
