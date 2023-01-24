@@ -5,18 +5,38 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon } from "@/icons";
 import Link from "next/link";
 
-const ItemCard: NextPage = () => {
+interface IProps {
+  to: number;
+  title: string;
+  price: string;
+  ownedBy: string;
+  saleEndDate: string;
+  image?: string;
+}
+
+const ItemCard = ({
+  to,
+  title,
+  price,
+  ownedBy,
+  saleEndDate,
+  image,
+}: IProps) => {
   return (
-    <Link href="/">
+    <Link href={`products/${to.toString()}`}>
       <Box minW="304px" minH="435px" bg="white">
-        <Flex
-          justifyContent="center"
-          alignItems="center"
-          h="240px"
-          bg="gray.800"
-        >
-          <Image src={CardImage} alt="card image" />
-        </Flex>
+        {image ? (
+          <Image src={image} alt="card image" width={304} height={240} />
+        ) : (
+          <Flex
+            justifyContent="center"
+            alignItems="center"
+            h="240px"
+            bg="gray.800"
+          >
+            <Image src={CardImage} alt="card image" />
+          </Flex>
+        )}
         <Flex
           h="195px"
           flexDir="column"
@@ -26,10 +46,10 @@ const ItemCard: NextPage = () => {
           <Flex flexDir="column" gap="6px">
             <Flex justifyContent="space-between">
               <Text textStyle="bigText" color="gray.900">
-                Tree planting plan
+                {title}
               </Text>
               <Text textStyle="bigText" color="gray.900">
-                32 FIL
+                {price}
               </Text>
             </Flex>
             <Flex justifyContent="space-between">
@@ -37,7 +57,7 @@ const ItemCard: NextPage = () => {
                 Owned by
               </Text>
               <Text textStyle="smallText" color="gray.300">
-                0x9D21...7a88
+                {ownedBy}
               </Text>
             </Flex>
             <Flex
@@ -49,7 +69,7 @@ const ItemCard: NextPage = () => {
                 Sale ends
               </Text>
               <Text textStyle="smallText" color="gray.300">
-                28 Feb 2023
+                {saleEndDate}
               </Text>
             </Flex>
             <Box
@@ -66,6 +86,7 @@ const ItemCard: NextPage = () => {
             bg="blue.primary"
             color="white"
             textStyle="button"
+            borderRadius={0}
             transition="all .3s"
             _hover={{ bg: "blue.hover" }}
           >

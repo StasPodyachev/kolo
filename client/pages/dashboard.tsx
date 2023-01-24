@@ -1,12 +1,12 @@
-import {NextPage} from "next";
-import {Box, Heading, Text} from "@chakra-ui/react";
+import { NextPage } from "next";
+import { Heading } from "@chakra-ui/react";
+import Layout from "@/components/Layout";
 
 const Dashboard: NextPage = () => {
   return (
-    <Box>
-      <Heading variant="h1">Dashboard</Heading>
-      <Text>Dashboard</Text>
-    </Box>
-  )
-}
+    <Layout pageTitle="Dashboard">
+      <Heading>Dashboard</Heading>
+    </Layout>
+  );
+};
 export default Dashboard;

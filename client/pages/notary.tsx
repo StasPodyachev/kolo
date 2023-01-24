@@ -1,12 +1,12 @@
-import {NextPage} from "next";
-import {Box, Heading, Text} from "@chakra-ui/react";
+import { NextPage } from "next";
+import { Heading } from "@chakra-ui/react";
+import Layout from "@/components/Layout";
 
 const Notary: NextPage = () => {
   return (
-    <Box>
-      <Heading variant="h1">Notary</Heading>
-      <Text>Notary</Text>
-    </Box>
-  )
-}
+    <Layout pageTitle="Notary">
+      <Heading>Notary</Heading>
+    </Layout>
+  );
+};
 export default Notary;

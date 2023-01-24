@@ -1,39 +1,30 @@
 import { NextPage } from "next";
-import { Box, Flex, Grid, Heading } from "@chakra-ui/react";
-import ManageBar from "@/components/ManageBar/ManageBar";
-import Sidebar from "@/components/Home/Sidebar";
+import { Grid } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
+import { auctionItems } from "@/constants/shared";
 
 const Home: NextPage = () => {
   return (
-    <Layout>
-      <Flex flexDir="column" w="100%">
-        <Flex
-          w="100%"
-          justifyContent="space-between"
-          p="56px 70px"
-          h="max-content"
-        >
-          <Heading variant="h3">Market</Heading>
-          <ManageBar />
-        </Flex>
-        <Grid
-          gap="26px"
-          justifyContent="space-between"
-          templateColumns="repeat(auto-fill, 304px)"
-          templateRows="auto"
-          px="70px"
-          pb="56px"
-        >
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-          <ItemCard />
-        </Grid>
-      </Flex>
+    <Layout pageTitle="Market">
+      <Grid
+        mt="60px"
+        gap="26px"
+        justifyContent="space-between"
+        templateColumns="repeat(auto-fill, 304px)"
+        templateRows="auto"
+      >
+        {auctionItems.map((auctionItem) => (
+          <ItemCard
+            key={auctionItem.id}
+            to={auctionItem.id}
+            title={auctionItem.title}
+            price={auctionItem.price}
+            ownedBy={auctionItem.ownedBy}
+            saleEndDate={auctionItem.saleEndDate}
+          />
+        ))}
+      </Grid>
     </Layout>
   );
 };

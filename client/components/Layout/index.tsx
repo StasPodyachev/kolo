@@ -1,15 +1,21 @@
-import { Box, Flex } from "@chakra-ui/react";
-import Sidebar from "../Home/Sidebar";
+import { Box, Flex, Heading } from "@chakra-ui/react";
+import Sidebar from "../ui/Sidebar";
+import ManageBar from "../ManageBar/ManageBar";
 
 interface IProps {
   children: JSX.Element;
+  pageTitle: string;
 }
 
-const Layout = ({ children }: IProps) => {
+const Layout = ({ children, pageTitle }: IProps) => {
   return (
     <Flex>
       <Sidebar />
-      <Box>
+      <Box bg="gray.900" w="100%" p="56px 70px">
+        <Flex w="100%" justifyContent="space-between" h="max-content">
+          <Heading variant="h3">{pageTitle}</Heading>
+          <ManageBar />
+        </Flex>
         {children}
       </Box>
     </Flex>
