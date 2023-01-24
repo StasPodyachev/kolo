@@ -1,9 +1,19 @@
-import { NextPage } from "next";
+import { Box, Flex } from "@chakra-ui/react";
+import Sidebar from "../Home/Sidebar";
 
-const Layout: NextPage = () => {
+interface IProps {
+  children: JSX.Element;
+}
+
+const Layout = ({ children }: IProps) => {
   return (
-    <div>
-      <span>layout</span>
-    </div>
+    <Flex>
+      <Sidebar />
+      <Box>
+        {children}
+      </Box>
+    </Flex>
   );
 };
+
+export default Layout;

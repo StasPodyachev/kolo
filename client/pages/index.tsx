@@ -3,11 +3,11 @@ import { Box, Flex, Grid, Heading } from "@chakra-ui/react";
 import ManageBar from "@/components/ManageBar/ManageBar";
 import Sidebar from "@/components/Home/Sidebar";
 import ItemCard from "@/components/Home/ItemCard";
+import Layout from "@/components/Layout";
 
 const Home: NextPage = () => {
   return (
-    <Flex bg="black">
-      <Sidebar />
+    <Layout>
       <Flex flexDir="column" w="100%">
         <Flex
           w="100%"
@@ -34,7 +34,7 @@ const Home: NextPage = () => {
           <ItemCard />
         </Grid>
       </Flex>
-    </Flex>
+    </Layout>
   );
 };
 
