@@ -12,6 +12,14 @@ import {
 } from "@/icons";
 import SidebarLink from "./SidebarLink";
 
+const navList = [
+  {
+    url: "/",
+    title: "Market",
+    icon: <MarketIcon boxSize="24px" color="white" />,
+  }
+]
+
 const SideBar: NextPage = () => {
   return (
     <Box
@@ -49,7 +57,7 @@ const SideBar: NextPage = () => {
         />
         <SidebarLink
           icon={<FaqIcon boxSize="24px" color="white" />}
-          title="Dashboard"
+          title="FAQ"
           to="/"
         />
       </Flex>
