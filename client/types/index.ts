@@ -15,6 +15,7 @@ export interface IAuctionItem {
   image?: string;
   description: string;
   status: string;
+  totalBids: number;
 };
 
 export interface IBidsTableData {

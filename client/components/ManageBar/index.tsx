@@ -38,7 +38,7 @@ const ManageBar: NextPage = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            minW: isConnected ? "100%" : "194px",
+            minW: isConnected ? "max-content" : "194px",
             height: "52px",
           },
         }}

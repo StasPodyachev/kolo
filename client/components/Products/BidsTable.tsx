@@ -1,5 +1,5 @@
 import { BidsTableData } from "@/constants/shared";
-import { numberWithCommas } from "@/helpers";
+import { addressTruncation, numberWithCommas } from "@/helpers";
 import { Table, TableContainer, Tbody, Td, Tr } from "@chakra-ui/react";
 import { NextPage } from "next";
 
@@ -10,7 +10,7 @@ const BidsTable: NextPage = () => {
         <Tbody>
           {BidsTableData.map((item) => (
             <Tr key={item.bid}>
-              <Td pl={0}>{item.address}</Td>
+              <Td pl={0}>{addressTruncation(item.address)}</Td>
               <Td textStyle="smallText" color="gray.300">
                 {item.date}
               </Td>

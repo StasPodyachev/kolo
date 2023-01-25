@@ -19,6 +19,7 @@ import {
   VotesItems,
   VotesParameters,
 } from "@/constants/shared";
+import { addressTruncation } from "@/helpers";
 
 const AuctionItemAccordion: NextPage = () => {
   const { onCopy, hasCopied } = useClipboard("");
@@ -61,7 +62,7 @@ const AuctionItemAccordion: NextPage = () => {
                       title={hasCopied ? "Copied" : "Copy"}
                     >
                       <Text textStyle="smallText" color="gray.300">
-                        CID:&nbsp;{item.address}
+                        CID:&nbsp;{addressTruncation(item.address)}
                       </Text>
                       <CopyIcon onClick={onCopy} boxSize="16px" />
                     </Flex>
@@ -128,7 +129,7 @@ const AuctionItemAccordion: NextPage = () => {
                         {block.title}
                       </Text>
                       <Text textStyle="smallText" color="white">
-                        {block.value}
+                        {addressTruncation(block.value)}
                       </Text>
                     </Flex>
                   ))}

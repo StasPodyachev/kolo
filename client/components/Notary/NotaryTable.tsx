@@ -1,5 +1,5 @@
 import { NotaryTableData } from "@/constants/shared";
-import { numberWithCommas } from "@/helpers";
+import { addressTruncation, numberWithCommas } from "@/helpers";
 import { Table, TableContainer, Tbody, Td, Tr } from "@chakra-ui/react";
 import { NextPage } from "next";
 
@@ -10,7 +10,7 @@ const NotaryTable: NextPage = () => {
         <Tbody>
           {NotaryTableData.map((item) => (
             <Tr key={item.balance}>
-              <Td pl={0}>{item.address}</Td>
+              <Td pl={0}>{addressTruncation(item.address)}</Td>
               <Td pr={0} isNumeric>
                 {numberWithCommas(item.balance)}&nbsp;FIL
               </Td>

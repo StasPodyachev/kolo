@@ -56,6 +56,7 @@ export const auctionItems: IAuctionItem[] = [
     description:
       "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
     status: "active",
+    totalBids: 20,
   },
   {
     id: 2,
@@ -68,6 +69,7 @@ export const auctionItems: IAuctionItem[] = [
     description:
       "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
     status: "active",
+    totalBids: 20,
   },
   {
     id: 3,
@@ -80,6 +82,7 @@ export const auctionItems: IAuctionItem[] = [
     description:
       "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
     status: "active",
+    totalBids: 20,
   },
   {
     id: 4,
@@ -92,6 +95,7 @@ export const auctionItems: IAuctionItem[] = [
     description:
       "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
     status: "active",
+    totalBids: 20,
   },
   {
     id: 5,
@@ -104,6 +108,7 @@ export const auctionItems: IAuctionItem[] = [
     description:
       "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
     status: "active",
+    totalBids: 20,
   },
   {
     id: 6,
@@ -116,6 +121,7 @@ export const auctionItems: IAuctionItem[] = [
     description:
       "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
     status: "active",
+    totalBids: 20,
   },
 ];
 
@@ -324,4 +330,11 @@ export const MyPurchasesBlocks: IBlock[] = [
     title: "Locked in Bids",
     value: "FIL 21.3170",
   },
+];
+
+export const SaleTypeMenuItems = [
+  "AUCTION OF FILES",
+  "AUCTION OF LIVEPEER",
+  "AUCTION OF HUDDLE",
+  "SIMPLE TRADES OF FILES",
 ];

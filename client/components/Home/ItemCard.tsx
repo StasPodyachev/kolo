@@ -4,6 +4,7 @@ import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon } from "@/icons";
 import Link from "next/link";
+import { addressTruncation } from "@/helpers";
 
 interface IProps {
   to: number;
@@ -57,7 +58,7 @@ const ItemCard = ({
                 Owned by
               </Text>
               <Text textStyle="smallText" color="gray.300">
-                {ownedBy}
+                {addressTruncation(ownedBy)}
               </Text>
             </Flex>
             <Flex

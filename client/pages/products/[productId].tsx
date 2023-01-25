@@ -15,6 +15,7 @@ import { auctionItems } from "@/constants/shared";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import BidsTable from "@/components/Products/BidsTable";
+import { addressTruncation } from "@/helpers";
 
 const Product: NextPage = () => {
   const router = useRouter();
@@ -24,7 +25,7 @@ const Product: NextPage = () => {
   return (
     <Layout pageTitle="Item">
       <Flex flexDir="column">
-        <Flex justifyContent="space-between">
+        <Flex gap="56px">
           <Flex flexDir="column">
             {productItem?.image ? (
               <Image
@@ -70,7 +71,7 @@ const Product: NextPage = () => {
                 Owned by:
               </Text>
               <Text textStyle="mediumText" color="gray.500">
-                {productItem?.ownedBy}
+                {addressTruncation(productItem?.ownedBy!)}
               </Text>
             </HStack>
             <Flex justifyContent="space-between" mt="6px">
@@ -137,13 +138,13 @@ const Product: NextPage = () => {
             </Button>
           </Flex>
         </Flex>
-        <Flex justify="space-between">
+        <Flex gap="88px">
           <Box minW="400px">
             <Flex justify="space-between" w="100%">
               <Heading variant="h6">Bids</Heading>
               <Flex alignItems="center">
                 <UserIcon width="21px" height="20px" />
-                <Heading variant="h6">20</Heading>
+                <Heading variant="h6">{productItem?.totalBids}</Heading>
               </Flex>
             </Flex>
             <BidsTable />
@@ -156,7 +157,9 @@ const Product: NextPage = () => {
             bg="gray.800"
             p="32px 24px"
           >
-            <Text color="gray.50">0x9D21...7a88:</Text>
+            <Text color="gray.50">
+              {addressTruncation(productItem?.ownedBy!)}:
+            </Text>
             <Text textStyle="smallText" color="gray.400">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras
               pulvinar commodo lacus eu dapibus. Aliquam vestibulum, lectus at
