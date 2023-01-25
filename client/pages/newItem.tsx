@@ -1,12 +1,12 @@
 import {NextPage} from "next";
-import {Box, Heading, Text} from "@chakra-ui/react";
+import Layout from "@/components/Layout";
+import NewPoduct from "@/components/NewPoduct/NewPoduct";
 
 const newItem: NextPage = () => {
   return (
-    <Box>
-      <Heading variant="h1">newItem</Heading>
-      <Text>newItem</Text>
-    </Box>
+    <Layout pageTitle="New Item">
+      <NewPoduct />
+    </Layout>
   )
 }
 export default newItem;

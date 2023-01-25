@@ -5,7 +5,7 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { filecoinHyperspace } from "wagmi/chains";
+import { filecoinHyperspace, polygonMumbai } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { ChakraProvider } from "@chakra-ui/react";
 import { AppProps } from "next/app";
@@ -15,7 +15,7 @@ import "../styles/globals.css";
 const { chains, provider } = configureChains(
   [
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true"
-      ? [filecoinHyperspace]
+      ? [filecoinHyperspace, polygonMumbai]
       : []),
   ],
   [
