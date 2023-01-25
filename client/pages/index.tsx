@@ -8,7 +8,6 @@ const Home: NextPage = () => {
   return (
     <Layout pageTitle="Market">
       <Grid
-        mt="60px"
         gap="26px"
         justifyContent="space-between"
         templateColumns="repeat(auto-fill, 304px)"

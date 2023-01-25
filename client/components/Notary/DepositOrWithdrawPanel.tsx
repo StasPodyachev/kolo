@@ -3,16 +3,19 @@ import {
   DepositOrWithdrawBlocks,
 } from "@/constants/shared";
 import {
+  Badge,
   Button,
   Flex,
   HStack,
+  InputGroup,
+  InputRightElement,
   NumberInput,
   NumberInputField,
   TabPanel,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useState } from "react";
-import NotaryBlock from "./NotaryBlock";
+import Block from "../ui/Block";
 
 const DepositOrWithdrawPanel: NextPage = () => {
   const [value, setValue] = useState(10);
@@ -21,24 +24,42 @@ const DepositOrWithdrawPanel: NextPage = () => {
       <Flex flexDir="column" gap="50px">
         <Flex justifyContent="space-between">
           {DepositOrWithdrawBlocks.map((block) => (
-            <NotaryBlock
-              key={block.title}
-              title={block.title}
-              value={block.value}
-            />
+            <Block key={block.title} title={block.title} value={block.value} />
           ))}
         </Flex>
         <Flex flexDir="column" gap="28px">
-          <NumberInput
-            minH="48px"
-            bg="gray.700"
-            maxW="576px"
-            value={value}
-            onChange={(value) => setValue(+value)}
-            placeholder="Amount"
-          >
-            <NumberInputField w="100%" h="100%" p="12px 16px" />
-          </NumberInput>
+          <InputGroup maxW="576px" minH="48px">
+            <NumberInput
+              w="100%"
+              bg="gray.700"
+              borderRadius="md"
+              value={value}
+              onChange={(value) => setValue(+value)}
+              placeholder="Amount"
+            >
+              <NumberInputField
+                w="100%"
+                h="100%"
+                p="12px 16px"
+                transition="all .3s"
+                _focusVisible={{
+                  boxShadow: "none",
+                  border: "1px solid",
+                  borderColor: "gray.300",
+                }}
+              />
+              <InputRightElement top="5px" right="13px">
+                <Badge
+                  letterSpacing="1px"
+                  bg="gray.800"
+                  p="2px 8px"
+                  textStyle="mediumText"
+                >
+                  FIL
+                </Badge>
+              </InputRightElement>
+            </NumberInput>
+          </InputGroup>
           <HStack spacing="20px">
             {DepositAndWithdrawButtons.map((btn) => (
               <Button

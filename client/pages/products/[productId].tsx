@@ -23,7 +23,7 @@ const Product: NextPage = () => {
   );
   return (
     <Layout pageTitle="Item">
-      <Flex flexDir="column" mt="60px">
+      <Flex flexDir="column">
         <Flex justifyContent="space-between">
           <Flex flexDir="column">
             {productItem?.image ? (
@@ -93,7 +93,7 @@ const Product: NextPage = () => {
               textStyle="button"
               bg="blue.primary"
               mt="39px"
-              borderRadius={0}
+              borderRadius="md"
               transition="all .3s"
               _hover={{ bg: "blue.hover" }}
             >
@@ -131,7 +131,7 @@ const Product: NextPage = () => {
               textStyle="button"
               transition="all .3s"
               _hover={{ bg: "blue.active" }}
-              borderRadius={0}
+              borderRadius="md"
             >
               buy now
             </Button>

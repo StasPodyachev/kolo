@@ -5,7 +5,7 @@ interface IProps {
   value: number | string;
 }
 
-const NotaryBlock = ({ title, value }: IProps) => {
+const Block = ({ title, value }: IProps) => {
   return (
     <Flex
       minW="220px"
@@ -31,4 +31,4 @@ const NotaryBlock = ({ title, value }: IProps) => {
   );
 };
 
-export default NotaryBlock;
+export default Block;

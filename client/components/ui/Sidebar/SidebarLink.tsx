@@ -1,6 +1,7 @@
 import { Box, HStack, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface IProps {
   icon: JSX.Element;
@@ -9,13 +10,15 @@ interface IProps {
 }
 
 const SidebarLink = ({ icon, title, to }: IProps) => {
+  const router = useRouter();
   return (
     <Link href={to}>
       <Box
         p="16px 18px"
-        borderRadius="2px"
+        borderRadius="md"
         transition="all .3s"
-        opacity={0.7}
+        opacity={router.pathname === to ? 1 : 0.7}
+        bg={router.pathname === to ? "gray.600" : "inherit"}
         _hover={{ bg: "gray.600", cursor: "pointer", opacity: 1 }}
         data-group
       >

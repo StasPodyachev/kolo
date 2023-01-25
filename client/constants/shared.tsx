@@ -9,9 +9,9 @@ import {
   INavlink,
   IAuctionItem,
   IBidsTableData,
-  INotaryBlocks,
+  IBlock,
   INotaryTableData,
-  IVotesParameters,
+  IVotesParameter,
   IVotesItem,
   IDepositAndWithdrawButton,
 } from "@/types";
@@ -139,7 +139,7 @@ export const BidsTableData: IBidsTableData[] = [
 
 export const NotaryTabs = ["Notary community", "My votes", "Deposit/Withdraw"];
 
-export const NotaryCommunityBlocks: INotaryBlocks[] = [
+export const NotaryCommunityBlocks: IBlock[] = [
   {
     title: "Active Notaries",
     value: 325,
@@ -173,7 +173,7 @@ export const NotaryTableData: INotaryTableData[] = [
   },
 ];
 
-export const NotaryVotesBlocks: INotaryBlocks[] = [
+export const NotaryVotesBlocks: IBlock[] = [
   {
     title: "Disputes waiting for Vote",
     value: 3,
@@ -192,7 +192,7 @@ export const NotaryVotesBlocks: INotaryBlocks[] = [
   },
 ];
 
-export const VotesParameters: IVotesParameters[] = [
+export const VotesParameters: IVotesParameter[] = [
   {
     title: "Price Start:",
     value: "10.0000 FIL",
@@ -215,7 +215,7 @@ export const VotesParameters: IVotesParameters[] = [
   },
 ];
 
-export const VotesBlockchain: IVotesParameters[] = [
+export const VotesBlockchain: IVotesParameter[] = [
   {
     title: "TX Create Item:",
     value: "0x671F...7891",
@@ -260,7 +260,7 @@ export const VotesItems: IVotesItem[] = [
   },
 ];
 
-export const DepositOrWithdrawBlocks: INotaryBlocks[] = [
+export const DepositOrWithdrawBlocks: IBlock[] = [
   {
     title: "My Status",
     value: "Active",
@@ -283,5 +283,45 @@ export const DepositAndWithdrawButtons: IDepositAndWithdrawButton[] = [
   {
     title: "withdraw",
     isDepositBtn: false,
+  },
+];
+
+export const DashboardTabs = ["My store", "My purchases"];
+
+export const MyStoreBlocks: IBlock[] = [
+  {
+    title: "Active Items",
+    value: 2,
+  },
+  {
+    title: "Wait to send payment",
+    value: 1,
+  },
+  {
+    title: "In Dispute",
+    value: "1",
+  },
+  {
+    title: "Total Revenue",
+    value: "FIL 54.3170",
+  },
+];
+
+export const MyPurchasesBlocks: IBlock[] = [
+  {
+    title: "Active bids",
+    value: 2,
+  },
+  {
+    title: "Wait to send payment",
+    value: 1,
+  },
+  {
+    title: "In Dispute",
+    value: 1,
+  },
+  {
+    title: "Locked in Bids",
+    value: "FIL 21.3170",
   },
 ];

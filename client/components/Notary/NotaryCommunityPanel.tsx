@@ -1,7 +1,7 @@
 import { NotaryCommunityBlocks } from "@/constants/shared";
 import { Flex, Heading, TabPanel, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
-import NotaryBlock from "./NotaryBlock";
+import Block from "../ui/Block";
 import NotaryTable from "./NotaryTable";
 
 const NotaryCommunityPanel: NextPage = () => {
@@ -10,7 +10,7 @@ const NotaryCommunityPanel: NextPage = () => {
       <Flex flexDir="column">
         <Flex justifyContent="space-between">
           {NotaryCommunityBlocks.map((block) => (
-            <NotaryBlock
+            <Block
               key={block.title}
               title={block.title}
               value={block.value}
