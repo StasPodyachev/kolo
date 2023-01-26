@@ -15,6 +15,7 @@ const Block = ({ title, value }: IProps) => {
       borderColor="gray.700"
     >
       <Heading
+        fontFamily={typeof value === "number" ? "Roboto Mono" : "inherit"}
         color={
           title === "My Status"
             ? "green.secondaryDark"
@@ -24,7 +25,13 @@ const Block = ({ title, value }: IProps) => {
         }
         variant="h4"
       >
-        {value}
+        {title.toLowerCase().includes("balance") ||
+        title.toLowerCase().includes("total") ||
+        title.toLowerCase().includes("locked") ? (
+          <Text>FIL&nbsp;{value}</Text>
+        ) : (
+          value
+        )}
       </Heading>
       <Text color="gray.500">{title}</Text>
     </Flex>

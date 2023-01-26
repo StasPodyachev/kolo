@@ -7,7 +7,7 @@ export interface INavlink {
 export interface IAuctionItem {
   id: number;
   title: string;
-  price: string;
+  price: number;
   ownedBy: string;
   saleEndDate: string;
   currentPrice: number;
@@ -39,18 +39,12 @@ export interface IVotesParameter {
   value: string;
 };
 
-export interface IVotesItem {
-  image?: string;
-  title: string;
-  address: string;
-  lastPrice: number;
-  bids: number;
-  saleEnds: string;
-  description: string;
-  isFirstItem: boolean;
-};
-
 export interface IDepositAndWithdrawButton {
   title: string;
   isDepositBtn: boolean;
+}
+
+export interface FaqAccordionItem {
+  title: string;
+  description: string;
 }

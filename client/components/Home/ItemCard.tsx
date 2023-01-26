@@ -5,6 +5,7 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon } from "@/icons";
 import Link from "next/link";
 import { addressTruncation } from "@/helpers";
+import AddressCopy from "../ui/AddressCopy";
 
 interface IProps {
   to: number;
@@ -49,17 +50,23 @@ const ItemCard = ({
               <Text textStyle="bigText" color="gray.900">
                 {title}
               </Text>
-              <Text textStyle="bigText" color="gray.900">
-                {price}
+              <Text
+                fontFamily="Roboto Mono"
+                textStyle="bigText"
+                color="gray.900"
+              >
+                {price}&nbsp;FIL
               </Text>
             </Flex>
             <Flex justifyContent="space-between">
               <Text textStyle="smallText" color="gray.300">
                 Owned by
               </Text>
-              <Text textStyle="smallText" color="gray.300">
-                {addressTruncation(ownedBy)}
-              </Text>
+              <AddressCopy
+                address={ownedBy}
+                textStyle="smallText"
+                color="gray.300"
+              />
             </Flex>
             <Flex
               justifyContent="space-between"

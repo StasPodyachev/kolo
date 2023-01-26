@@ -12,8 +12,8 @@ import {
   IBlock,
   INotaryTableData,
   IVotesParameter,
-  IVotesItem,
   IDepositAndWithdrawButton,
+  FaqAccordionItem,
 } from "@/types";
 
 export const navLinks: INavlink[] = [
@@ -48,7 +48,7 @@ export const auctionItems: IAuctionItem[] = [
   {
     id: 1,
     title: "Tree planting plan",
-    price: "32 FIL",
+    price: 32,
     ownedBy: "0x9D21...7a88",
     saleEndDate: "28 Feb 2023",
     currentPrice: 300,
@@ -61,7 +61,7 @@ export const auctionItems: IAuctionItem[] = [
   {
     id: 2,
     title: "Tree planting plan",
-    price: "40 FIL",
+    price: 40,
     ownedBy: "0x9D21...7a88",
     saleEndDate: "25 Feb 2023",
     currentPrice: 300,
@@ -74,7 +74,7 @@ export const auctionItems: IAuctionItem[] = [
   {
     id: 3,
     title: "Tree planting plan",
-    price: "10 FIL",
+    price: 10,
     ownedBy: "0x9D21...7a88",
     saleEndDate: "27 Feb 2023",
     currentPrice: 300,
@@ -87,7 +87,7 @@ export const auctionItems: IAuctionItem[] = [
   {
     id: 4,
     title: "Tree planting plan",
-    price: "14 FIL",
+    price: 14,
     ownedBy: "0x9D21...7a88",
     saleEndDate: "28 Feb 2023",
     currentPrice: 300,
@@ -100,7 +100,7 @@ export const auctionItems: IAuctionItem[] = [
   {
     id: 5,
     title: "Tree planting plan",
-    price: "7 FIL",
+    price: 7,
     ownedBy: "0x9D21...7a88",
     saleEndDate: "22 Feb 2023",
     currentPrice: 300,
@@ -113,7 +113,7 @@ export const auctionItems: IAuctionItem[] = [
   {
     id: 6,
     title: "Tree planting plan",
-    price: "11 FIL",
+    price: 11,
     ownedBy: "0x9D21...7a88",
     saleEndDate: "20 Feb 2023",
     currentPrice: 300,
@@ -160,7 +160,7 @@ export const NotaryCommunityBlocks: IBlock[] = [
   },
   {
     title: "Notary Balance",
-    value: "FIL 1.3170",
+    value: 1.317,
   },
 ];
 
@@ -194,7 +194,7 @@ export const NotaryVotesBlocks: IBlock[] = [
   },
   {
     title: "Notary Balance",
-    value: "FIL 1.3170",
+    value: 1.317,
   },
 ];
 
@@ -244,28 +244,6 @@ export const VotesBlockchain: IVotesParameter[] = [
   },
 ];
 
-export const VotesItems: IVotesItem[] = [
-  {
-    title: "Tree planting plan",
-    address: "0xh567...55",
-    lastPrice: 32.0574,
-    bids: 18,
-    saleEnds: "28 Feb 2023",
-    description: "Tree planting plan",
-    isFirstItem: true,
-  },
-  {
-    title: "Idea for new DeFi MVP",
-    address: "0xh347...88",
-    lastPrice: 21.0342,
-    bids: 2,
-    saleEnds: "27 Feb 2023",
-    description:
-      "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
-    isFirstItem: false,
-  },
-];
-
 export const DepositOrWithdrawBlocks: IBlock[] = [
   {
     title: "My Status",
@@ -273,11 +251,11 @@ export const DepositOrWithdrawBlocks: IBlock[] = [
   },
   {
     title: "My Notary Balance",
-    value: "FIL 1.3170",
+    value: 1.317,
   },
   {
     title: "Min Notary Balance",
-    value: "FIL 1.0000",
+    value: 1.0,
   },
 ];
 
@@ -309,7 +287,7 @@ export const MyStoreBlocks: IBlock[] = [
   },
   {
     title: "Total Revenue",
-    value: "FIL 54.3170",
+    value: 54.317,
   },
 ];
 
@@ -328,7 +306,7 @@ export const MyPurchasesBlocks: IBlock[] = [
   },
   {
     title: "Locked in Bids",
-    value: "FIL 21.3170",
+    value: 21.317,
   },
 ];
 
@@ -337,4 +315,17 @@ export const SaleTypeMenuItems = [
   "AUCTION OF LIVEPEER",
   "AUCTION OF HUDDLE",
   "SIMPLE TRADES OF FILES",
+];
+
+export const FaqAccodionItems: FaqAccordionItem[] = [
+  {
+    title: "Who are we?",
+    description:
+      "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illo voluptate facilis error vel molestias quasi modi cumque laboriosam architecto totam! Recusandae commodi veniam, nesciunt vitae expedita quasi. Aspernatur, reprehenderit suscipit. Nisi enim vel rerum libero asperiores voluptatum saepe, ea consequatur dolorem! Aliquid molestias quo veniam dicta ducimus soluta atque commodi id, sapiente distinctio, saepe asperiores adipisci maiores eaque itaque ratione. Nesciunt repudiandae fugit vel deleniti error sapiente suscipit debitis, similique quidem illum quo porro perferendis eligendi sequi quasi nam modi pariatur! Nostrum asperiores similique aliquam, animi nemo accusamus impedit aliquid?",
+  },
+  {
+    title: "Why should you choose exactly KOLO?",
+    description:
+      "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illo voluptate facilis error vel molestias quasi modi cumque laboriosam architecto totam! Recusandae commodi veniam, nesciunt vitae expedita quasi. Aspernatur, reprehenderit suscipit. Nisi enim vel rerum libero asperiores voluptatum saepe, ea consequatur dolorem! Aliquid molestias quo veniam dicta ducimus soluta atque commodi id, sapiente distinctio, saepe asperiores adipisci maiores eaque itaque ratione. Nesciunt repudiandae fugit vel deleniti error sapiente suscipit debitis, similique quidem illum quo porro perferendis eligendi sequi quasi nam modi pariatur! Nostrum asperiores similique aliquam, animi nemo accusamus impedit aliquid?",
+  },
 ];

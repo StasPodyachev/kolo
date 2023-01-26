@@ -1,11 +1,11 @@
 import { NextPage } from "next";
-import { Heading } from "@chakra-ui/react";
 import Layout from "@/components/Layout";
+import FaqAccordion from "@/components/Faq/FaqAccordion";
 
 const FAQ: NextPage = () => {
   return (
     <Layout pageTitle="FAQ">
-      <Heading>FAQ</Heading>
+      <FaqAccordion />
     </Layout>
   );
 };

@@ -9,6 +9,8 @@ import {
   HStack,
   Button,
   Badge,
+  useClipboard,
+  Tooltip,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { auctionItems } from "@/constants/shared";
@@ -16,12 +18,14 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import BidsTable from "@/components/Products/BidsTable";
 import { addressTruncation } from "@/helpers";
+import AddressCopy from "@/components/ui/AddressCopy";
 
 const Product: NextPage = () => {
   const router = useRouter();
   const productItem = auctionItems.find(
     (item) => item.id.toString() === router.query.productId
   );
+  const { onCopy, value, setValue, hasCopied } = useClipboard("");
   return (
     <Layout pageTitle="Item">
       <Flex flexDir="column">
@@ -70,15 +74,13 @@ const Product: NextPage = () => {
               <Text textStyle="mediumText" color="gray.500">
                 Owned by:
               </Text>
-              <Text textStyle="mediumText" color="gray.500">
-                {addressTruncation(productItem?.ownedBy!)}
-              </Text>
+              <AddressCopy address={productItem?.ownedBy!} color="gray.500" />
             </HStack>
             <Flex justifyContent="space-between" mt="6px">
               <Heading variant="h6" color="gray.200">
                 Current price
               </Heading>
-              <Heading variant="h6" color="gray.200">
+              <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
                 {productItem?.currentPrice}&nbsp;FIL
               </Heading>
             </Flex>
@@ -86,7 +88,7 @@ const Product: NextPage = () => {
               <Heading variant="h6" color="gray.200">
                 Price end
               </Heading>
-              <Heading variant="h6" color="gray.200">
+              <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
                 {productItem?.priceEnd}&nbsp;FIL
               </Heading>
             </Flex>
@@ -157,9 +159,7 @@ const Product: NextPage = () => {
             bg="gray.800"
             p="32px 24px"
           >
-            <Text color="gray.50">
-              {addressTruncation(productItem?.ownedBy!)}:
-            </Text>
+            <AddressCopy address={productItem?.ownedBy!} color="gray.50" />
             <Text textStyle="smallText" color="gray.400">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras
               pulvinar commodo lacus eu dapibus. Aliquam vestibulum, lectus at
