@@ -1,6 +1,6 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import Sidebar from "../ui/Sidebar";
-import ManageBar from "../ManageBar/ManageBar";
+import ManageBar from "../ManageBar";
 
 interface IProps {
   children: JSX.Element;
@@ -16,7 +16,7 @@ const Layout = ({ children, pageTitle }: IProps) => {
           <Heading variant="h3">{pageTitle}</Heading>
           <ManageBar />
         </Flex>
-        {children}
+        <Box mt="60px">{children}</Box>
       </Box>
     </Flex>
   );

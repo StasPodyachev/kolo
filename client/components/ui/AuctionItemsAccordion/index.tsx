@@ -19,8 +19,9 @@ import {
   VotesItems,
   VotesParameters,
 } from "@/constants/shared";
+import { addressTruncation } from "@/helpers";
 
-const MyVotesAccordion: NextPage = () => {
+const AuctionItemAccordion: NextPage = () => {
   const { onCopy, hasCopied } = useClipboard("");
   return (
     <Accordion allowMultiple mt="16px">
@@ -61,7 +62,7 @@ const MyVotesAccordion: NextPage = () => {
                       title={hasCopied ? "Copied" : "Copy"}
                     >
                       <Text textStyle="smallText" color="gray.300">
-                        CID:&nbsp;{item.address}
+                        CID:&nbsp;{addressTruncation(item.address)}
                       </Text>
                       <CopyIcon onClick={onCopy} boxSize="16px" />
                     </Flex>
@@ -87,13 +88,13 @@ const MyVotesAccordion: NextPage = () => {
               </Flex>
             </Flex>
           </AccordionButton>
-          <AccordionPanel bg="white" p="16px 20px 18px 36px">
-            <Text textStyle="smallText" color="gray.700">
+          <AccordionPanel bg="inherit" p="16px 20px 18px 36px">
+            <Text textStyle="smallText" color="white">
               Description:&nbsp;{item.description}
             </Text>
             <Flex mt="20px" justifyContent="space-between">
               <Flex flexDir="column" gap="20px">
-                <Text textStyle="bigText" color="gray.700">
+                <Text textStyle="bigText" color="white">
                   Parameters
                 </Text>
                 <Flex flexDir="column" gap="7px" minW="225px">
@@ -103,10 +104,10 @@ const MyVotesAccordion: NextPage = () => {
                       justifyContent="space-between"
                       w="100%"
                     >
-                      <Text textStyle="smallText" color="gray.700">
+                      <Text textStyle="smallText" color="white">
                         {param.title}
                       </Text>
-                      <Text textStyle="smallText" color="gray.700">
+                      <Text textStyle="smallText" color="white">
                         {param.value}
                       </Text>
                     </Flex>
@@ -114,7 +115,7 @@ const MyVotesAccordion: NextPage = () => {
                 </Flex>
               </Flex>
               <Flex flexDir="column" gap="20px">
-                <Text textStyle="bigText" color="gray.700">
+                <Text textStyle="bigText" color="white">
                   Blockchain
                 </Text>
                 <Flex flexDir="column" gap="7px" minW="225px">
@@ -124,11 +125,11 @@ const MyVotesAccordion: NextPage = () => {
                       justifyContent="space-between"
                       w="100%"
                     >
-                      <Text textStyle="smallText" color="gray.700">
+                      <Text textStyle="smallText" color="white">
                         {block.title}
                       </Text>
-                      <Text textStyle="smallText" color="gray.700">
-                        {block.value}
+                      <Text textStyle="smallText" color="white">
+                        {addressTruncation(block.value)}
                       </Text>
                     </Flex>
                   ))}
@@ -152,4 +153,4 @@ const MyVotesAccordion: NextPage = () => {
   );
 };
 
-export default MyVotesAccordion;
+export default AuctionItemAccordion;

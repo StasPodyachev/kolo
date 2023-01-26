@@ -1,11 +1,17 @@
 import { NextPage } from "next";
-import { Heading } from "@chakra-ui/react";
 import Layout from "@/components/Layout";
+import { DashboardTabs } from "@/constants/shared";
+import Tabs from "@/components/ui/Tabs";
+import MyPurchasesPanel from "@/components/Dashboard/MyPurchasesPanel";
+import MyStorePanel from "@/components/Dashboard/MyStorePanel";
 
 const Dashboard: NextPage = () => {
   return (
     <Layout pageTitle="Dashboard">
-      <Heading>Dashboard</Heading>
+      <Tabs tabs={DashboardTabs}>
+        <MyStorePanel />
+        <MyPurchasesPanel />
+      </Tabs>
     </Layout>
   );
 };

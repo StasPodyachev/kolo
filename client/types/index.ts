@@ -15,6 +15,7 @@ export interface IAuctionItem {
   image?: string;
   description: string;
   status: string;
+  totalBids: number;
 };
 
 export interface IBidsTableData {
@@ -23,7 +24,7 @@ export interface IBidsTableData {
   bid: number;
 };
 
-export interface INotaryBlocks {
+export interface IBlock {
   title: string;
   value: number | string;
 };
@@ -33,7 +34,7 @@ export interface INotaryTableData {
   balance: number;
 };
 
-export interface IVotesParameters {
+export interface IVotesParameter {
   title: string;
   value: string;
 };
