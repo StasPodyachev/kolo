@@ -10,6 +10,8 @@ contract Store is IStore, Ownable {
     mapping(uint256 => address) private deals;
     mapping(uint256 => mapping(address => uint256)) private buyers;
     mapping(uint256 => uint256) private sellerCollaterals;
+    mapping(uint256 => uint256) private buyerCollaterals;
+
     mapping(bytes => mapping(address => bool)) private accsess;
 
     function createDeal(uint256 dealId) external payable {
@@ -21,10 +23,37 @@ contract Store is IStore, Ownable {
         buyers[dealId][buyer] += msg.value;
     }
 
-    function withdrawBuyer(uint256 dealId, address buyer) external {
-        // TODO: security
-        // TODO: Transfer
+    function depositBuyerCollateral(uint256 dealId) external payable {
+        buyerCollaterals[dealId] = msg.value;
+    }
 
+    function transferSellerCollateral(uint256 dealId, address to)
+        external
+        returns (uint256)
+    {
+        // TODO: Security
+        payable(to).transfer(sellerCollaterals[dealId]);
+
+        return sellerCollaterals[dealId];
+    }
+
+    function transferBuyerCollateral(uint256 dealId, address to)
+        external
+        returns (uint256)
+    {
+        // TODO: Security
+        payable(to).transfer(buyerCollaterals[dealId]);
+
+        return buyerCollaterals[dealId];
+    }
+
+    function transfer(
+        uint256 dealId,
+        address buyer,
+        address to
+    ) external {
+        // TODO: security
+        payable(to).transfer(buyers[dealId][buyer]);
         buyers[dealId][buyer] = 0;
     }
 

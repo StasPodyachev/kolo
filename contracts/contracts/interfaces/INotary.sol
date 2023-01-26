@@ -10,5 +10,7 @@ interface INotary {
 
     function penalty() external;
 
-    function chooseNotary() external;
+    function chooseNotaries(uint256 dealId) external;
+
+    function disputResult(uint256 dealId) external returns (uint8 result);
 }

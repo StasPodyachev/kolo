@@ -6,9 +6,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IAuctionFile.sol";
 import "./interfaces/IStore.sol";
 import "./interfaces/IFactory.sol";
+import "./interfaces/INotary.sol";
 
 contract AuctionFile is IAuctionFile, Ownable {
     IFactory public _factory;
+    INotary public _notary;
 
     uint256 public _periodDelivery = 2 days;
     uint256 public _periodDispute = 5 days;
@@ -39,6 +41,10 @@ contract AuctionFile is IAuctionFile, Ownable {
 
     function setFactory(address factory) external onlyOwner {
         _factory = IFactory(factory);
+    }
+
+    function setNotary(address notary) external onlyOwner {
+        _notary = INotary(notary);
     }
 
     function create(
@@ -175,16 +181,65 @@ contract AuctionFile is IAuctionFile, Ownable {
         );
 
         address storeAddress = _factory.getStore(deal.seller);
-        IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
+        IStore(storeAddress).depositBuyerCollateral{value: msg.value}(dealId);
 
         deal.status = AuctionStatus.DISPUTE;
 
-        // choose notary
+        _notary.chooseNotaries(dealId);
     }
 
-    function finalizeDeal(uint256 dealId) external {}
+    function finalizeDeal(uint256 dealId) external {
+        AuctionFileParams memory deal = deals[dealId];
+        require(deal.priceStart != 0, "AuctionFile: Id not found");
 
-    function finalizeDispute(uint256 dealId) external {}
+        require(
+            block.timestamp >
+                deal.dateExpire + _periodDispute + _periodDelivery,
+            "AuctionFile: "
+        );
+
+        address storeAddress = _factory.getStore(deal.seller);
+        IStore store = IStore(storeAddress);
+
+        store.transferSellerCollateral(dealId, deal.seller);
+        store.transfer(dealId, deal.seller, deal.buyer);
+
+        //_returnBids(dealId); ?
+
+        deal.status = AuctionStatus.CLOSE;
+    }
+
+    function finalizeDispute(uint256 dealId) external {
+        AuctionFileParams memory deal = deals[dealId];
+        require(deal.priceStart != 0, "AuctionFile: Id not found");
+
+        require(
+            deal.status == AuctionStatus.DISPUTE,
+            "AuctionFile: Wrong status"
+        );
+
+        uint8 result = _notary.disputResult(dealId);
+
+        require(result > 0, "AuctionFile: Disput is not finished");
+
+        address storeAddress = _factory.getStore(deal.seller);
+        IStore store = IStore(storeAddress);
+
+        if (result == 1) {
+            // Buyer win
+            store.transferBuyerCollateral(dealId, deal.buyer);
+            store.transfer(dealId, deal.buyer, deal.buyer);
+        } else {
+            // Buyer lose
+            // reutrn colletoral Seller
+            store.transferSellerCollateral(dealId, deal.seller);
+            store.transfer(dealId, deal.seller, deal.buyer);
+        }
+
+        deal.status = AuctionStatus.CLOSE;
+    }
 
     function finalizeForce(uint256 dealId) external {}
+
+    function _returnBids(uint256 dealId) internal {}
 }
