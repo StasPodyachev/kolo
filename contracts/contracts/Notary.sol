@@ -19,12 +19,15 @@ contract Notary is Ownable {
         _conensusCount = value;
     }
 
-    function setCountInvaitedNotary(uint256 value) external payable onlyOwner {
+    function setCountInvitedNotary(uint256 value) external payable onlyOwner {
         _countInvaitedNotary = value;
     }
 
     function deposit() external payable {
-        require(msg.value >= _minDeposit, "Notary: deposit is not enough");
+        require(
+            notaries[msg.sender] + msg.value >= _minDeposit,
+            "Notary: deposit is not enough"
+        );
 
         notaries[msg.sender] += msg.value;
     }

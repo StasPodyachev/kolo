@@ -10,6 +10,7 @@ contract Store is IStore, Ownable {
     mapping(uint256 => address) private deals;
     mapping(uint256 => mapping(address => uint256)) private buyers;
     mapping(uint256 => uint256) private sellerCollaterals;
+    mapping(bytes => mapping(address => uint256)) private accsess;
 
     function createDeal(uint256 dealId) external payable {
         deals[dealId] = msg.sender;
@@ -26,4 +27,6 @@ contract Store is IStore, Ownable {
 
         buyers[dealId][buyer] = 0;
     }
+
+    function checkAccsess(uint256 dealId, address buyer) external payable {}
 }
