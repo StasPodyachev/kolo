@@ -10,16 +10,19 @@ const NotaryCommunityPanel: NextPage = () => {
       <Flex flexDir="column">
         <Flex justifyContent="space-between">
           {NotaryCommunityBlocks.map((block) => (
-            <Block
-              key={block.title}
-              title={block.title}
-              value={block.value}
-            />
+            <Block key={block.title} title={block.title} value={block.value} />
           ))}
         </Flex>
         <Flex mt="28px" justifyContent="space-between" alignItems="center">
           <Heading variant="h3">List of Notaries</Heading>
-          <Heading variant="h6">20/325</Heading>
+          <Heading
+            fontFamily="Roboto Mono"
+            variant="h6"
+            pos="relative"
+            top="2px"
+          >
+            20/325
+          </Heading>
         </Flex>
         <NotaryTable />
       </Flex>

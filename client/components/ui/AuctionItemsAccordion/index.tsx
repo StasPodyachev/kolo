@@ -8,30 +8,33 @@ import {
   Flex,
   HStack,
   Text,
-  useClipboard,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
-import { CopyIcon } from "@/icons";
 import {
+  auctionItems,
   VotesBlockchain,
-  VotesItems,
   VotesParameters,
 } from "@/constants/shared";
-import { addressTruncation } from "@/helpers";
+import AddressCopy from "../AddressCopy";
+import Link from "next/link";
+import { useState } from "react";
 
 const AuctionItemAccordion: NextPage = () => {
-  const { onCopy, hasCopied } = useClipboard("");
+  const [accordionIndex, setAccordionIndex] = useState(-1);
+  const [numberOfClicks, setNumberOfClicks] = useState(0);
   return (
-    <Accordion allowMultiple mt="16px">
-      {VotesItems.map((item) => (
+    <Accordion mt="16px" index={accordionIndex}>
+      {auctionItems.map((item) => (
         <AccordionItem
-          key={item.address}
-          border={0}
-          mt={item.isFirstItem ? 0 : "34px"}
+          border="1px solid"
+          borderColor="gray.800"
+          key={item.id}
+          _first={{ mt: 0 }}
+          _notFirst={{ mt: "34px" }}
         >
-          <AccordionButton border="1px solid" borderColor="gray.800" p={0}>
+          <Link href={`/products/${item.id}`}>
             <Flex w="100%" alignItems="center">
               {item.image ? (
                 <Image
@@ -55,16 +58,15 @@ const AuctionItemAccordion: NextPage = () => {
                 <Flex justifyContent="space-between" w="100%">
                   <Flex flexDir="column" gap="8px">
                     <Text>{item.title}</Text>
-                    <Flex
-                      gap="8px"
-                      alignItems="center"
-                      cursor="pointer"
-                      title={hasCopied ? "Copied" : "Copy"}
-                    >
+                    <Flex>
                       <Text textStyle="smallText" color="gray.300">
-                        CID:&nbsp;{addressTruncation(item.address)}
+                        CID:&nbsp;
                       </Text>
-                      <CopyIcon onClick={onCopy} boxSize="16px" />
+                      <AddressCopy
+                        address={item.ownedBy}
+                        textStyle="smallText"
+                        color="gray.300"
+                      />
                     </Flex>
                   </Flex>
                   <Flex flexDir="column" gap="8px">
@@ -72,22 +74,62 @@ const AuctionItemAccordion: NextPage = () => {
                       <Text textStyle="smallText" color="gray.300">
                         Last price
                       </Text>
-                      <Text textStyle="bigText">{item.lastPrice}&nbsp;FIL</Text>
+                      <Text fontFamily="Roboto Mono" textStyle="bigText">
+                        {item.currentPrice}&nbsp;FIL
+                      </Text>
                     </HStack>
                     <HStack spacing="24px">
-                      <Text textStyle="smallText" color="gray.300">
-                        Bids:&nbsp;{item.bids}
-                      </Text>
-                      <Text textStyle="smallText" color="gray.300">
-                        Sale ends: {item.saleEnds}
-                      </Text>
+                      <Flex>
+                        <Text textStyle="smallText" color="gray.300">
+                          Bids:&nbsp;
+                        </Text>
+                        <Text
+                          fontFamily="Roboto Mono"
+                          textStyle="smallText"
+                          color="gray.300"
+                        >
+                          {item.totalBids}
+                        </Text>
+                      </Flex>
+                      <Flex>
+                        <Text textStyle="smallText" color="gray.300">
+                          Sale ends:&nbsp;
+                        </Text>
+                        <Text
+                          fontFamily="Roboto Mono"
+                          textStyle="smallText"
+                          color="gray.300"
+                        >
+                          {item.saleEndDate}
+                        </Text>
+                      </Flex>
                     </HStack>
                   </Flex>
                 </Flex>
-                <AccordionIcon ml="36px" boxSize="36px" />
+                <AccordionButton
+                  cursor="pointer"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setNumberOfClicks(1);
+                    setAccordionIndex(item.id - 1);
+                    if (numberOfClicks % 2 === 1) {
+                      if (item.id !== accordionIndex + 1) {
+                        setAccordionIndex(item.id - 1);
+                        setNumberOfClicks(1);
+                      } else {
+                        setNumberOfClicks(0);
+                        setAccordionIndex(-1);
+                      }
+                    }
+                  }}
+                  p={0}
+                  w="max-content"
+                >
+                  <AccordionIcon ml="36px" boxSize="36px" />
+                </AccordionButton>
               </Flex>
             </Flex>
-          </AccordionButton>
+          </Link>
           <AccordionPanel bg="inherit" p="16px 20px 18px 36px">
             <Text textStyle="smallText" color="white">
               Description:&nbsp;{item.description}
@@ -107,7 +149,11 @@ const AuctionItemAccordion: NextPage = () => {
                       <Text textStyle="smallText" color="white">
                         {param.title}
                       </Text>
-                      <Text textStyle="smallText" color="white">
+                      <Text
+                        fontFamily="Roboto Mono"
+                        textStyle="smallText"
+                        color="white"
+                      >
                         {param.value}
                       </Text>
                     </Flex>
@@ -128,9 +174,10 @@ const AuctionItemAccordion: NextPage = () => {
                       <Text textStyle="smallText" color="white">
                         {block.title}
                       </Text>
-                      <Text textStyle="smallText" color="white">
-                        {addressTruncation(block.value)}
-                      </Text>
+                      <AddressCopy
+                        address={block.value}
+                        textStyle="smallText"
+                      />
                     </Flex>
                   ))}
                 </Flex>

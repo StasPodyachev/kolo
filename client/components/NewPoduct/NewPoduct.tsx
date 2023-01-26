@@ -16,6 +16,11 @@ const CustomInput = chakra(Input, {
     _placeholder: {
       color: "white",
     },
+    _focusVisible: {
+      boxShadow: "none",
+      border: "1px solid",
+      borderColor: "gray.300",
+    },
   },
 });
 

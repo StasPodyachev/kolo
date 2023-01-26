@@ -2,6 +2,7 @@ import { BidsTableData } from "@/constants/shared";
 import { addressTruncation, numberWithCommas } from "@/helpers";
 import { Table, TableContainer, Tbody, Td, Tr } from "@chakra-ui/react";
 import { NextPage } from "next";
+import AddressCopy from "../ui/AddressCopy";
 
 const BidsTable: NextPage = () => {
   return (
@@ -10,11 +11,13 @@ const BidsTable: NextPage = () => {
         <Tbody>
           {BidsTableData.map((item) => (
             <Tr key={item.bid}>
-              <Td pl={0}>{addressTruncation(item.address)}</Td>
+              <Td pl={0}>
+                <AddressCopy address={item.address} />
+              </Td>
               <Td textStyle="smallText" color="gray.300">
                 {item.date}
               </Td>
-              <Td pr={0} isNumeric>
+              <Td fontFamily="Roboto Mono" pr={0} isNumeric>
                 {numberWithCommas(item.bid)}&nbsp;FIL
               </Td>
             </Tr>

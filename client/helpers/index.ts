@@ -3,7 +3,9 @@ export function numberWithCommas(x: number) {
 };
 
 export function addressTruncation(address: string) {
-  const leftSide = address.slice(0, 4);
-  const rightSide = address.slice(-4);
-  return [leftSide, rightSide].join('....');
+  if (address) {
+    const leftSide = address.slice(0, 4);
+    const rightSide = address.slice(-4);
+    return [leftSide, rightSide].join('....');
+  }
 };
