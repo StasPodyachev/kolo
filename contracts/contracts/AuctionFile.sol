@@ -12,6 +12,7 @@ contract AuctionFile is IAuctionFile, Ownable {
 
     uint256 public _periodDelivery = 2 days;
     uint256 public _periodDispute = 5 days;
+
     uint256 public _colletoralAmount = 1e17;
     uint256 public _colletoralPercent = 1e17;
 
@@ -83,6 +84,8 @@ contract AuctionFile is IAuctionFile, Ownable {
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
 
+        // Add accsess
+
         emit DealCreated(dealId, msg.sender);
     }
 
@@ -103,7 +106,7 @@ contract AuctionFile is IAuctionFile, Ownable {
 
         uint256 currentBid = bids[dealId][msg.sender] + msg.value;
 
-        require(currentBid >= deal.priceStart, "AuctionFile: Wromg amount");
+        require(currentBid >= deal.priceStart, "AuctionFile: Wrong amount");
 
         require(
             currentBid > deal.price,
@@ -147,6 +150,11 @@ contract AuctionFile is IAuctionFile, Ownable {
         AuctionFileParams memory deal = deals[dealId];
 
         require(deal.priceStart != 0, "AuctionFile: Id not found");
+
+        if (block.timestamp >= deal.dateExpire) {
+            deal.status = AuctionStatus.FINALIZE;
+        } else if (deal.status != AuctionStatus.FINALIZE) revert();
+
         require(deal.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
         require(
             block.timestamp <
@@ -172,10 +180,7 @@ contract AuctionFile is IAuctionFile, Ownable {
         // choose notary
     }
 
-    function finalizeDeal(uint256 dealId) external {
-        AuctionFileParams memory deal = deals[dealId];
-        deal.status = AuctionStatus.FINALIZE;
-    }
+    function finalizeDeal(uint256 dealId) external {}
 
     function finalizeDispute(uint256 dealId) external {}
 
