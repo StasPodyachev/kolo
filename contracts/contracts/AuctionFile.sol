@@ -104,6 +104,8 @@ contract AuctionFile is IAuctionFile, Ownable {
             "AuctionFile: Seller cannot be a buyer"
         );
 
+        require(block.timestamp < deal.dateExpire, "AuctionFile: Time is up");
+
         uint256 currentBid = bids[dealId][msg.sender] + msg.value;
 
         require(currentBid >= deal.priceStart, "AuctionFile: Wrong amount");
