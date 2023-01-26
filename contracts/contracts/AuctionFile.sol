@@ -110,8 +110,6 @@ contract AuctionFile is IAuctionFile, Ownable {
             "AuctionFile: Current bid cannot be less then previous bid"
         );
 
-        //check priceForceStop
-
         address storeAddress = _factory.getStore(deal.seller);
         IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
@@ -121,7 +119,9 @@ contract AuctionFile is IAuctionFile, Ownable {
         bids[dealId][msg.sender] = currentBid;
 
         if (currentBid >= deal.priceForceStop) {
-            this.finalizeForce(dealId);
+            // this.finalizeForce(dealId);
+
+            deal.status = AuctionStatus.FINALIZE;
         }
     }
 
@@ -172,7 +172,10 @@ contract AuctionFile is IAuctionFile, Ownable {
         // choose notary
     }
 
-    function finalizeDeal(uint256 dealId) external {}
+    function finalizeDeal(uint256 dealId) external {
+        AuctionFileParams memory deal = deals[dealId];
+        deal.status = AuctionStatus.FINALIZE;
+    }
 
     function finalizeDispute(uint256 dealId) external {}
 

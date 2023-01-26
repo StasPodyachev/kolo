@@ -43,8 +43,8 @@ interface IAuctionFile {
         uint256 priceStart,
         uint256 priceForceStop,
         uint256 dateExpire,
-        uint256 cid,
-        uint256 cidThumbnail
+        bytes calldata cid,
+        bytes calldata cidThumbnail
     ) external payable returns (uint256 dealId);
 
     function bid(uint256 dealId) external payable;
