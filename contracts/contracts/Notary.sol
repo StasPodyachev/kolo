@@ -89,14 +89,14 @@ contract Notary is Ownable {
         }
 
         if (
-            votesPositive[dealId].length + votesNegative[dealId].length ==
-            _consensusCount
+            votesPositive[dealId].length == _consensusCount ||
+            votesNegative[dealId].length == _consensusCount
         ) {
             address seller = address(0);
             address storeAddress = _factory.getStore(seller);
             IStore store = IStore(storeAddress);
 
-            if (votesPositive[dealId].length > votesNegative[dealId].length) {
+            if (votesPositive[dealId].length == _consensusCount) {
                 // buyer win
                 // collatoral seller to notary
                 uint256 collateral = store.getSellerCollateral(dealId);
@@ -113,7 +113,10 @@ contract Notary is Ownable {
                     penaltyByDeal[dealId] *
                     votesNegative[dealId].length +
                     (collateral - reward * votesPositive[dealId].length);
-            } else {
+
+                store.transferBuyerCollateral(dealId, deal.buyer);
+                store.transfer(dealId, deal.buyer, deal.buyer);
+            } else if (votesNegative[dealId].length == _consensusCount) {
                 // buyer loses
                 // collatoral buyer to notary
                 uint256 collateral = store.getBuyerCollateral(dealId);
@@ -130,21 +133,30 @@ contract Notary is Ownable {
                     penaltyByDeal[dealId] *
                     votesPositive[dealId].length +
                     (collateral - reward * votesNegative[dealId].length);
+
+                store.transferSellerCollateral(dealId, deal.seller);
+                store.transfer(dealId, deal.seller, deal.buyer);
             }
+
+            deal.status = AuctionStatus.CLOSE;
         }
     }
 
-    function disputResult(uint256 dealId) external view returns (uint8 result) {
-        if (
-            votesPositive[dealId].length + votesNegative[dealId].length ==
-            _consensusCount
-        ) {
-            return
-                votesPositive[dealId].length > votesNegative[dealId].length
-                    ? 1
-                    : 2;
-        }
-    }
+    // function getDisputResult(uint256 dealId)
+    //     external
+    //     view
+    //     returns (uint8 result)
+    // {
+    //     if (
+    //         votesPositive[dealId].length + votesNegative[dealId].length ==
+    //         _consensusCount
+    //     ) {
+    //         return
+    //             votesPositive[dealId].length > votesNegative[dealId].length
+    //                 ? 1
+    //                 : 2;
+    //     }
+    // }
 
     function penalty(address notary) external payable {}
 
