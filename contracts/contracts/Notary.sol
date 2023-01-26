@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 import "./interfaces/INotary.sol";
 import "./interfaces/IStore.sol";
 import "./interfaces/IFactory.sol";
+import "./interfaces/IIntegration.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -11,11 +12,10 @@ contract Notary is Ownable {
     IFactory public _factory;
 
     mapping(address => uint256) private deposits;
-    // mapping(address => uint256) private freezes;
     mapping(uint256 => uint256) private penaltyByDeal;
     mapping(uint256 => mapping(address => bool)) private notaries;
-    mapping(uint256 => address[]) private votesPositive;
-    mapping(uint256 => address[]) private votesNegative;
+    mapping(uint256 => address[]) private votesForBuyer;
+    mapping(uint256 => address[]) private votesForSeller;
 
     address[] notariesArr;
 
@@ -40,7 +40,6 @@ contract Notary is Ownable {
     }
 
     function setConensusCount(uint256 value) external onlyOwner {
-        // TODO: odd number
         _consensusCount = value;
     }
 
@@ -75,100 +74,83 @@ contract Notary is Ownable {
         require(notaries[dealId][msg.sender], "Notary: No accsess");
 
         require(
-            votesPositive[dealId].length + votesNegative[dealId].length <
-                _consensusCount,
+            votesForBuyer[dealId].length == _consensusCount ||
+                votesForSeller[dealId].length == _consensusCount,
             "Notary: Enough votes"
         );
 
         deposits[msg.sender] -= penaltyByDeal[dealId];
 
         if (mark) {
-            votesPositive[dealId].push(msg.sender);
+            votesForBuyer[dealId].push(msg.sender);
         } else {
-            votesNegative[dealId].push(msg.sender);
+            votesForSeller[dealId].push(msg.sender);
         }
 
         if (
-            votesPositive[dealId].length == _consensusCount ||
-            votesNegative[dealId].length == _consensusCount
+            votesForBuyer[dealId].length == _consensusCount ||
+            votesForSeller[dealId].length == _consensusCount
         ) {
-            address seller = address(0);
-            address storeAddress = _factory.getStore(seller);
+            address storeAddress = _factory.getStore(dealId);
             IStore store = IStore(storeAddress);
+            IIntegration.DisputeWinner winner;
 
-            if (votesPositive[dealId].length == _consensusCount) {
-                // buyer win
-                // collatoral seller to notary
-                uint256 collateral = store.getSellerCollateral(dealId);
-                uint256 reward = collateral / votesPositive[dealId].length;
+            if (votesForBuyer[dealId].length == _consensusCount) {
+                uint256 collateral = store.transferSellerCollateral(
+                    dealId,
+                    address(this)
+                );
+                uint256 reward = collateral / votesForBuyer[dealId].length;
 
-                // deposit return to notries
-                for (uint256 i = 0; i < votesPositive[dealId].length; i++) {
-                    deposits[votesPositive[dealId][i]] +=
+                for (uint256 i = 0; i < votesForBuyer[dealId].length; i++) {
+                    deposits[votesForBuyer[dealId][i]] +=
                         penaltyByDeal[dealId] +
                         reward;
                 }
 
                 serviceFee +=
                     penaltyByDeal[dealId] *
-                    votesNegative[dealId].length +
-                    (collateral - reward * votesPositive[dealId].length);
+                    votesForSeller[dealId].length +
+                    (collateral - reward * votesForBuyer[dealId].length);
 
-                store.transferBuyerCollateral(dealId, deal.buyer);
-                store.transfer(dealId, deal.buyer, deal.buyer);
-            } else if (votesNegative[dealId].length == _consensusCount) {
-                // buyer loses
-                // collatoral buyer to notary
-                uint256 collateral = store.getBuyerCollateral(dealId);
-                uint256 reward = collateral / votesNegative[dealId].length;
+                winner = IIntegration.DisputeWinner.Buyer;
+            } else if (votesForSeller[dealId].length == _consensusCount) {
+                uint256 collateral = store.transferBuyerCollateral(
+                    dealId,
+                    address(this)
+                );
+                uint256 reward = collateral / votesForSeller[dealId].length;
 
-                // deposit return to notries
-                for (uint256 i = 0; i < votesNegative[dealId].length; i++) {
-                    deposits[votesNegative[dealId][i]] +=
+                for (uint256 i = 0; i < votesForSeller[dealId].length; i++) {
+                    deposits[votesForSeller[dealId][i]] +=
                         penaltyByDeal[dealId] +
                         reward;
                 }
 
                 serviceFee +=
                     penaltyByDeal[dealId] *
-                    votesPositive[dealId].length +
-                    (collateral - reward * votesNegative[dealId].length);
+                    votesForBuyer[dealId].length +
+                    (collateral - reward * votesForSeller[dealId].length);
 
-                store.transferSellerCollateral(dealId, deal.seller);
-                store.transfer(dealId, deal.seller, deal.buyer);
+                winner = IIntegration.DisputeWinner.Seller;
             }
 
-            deal.status = AuctionStatus.CLOSE;
+            address integration = store.getIntegration(dealId);
+            IIntegration(integration).finalizeDispute(dealId, winner);
         }
     }
 
-    // function getDisputResult(uint256 dealId)
-    //     external
-    //     view
-    //     returns (uint8 result)
-    // {
-    //     if (
-    //         votesPositive[dealId].length + votesNegative[dealId].length ==
-    //         _consensusCount
-    //     ) {
-    //         return
-    //             votesPositive[dealId].length > votesNegative[dealId].length
-    //                 ? 1
-    //                 : 2;
-    //     }
-    // }
-
-    function penalty(address notary) external payable {}
-
     function chooseNotaries(uint256 dealId) external {
-        // require
-
-        penaltyByDeal[dealId] = _penalty; //calculatePenalty();
+        penaltyByDeal[dealId] = _penalty;
 
         address[] memory arr = _getRandomNotaries();
 
+        address storeAddress = _factory.getStore(dealId);
+        IStore store = IStore(storeAddress);
+
         for (uint256 i = 0; i < _countInvaitedNotary; i++) {
             notaries[dealId][arr[i]] = true;
+            store.addAccsess(dealId, arr[i]);
         }
     }
 

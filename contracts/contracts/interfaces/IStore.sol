@@ -8,6 +8,8 @@ interface IStore {
 
     function depositBuyerCollateral(uint256 dealId) external payable;
 
+    function withdrawBuyer(uint256 dealId, address buyer) external;
+
     function transfer(
         uint256 dealId,
         address buyer,
@@ -21,4 +23,10 @@ interface IStore {
     function transferSellerCollateral(uint256 dealId, address to)
         external
         returns (uint256);
+
+    function addAccsess(uint256 dealId, address wallet) external;
+
+    function checkAccsess(uint256 dealId, address wallet) external;
+
+    function getIntegration(uint256 dealId) external view returns (address);
 }

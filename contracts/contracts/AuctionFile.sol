@@ -4,15 +4,15 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./interfaces/IAuctionFile.sol";
+import "./interfaces/IIntegration.sol";
 import "./interfaces/IStore.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/INotary.sol";
 
-contract AuctionFile is IAuctionFile, Ownable {
+contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     IFactory public _factory;
     INotary public _notary;
 
-    uint256 public _periodDelivery = 2 days;
     uint256 public _periodDispute = 5 days;
 
     uint256 public _colletoralAmount = 1e17;
@@ -20,12 +20,10 @@ contract AuctionFile is IAuctionFile, Ownable {
 
     mapping(uint256 => AuctionFileParams) private deals;
     mapping(uint256 => mapping(address => uint256)) private bids;
+    mapping(uint256 => BidParams[]) private bidHistory;
+    mapping(uint256 => address[]) private bidBuyers;
 
     uint256 id;
-
-    function setPeriodDelivery(uint256 value) external onlyOwner {
-        _periodDelivery = value;
-    }
 
     function setPeriodDispute(uint256 value) external onlyOwner {
         _periodDispute = value;
@@ -47,15 +45,16 @@ contract AuctionFile is IAuctionFile, Ownable {
         _notary = INotary(notary);
     }
 
+    function getDeal(uint256 dealId) external returns (DealParams memory) {}
+
     function create(
         string calldata name,
         string calldata description,
         uint256 priceStart,
         uint256 priceForceStop,
         uint256 dateExpire,
-        bytes calldata cid,
-        bytes calldata cidThumbnail
-    ) external payable returns (uint256 dealId) {
+        bytes calldata cid
+    ) external payable returns (uint256) {
         address storeAddress = _factory.getStore(msg.sender);
 
         require(
@@ -74,7 +73,7 @@ contract AuctionFile is IAuctionFile, Ownable {
         deals[++id] = AuctionFileParams({
             name: name,
             description: description,
-            collatoralAmount: msg.value,
+            collateralAmount: msg.value,
             price: 0,
             priceForceStop: priceForceStop,
             priceStart: priceStart,
@@ -82,17 +81,17 @@ contract AuctionFile is IAuctionFile, Ownable {
             seller: msg.sender,
             buyer: address(0),
             cid: cid,
-            cidThumbnail: cidThumbnail,
             status: AuctionStatus.OPEN
         });
 
-        _factory.addDeal(id);
+        _factory.addDeal(id, storeAddress);
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
+        IStore(storeAddress).addAccsess(id, msg.sender);
 
-        // Add accsess
+        emit DealCreated(id, msg.sender);
 
-        emit DealCreated(dealId, msg.sender);
+        return id;
     }
 
     function bid(uint256 dealId) external payable {
@@ -129,14 +128,23 @@ contract AuctionFile is IAuctionFile, Ownable {
 
         bids[dealId][msg.sender] = currentBid;
 
-        if (currentBid >= deal.priceForceStop) {
-            // this.finalizeForce(dealId);
+        bidHistory[dealId].push(
+            BidParams({
+                timestamp: block.timestamp,
+                buyer: msg.sender,
+                bid: currentBid
+            })
+        );
 
+        bidBuyers[dealId].push(msg.sender);
+
+        if (currentBid >= deal.priceForceStop) {
+            _finalizeForce(dealId, msg.sender, IStore(storeAddress));
             deal.status = AuctionStatus.FINALIZE;
         }
     }
 
-    function cancel(uint256 dealId) external payable {
+    function cancel(uint256 dealId) external {
         AuctionFileParams memory deal = deals[dealId];
 
         require(deal.priceStart != 0, "AuctionFile: Id not found");
@@ -156,18 +164,12 @@ contract AuctionFile is IAuctionFile, Ownable {
 
     function dispute(uint256 dealId) external payable {
         AuctionFileParams memory deal = deals[dealId];
-
         require(deal.priceStart != 0, "AuctionFile: Id not found");
-
-        if (block.timestamp >= deal.dateExpire) {
-            deal.status = AuctionStatus.FINALIZE;
-        } else if (deal.status != AuctionStatus.FINALIZE) revert();
 
         require(deal.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
         require(
-            block.timestamp <
-                deal.dateExpire + _periodDispute + _periodDelivery,
-            "AuctionFile: Time is up"
+            block.timestamp < deal.dateExpire + _periodDispute,
+            "AuctionFile: Time for dispute is up"
         );
 
         require(
@@ -176,7 +178,7 @@ contract AuctionFile is IAuctionFile, Ownable {
         );
 
         require(
-            msg.value == deal.collatoralAmount,
+            msg.value == deal.collateralAmount,
             "AuctionFile: Wrong colletoral"
         );
 
@@ -188,28 +190,26 @@ contract AuctionFile is IAuctionFile, Ownable {
         _notary.chooseNotaries(dealId);
     }
 
-    function finalizeDeal(uint256 dealId) external {
+    function close(uint256 dealId) external {
         AuctionFileParams memory deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
-
         require(
-            block.timestamp >
-                deal.dateExpire + _periodDispute + _periodDelivery,
-            "AuctionFile: "
+            block.timestamp > deal.dateExpire + _periodDispute,
+            "AuctionFile: Time for dispute"
         );
 
         address storeAddress = _factory.getStore(deal.seller);
         IStore store = IStore(storeAddress);
 
         store.transferSellerCollateral(dealId, deal.seller);
-        store.transfer(dealId, deal.seller, deal.buyer);
-
-        //_returnBids(dealId); ?
+        store.transfer(dealId, deal.buyer, deal.seller);
 
         deal.status = AuctionStatus.CLOSE;
     }
 
-    function finalizeDispute(uint256 dealId) external {
+    function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
+        external
+    {
         AuctionFileParams memory deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
 
@@ -218,20 +218,13 @@ contract AuctionFile is IAuctionFile, Ownable {
             "AuctionFile: Wrong status"
         );
 
-        uint8 result = _notary.disputResult(dealId);
-
-        require(result > 0, "AuctionFile: Disput is not finished");
-
         address storeAddress = _factory.getStore(deal.seller);
         IStore store = IStore(storeAddress);
 
-        if (result == 1) {
-            // Buyer win
+        if (winner == IIntegration.DisputeWinner.Buyer) {
             store.transferBuyerCollateral(dealId, deal.buyer);
             store.transfer(dealId, deal.buyer, deal.buyer);
         } else {
-            // Buyer lose
-            // reutrn colletoral Seller
             store.transferSellerCollateral(dealId, deal.seller);
             store.transfer(dealId, deal.seller, deal.buyer);
         }
@@ -239,7 +232,139 @@ contract AuctionFile is IAuctionFile, Ownable {
         deal.status = AuctionStatus.CLOSE;
     }
 
-    function finalizeForce(uint256 dealId) external {}
+    function finalize(uint256 dealId) external {
+        AuctionFileParams memory deal = deals[dealId];
+        require(deal.priceStart != 0, "AuctionFile: Id not found");
 
-    function _returnBids(uint256 dealId) internal {}
+        require(
+            block.timestamp > deal.dateExpire,
+            "AuctionFile: Date is not expire"
+        );
+
+        require(
+            deal.status == AuctionStatus.OPEN,
+            "AuctionFile: Auction is not open"
+        );
+
+        address storeAddress = _factory.getStore(deal.seller);
+
+        if (deal.buyer == address(0)) {
+            IStore(storeAddress).transferSellerCollateral(dealId, deal.seller);
+            deal.status = AuctionStatus.CLOSE;
+
+            return;
+        }
+
+        _finalizeForce(dealId, deal.buyer, IStore(storeAddress));
+        deal.status = AuctionStatus.FINALIZE;
+    }
+
+    function _finalizeForce(
+        uint256 dealId,
+        address buyerAddress,
+        IStore store
+    ) internal {
+        _withdrawBids(dealId, buyerAddress, store);
+        store.addAccsess(dealId, buyerAddress);
+    }
+
+    function _withdrawBids(
+        uint256 dealId,
+        address buyer,
+        IStore store
+    ) internal {
+        address[] memory buyers = bidBuyers[dealId];
+
+        for (uint256 i = 0; i < buyers.length; i++) {
+            if (buyers[i] == buyer) continue;
+
+            store.withdrawBuyer(dealId, buyers[i]);
+        }
+    }
+
+    function getBidHistory(uint256 dealId)
+        external
+        view
+        returns (BidParams[] memory)
+    {
+        BidParams[] memory result = bidHistory[dealId];
+
+        if (result.length == 0) {
+            BidParams[] memory res = new BidParams[](5);
+
+            res[0] = BidParams({
+                timestamp: block.timestamp - 100,
+                bid: 1e18,
+                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+            });
+
+            res[1] = BidParams({
+                timestamp: block.timestamp - 50,
+                bid: 5e18,
+                buyer: 0x0dD6392662B132bA11e02cd5Cd628DfedF95c6f4
+            });
+
+            res[2] = BidParams({
+                timestamp: block.timestamp - 30,
+                bid: 6e18,
+                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+            });
+
+            res[3] = BidParams({
+                timestamp: block.timestamp - 15,
+                bid: 7e18,
+                buyer: 0x4dDf68F76aaBf2CC2DF3b9Db3BBEC26508e59a6c
+            });
+
+            res[4] = BidParams({
+                timestamp: block.timestamp,
+                bid: 10e18,
+                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+            });
+
+            return res;
+        }
+
+        return result;
+    }
+
+    function getChat(uint256 dealId)
+        external
+        view
+        returns (ChatParams[] memory)
+    {
+        ChatParams[] memory res = new ChatParams[](5);
+
+        res[0] = ChatParams({
+            timestamp: block.timestamp - 100,
+            message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        });
+
+        res[1] = ChatParams({
+            timestamp: block.timestamp - 50,
+            message: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+            sender: 0x0dD6392662B132bA11e02cd5Cd628DfedF95c6f4
+        });
+
+        res[2] = ChatParams({
+            timestamp: block.timestamp - 30,
+            message: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
+            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        });
+
+        res[3] = ChatParams({
+            timestamp: block.timestamp - 15,
+            message: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
+            sender: 0x4dDf68F76aaBf2CC2DF3b9Db3BBEC26508e59a6c
+        });
+
+        res[4] = ChatParams({
+            timestamp: block.timestamp,
+            message: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
+            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        });
+
+        return res;
+    }
 }
