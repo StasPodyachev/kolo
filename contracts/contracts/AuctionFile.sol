@@ -12,10 +12,12 @@ contract AuctionFile is IAuctionFile, Ownable {
 
     uint256 public _periodDelivery = 2 days;
     uint256 public _periodDispute = 5 days;
+
+    uint256 public _colletoralAmount = 1e17;
     uint256 public _colletoralPercent = 1e17;
 
-    mapping(uint256 => AuctionFileParams) private files;
-    mapping(address => uint256) private bids;
+    mapping(uint256 => AuctionFileParams) private deals;
+    mapping(uint256 => mapping(address => uint256)) private bids;
 
     uint256 id;
 
@@ -25,6 +27,10 @@ contract AuctionFile is IAuctionFile, Ownable {
 
     function setPeriodDispute(uint256 value) external onlyOwner {
         _periodDispute = value;
+    }
+
+    function setColletoralAmount(uint256 value) external onlyOwner {
+        _colletoralAmount = value;
     }
 
     function setColletoralPercent(uint256 value) external onlyOwner {
@@ -40,8 +46,9 @@ contract AuctionFile is IAuctionFile, Ownable {
         string calldata description,
         uint256 priceStart,
         uint256 priceForceStop,
-        uint256 price,
-        uint256 dateExpire
+        uint256 dateExpire,
+        bytes calldata cid,
+        bytes calldata cidThumbnail
     ) external payable returns (uint256 dealId) {
         address storeAddress = _factory.getStore(msg.sender);
 
@@ -51,20 +58,25 @@ contract AuctionFile is IAuctionFile, Ownable {
         );
 
         require(
-            msg.value == (price * _colletoralPercent) / 1e18,
+            msg.value >= (priceStart * _colletoralPercent) / 1e18 &&
+                msg.value >= _colletoralAmount,
             "AuctionFile: Wrong colletoral"
         );
 
-        files[++id] = AuctionFileParams({
+        require(priceStart != 0, "AuctionFile: Wrong priceStart");
+
+        deals[++id] = AuctionFileParams({
             name: name,
             description: description,
-            price: price,
+            collatoralAmount: msg.value,
+            price: 0,
             priceForceStop: priceForceStop,
             priceStart: priceStart,
             dateExpire: dateExpire,
             seller: msg.sender,
             buyer: address(0),
-            lastBid: 0,
+            cid: cid,
+            cidThumbnail: cidThumbnail,
             status: AuctionStatus.OPEN
         });
 
@@ -72,77 +84,107 @@ contract AuctionFile is IAuctionFile, Ownable {
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
 
+        // Add accsess
+
         emit DealCreated(dealId, msg.sender);
     }
 
     function bid(uint256 dealId) external payable {
-        AuctionFileParams memory file = files[dealId];
+        AuctionFileParams memory deal = deals[dealId];
 
-        require(file.price != 0, "AuctionFile: Id not found");
+        require(deal.priceStart != 0, "AuctionFile: Id not found");
+
         require(
-            file.status == AuctionStatus.OPEN,
+            deal.status == AuctionStatus.OPEN,
             "AuctionFile: Auction is not open"
         );
 
         require(
-            file.seller != msg.sender,
+            deal.seller != msg.sender,
             "AuctionFile: Seller cannot be a buyer"
         );
 
-        uint256 currentBid = bids[msg.sender] + msg.value;
+        require(block.timestamp < deal.dateExpire, "AuctionFile: Time is up");
+
+        uint256 currentBid = bids[dealId][msg.sender] + msg.value;
+
+        require(currentBid >= deal.priceStart, "AuctionFile: Wrong amount");
 
         require(
-            currentBid > file.lastBid,
+            currentBid > deal.price,
             "AuctionFile: Current bid cannot be less then previous bid"
         );
 
-        //check priceForceStop
-
-        address storeAddress = _factory.getStore(file.seller);
+        address storeAddress = _factory.getStore(deal.seller);
         IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
-        file.lastBid = currentBid;
-        file.buyer = msg.sender;
+        deal.price = currentBid;
+        deal.buyer = msg.sender;
 
-        bids[msg.sender] = currentBid;
+        bids[dealId][msg.sender] = currentBid;
+
+        if (currentBid >= deal.priceForceStop) {
+            // this.finalizeForce(dealId);
+
+            deal.status = AuctionStatus.FINALIZE;
+        }
     }
 
     function cancel(uint256 dealId) external payable {
-        AuctionFileParams memory file = files[dealId];
+        AuctionFileParams memory deal = deals[dealId];
 
-        require(file.price != 0, "AuctionFile: Id not found");
+        require(deal.priceStart != 0, "AuctionFile: Id not found");
         require(
-            file.seller == msg.sender,
+            deal.seller == msg.sender,
             "AuctionFile: Caller is not a seller"
         );
         require(
-            file.buyer != address(0),
+            deal.buyer == address(0),
             "AuctionFile: Auction already have a bid"
         );
 
-        file.status = AuctionStatus.CANCEL;
+        deal.status = AuctionStatus.CANCEL;
 
         emit DealCanceled(dealId, msg.sender);
     }
 
     function dispute(uint256 dealId) external payable {
-        AuctionFileParams memory file = files[dealId];
+        AuctionFileParams memory deal = deals[dealId];
 
-        require(file.price != 0, "AuctionFile: Id not found");
-        require(file.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
+        require(deal.priceStart != 0, "AuctionFile: Id not found");
+
+        if (block.timestamp >= deal.dateExpire) {
+            deal.status = AuctionStatus.FINALIZE;
+        } else if (deal.status != AuctionStatus.FINALIZE) revert();
+
+        require(deal.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
+        require(
+            block.timestamp <
+                deal.dateExpire + _periodDispute + _periodDelivery,
+            "AuctionFile: Time is up"
+        );
 
         require(
-            msg.value == (file.price * _colletoralPercent) / 1e18,
+            deal.status == AuctionStatus.FINALIZE,
+            "AuctionFile: Wrong status"
+        );
+
+        require(
+            msg.value == deal.collatoralAmount,
             "AuctionFile: Wrong colletoral"
         );
 
-        address storeAddress = _factory.getStore(file.seller);
+        address storeAddress = _factory.getStore(deal.seller);
         IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
-        file.status = AuctionStatus.DISPUTE;
+        deal.status = AuctionStatus.DISPUTE;
 
-        //chose notary
+        // choose notary
     }
 
-    function finalize(uint256 dealId) external {}
+    function finalizeDeal(uint256 dealId) external {}
+
+    function finalizeDispute(uint256 dealId) external {}
+
+    function finalizeForce(uint256 dealId) external {}
 }

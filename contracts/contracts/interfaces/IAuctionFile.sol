@@ -8,10 +8,12 @@ interface IAuctionFile {
         uint256 price;
         uint256 priceStart;
         uint256 priceForceStop;
-        uint256 lastBid;
+        uint256 collatoralAmount;
         address seller;
         address buyer;
         uint256 dateExpire;
+        bytes cid;
+        bytes cidThumbnail;
         AuctionStatus status;
     }
 
@@ -19,7 +21,8 @@ interface IAuctionFile {
         OPEN,
         CANCEL,
         CLOSE,
-        DISPUTE
+        DISPUTE,
+        FINALIZE
     }
 
     event DisputeCreated(uint256 id);
@@ -32,15 +35,16 @@ interface IAuctionFile {
 
     function setPeriodDispute(uint256 value) external;
 
-    function setColletoralPercent(uint256 value) external;
+    function setColletoralAmount(uint256 value) external;
 
     function create(
         string calldata name,
         string calldata description,
         uint256 priceStart,
         uint256 priceForceStop,
-        uint256 price,
-        uint256 dateExpire
+        uint256 dateExpire,
+        bytes calldata cid,
+        bytes calldata cidThumbnail
     ) external payable returns (uint256 dealId);
 
     function bid(uint256 dealId) external payable;
@@ -49,5 +53,9 @@ interface IAuctionFile {
 
     function dispute(uint256 dealId) external payable;
 
-    function finalize(uint256 dealId) external;
+    function finalizeDeal(uint256 dealId) external;
+
+    function finalizeDispute(uint256 dealId) external;
+
+    function finalizeForce(uint256 dealId) external;
 }
