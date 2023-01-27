@@ -8,7 +8,7 @@ import "./interfaces/IIntegration.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Notary is Ownable {
+contract Notary is INotary, Ownable {
     IFactory public _factory;
 
     mapping(address => uint256) private deposits;
@@ -39,7 +39,7 @@ contract Notary is Ownable {
         _minDeposit = value;
     }
 
-    function setConensusCount(uint256 value) external onlyOwner {
+    function setConsensusCount(uint256 value) external onlyOwner {
         _consensusCount = value;
     }
 
