@@ -18,8 +18,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
     uint256 public _periodDispute = 5 days;
 
-    uint256 public _colletoralAmount = 1e17;
-    uint256 public _colletoralPercent = 1e17;
+    uint256 public _collateralAmount = 1e17;
+    uint256 public _collateralPercent = 1e17;
 
     mapping(uint256 => AuctionFileParams) private deals;
     mapping(uint256 => ChatParams[]) private chats;
@@ -32,12 +32,12 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         _periodDispute = value;
     }
 
-    function setColletoralAmount(uint256 value) external onlyOwner {
-        _colletoralAmount = value;
+    function setCollateralAmount(uint256 value) external onlyOwner {
+        _collateralAmount = value;
     }
 
-    function setColletoralPercent(uint256 value) external onlyOwner {
-        _colletoralPercent = value;
+    function setCollateralPercent(uint256 value) external onlyOwner {
+        _collateralPercent = value;
     }
 
     function setFactory(address factory) external onlyOwner {
@@ -46,6 +46,19 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
     function setNotary(address notary) external onlyOwner {
         _notary = INotary(notary);
+    }
+
+    function getIntegrationInfo()
+        external
+        view
+        returns (ConfigureParams memory)
+    {
+        return
+            ConfigureParams({
+                periodDispute: _periodDispute,
+                collateralAmount: _collateralAmount,
+                collateralPercent: _collateralPercent
+            });
     }
 
     function getDeal(uint256 dealId)
@@ -147,9 +160,9 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         );
 
         require(
-            msg.value >= (priceStart * _colletoralPercent) / 1e18 &&
-                msg.value >= _colletoralAmount,
-            "AuctionFile: Wrong colletoral"
+            msg.value >= (priceStart * _collateralPercent) / 1e18 &&
+                msg.value >= _collateralAmount,
+            "AuctionFile: Wrong collateral"
         );
 
         require(
@@ -272,7 +285,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         require(
             msg.value == deal.collateralAmount,
-            "AuctionFile: Wrong colletoral"
+            "AuctionFile: Wrong collateral"
         );
 
         address storeAddress = _factory.getStore(deal.seller);

@@ -26,6 +26,12 @@ interface IAuctionFile {
         AuctionStatus status;
     }
 
+    struct ConfigureParams {
+        uint256 periodDispute;
+        uint256 collateralAmount;
+        uint256 collateralPercent;
+    }
+
     struct BidParams {
         uint256 timestamp;
         address buyer;
@@ -36,11 +42,16 @@ interface IAuctionFile {
     event DealCreated(uint256 dealId, address sender);
     event DealCanceled(uint256 dealId, address sender);
 
+    function getIntegrationInfo()
+        external
+        view
+        returns (ConfigureParams memory);
+
     function setFactory(address factory) external;
 
     function setPeriodDispute(uint256 value) external;
 
-    function setColletoralAmount(uint256 value) external;
+    function setCollateralAmount(uint256 value) external;
 
     function sendMessage(uint256 dealId, string calldata message) external;
 
