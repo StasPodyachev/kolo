@@ -9,6 +9,9 @@ import "./interfaces/IStore.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/INotary.sol";
 
+import {SizeOf} from "./libs/seriality/SizeOf.sol";
+import {TypesToBytes} from "./libs/seriality/TypesToBytes.sol";
+
 contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     IFactory public _factory;
     INotary public _notary;
@@ -23,6 +26,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     mapping(uint256 => mapping(address => uint256)) private bids;
     mapping(uint256 => BidParams[]) private bidHistory;
     mapping(uint256 => address[]) private bidBuyers;
+    mapping(address => mapping(bytes => bool)) private _accsess;
 
     uint256 id;
 
@@ -46,7 +50,59 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         _notary = INotary(notary);
     }
 
-    function getDeal(uint256 dealId) external returns (DealParams memory) {}
+    function getDeal(uint256 dealId)
+        external
+        view
+        returns (DealParams memory deal)
+    {
+        AuctionFileParams memory params = deals[dealId];
+
+        uint256 size = SizeOf.sizeOfString(params.name) +
+            SizeOf.sizeOfString(params.description) +
+            SizeOf.sizeOfBytes(params.cid) +
+            6 *
+            32 +
+            20 *
+            2;
+        uint256 offset = 0;
+        bytes memory data = new bytes(size);
+
+        // Serialize AuctionFileParams to bytes
+        // 2x string
+        TypesToBytes.stringToBytes(offset, bytes(params.name), data);
+        offset += SizeOf.sizeOfString(params.name);
+        TypesToBytes.stringToBytes(offset, bytes(params.description), data);
+        offset += SizeOf.sizeOfString(params.description);
+
+        // 4x uint256
+        TypesToBytes.uintToBytes(offset, params.price, data);
+        offset += 32;
+        TypesToBytes.uintToBytes(offset, params.priceStart, data);
+        offset += 32;
+        TypesToBytes.uintToBytes(offset, params.priceForceStop, data);
+        offset += 32;
+        TypesToBytes.uintToBytes(offset, params.collateralAmount, data);
+        offset += 32;
+
+        // 2x address
+        TypesToBytes.addressToBytes(offset, params.seller, data);
+        offset += 20;
+        TypesToBytes.addressToBytes(offset, params.buyer, data);
+        offset += 20;
+
+        // uint
+        TypesToBytes.uintToBytes(offset, params.dateExpire, data);
+        offset += 32;
+
+        // bytes
+        TypesToBytes.stringToBytes(offset, params.cid, data);
+        offset += SizeOf.sizeOfBytes(params.cid);
+
+        // uint
+        TypesToBytes.uintToBytes(offset, uint256(params.status), data);
+        offset += 32;
+        deal = DealParams({id: dealId, _type: 0, data: data});
+    }
 
     function sendMessage(uint256 dealId, string calldata message) external {
         AuctionFileParams memory deal = deals[dealId];
@@ -58,6 +114,10 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             "AuctionFile: Wrong status"
         );
 
+        _sendMessage(dealId, message);
+    }
+
+    function _sendMessage(uint256 dealId, string memory message) internal {
         chats[dealId].push(
             ChatParams({
                 timestamp: block.timestamp,
@@ -91,6 +151,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         require(priceStart != 0, "AuctionFile: Wrong priceStart");
 
         deals[++id] = AuctionFileParams({
+            id: id,
             name: name,
             description: description,
             collateralAmount: msg.value,
@@ -107,7 +168,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         _factory.addDeal(id, storeAddress);
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
-        IStore(storeAddress).addAccsess(id, msg.sender);
+        _sendMessage(id, "Deal created.");
 
         emit DealCreated(id, msg.sender);
 
@@ -155,9 +216,13 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         bidBuyers[dealId].push(msg.sender);
 
+        _sendMessage(
+            dealId,
+            string(abi.encodePacked("Bid added by ", deal.buyer))
+        );
+
         if (currentBid >= deal.priceForceStop) {
-            _finalizeForce(dealId, msg.sender, IStore(storeAddress));
-            deal.status = AuctionStatus.FINALIZE;
+            _finalize(deal, IStore(storeAddress));
         }
     }
 
@@ -175,6 +240,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         );
 
         deal.status = AuctionStatus.CANCEL;
+
+        _sendMessage(deal.id, "Deal canceled.");
 
         emit DealCanceled(dealId, msg.sender);
     }
@@ -205,6 +272,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         deal.status = AuctionStatus.DISPUTE;
 
         _notary.chooseNotaries(dealId);
+
+        _sendMessage(deal.id, "Dispute started.");
     }
 
     function finalize(uint256 dealId) external {
@@ -224,23 +293,29 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         address storeAddress = _factory.getStore(deal.seller);
 
         if (deal.buyer == address(0)) {
-            IStore(storeAddress).transferSellerCollateral(dealId, deal.seller);
+            IStore(storeAddress).transferWinToSeller(
+                dealId,
+                address(0),
+                deal.seller
+            );
+
             deal.status = AuctionStatus.CLOSE;
+
+            _sendMessage(deal.id, "Deal closed.");
 
             return;
         }
 
-        _finalizeForce(dealId, deal.buyer, IStore(storeAddress));
-        deal.status = AuctionStatus.FINALIZE;
+        _finalize(deal, IStore(storeAddress));
     }
 
-    function _finalizeForce(
-        uint256 dealId,
-        address buyerAddress,
-        IStore store
-    ) internal {
-        _withdrawBids(dealId, buyerAddress, store);
-        store.addAccsess(dealId, buyerAddress);
+    function _finalize(AuctionFileParams memory deal, IStore store) internal {
+        _withdrawBids(deal.id, deal.buyer, store);
+        this.addAccsess(deal.id, deal.buyer);
+
+        deal.status = AuctionStatus.FINALIZE;
+
+        _sendMessage(deal.id, "Deal finalized.");
     }
 
     function _withdrawBids(
@@ -272,17 +347,28 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         IStore store = IStore(storeAddress);
 
         if (winner == IIntegration.DisputeWinner.Buyer) {
-            store.transferBuyerCollateral(dealId, deal.buyer);
-            store.transfer(dealId, deal.buyer, deal.buyer);
+            store.transferWinToBuyer(dealId, deal.buyer);
         } else {
-            store.transferSellerCollateral(dealId, deal.seller);
-            store.transfer(dealId, deal.buyer, deal.seller);
+            store.transferWinToSeller(dealId, deal.buyer, deal.seller);
         }
 
         deal.status = AuctionStatus.CLOSE;
+
+        _sendMessage(
+            deal.id,
+            string(
+                abi.encodePacked(
+                    "Dispute closed",
+                    winner == IIntegration.DisputeWinner.Buyer
+                        ? deal.buyer
+                        : deal.seller,
+                    "wins."
+                )
+            )
+        );
     }
 
-    function close(uint256 dealId) external {
+    function receiveReward(uint256 dealId) external {
         AuctionFileParams memory deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
         require(
@@ -297,10 +383,11 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         address storeAddress = _factory.getStore(deal.seller);
         IStore store = IStore(storeAddress);
 
-        store.transferSellerCollateral(dealId, deal.seller);
-        store.transfer(dealId, deal.buyer, deal.seller);
+        store.transferWinToSeller(dealId, deal.buyer, deal.seller);
 
         deal.status = AuctionStatus.CLOSE;
+
+        _sendMessage(deal.id, "Deal closed.");
     }
 
     function getBidHistory(uint256 dealId)
@@ -308,45 +395,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         view
         returns (BidParams[] memory)
     {
-        BidParams[] memory result = bidHistory[dealId];
-
-        if (result.length == 0) {
-            BidParams[] memory res = new BidParams[](5);
-
-            res[0] = BidParams({
-                timestamp: block.timestamp - 100,
-                bid: 1e18,
-                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-            });
-
-            res[1] = BidParams({
-                timestamp: block.timestamp - 50,
-                bid: 5e18,
-                buyer: 0x0dD6392662B132bA11e02cd5Cd628DfedF95c6f4
-            });
-
-            res[2] = BidParams({
-                timestamp: block.timestamp - 30,
-                bid: 6e18,
-                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-            });
-
-            res[3] = BidParams({
-                timestamp: block.timestamp - 15,
-                bid: 7e18,
-                buyer: 0x4dDf68F76aaBf2CC2DF3b9Db3BBEC26508e59a6c
-            });
-
-            res[4] = BidParams({
-                timestamp: block.timestamp,
-                bid: 10e18,
-                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-            });
-
-            return res;
-        }
-
-        return result;
+        return bidHistory[dealId];
     }
 
     function getChat(uint256 dealId)
@@ -354,38 +403,20 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         view
         returns (ChatParams[] memory)
     {
-        ChatParams[] memory res = new ChatParams[](5);
+        return chats[dealId];
+    }
 
-        res[0] = ChatParams({
-            timestamp: block.timestamp - 100,
-            message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-        });
+    function addAccsess(uint256 dealId, address wallet) external {
+        // TODO: Security
+        bytes memory cid = deals[dealId].cid;
+        _accsess[wallet][cid] = true;
+    }
 
-        res[1] = ChatParams({
-            timestamp: block.timestamp - 50,
-            message: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-            sender: 0x0dD6392662B132bA11e02cd5Cd628DfedF95c6f4
-        });
-
-        res[2] = ChatParams({
-            timestamp: block.timestamp - 30,
-            message: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
-            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-        });
-
-        res[3] = ChatParams({
-            timestamp: block.timestamp - 15,
-            message: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
-            sender: 0x4dDf68F76aaBf2CC2DF3b9Db3BBEC26508e59a6c
-        });
-
-        res[4] = ChatParams({
-            timestamp: block.timestamp,
-            message: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
-            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-        });
-
-        return res;
+    function checkAccsess(bytes calldata cid, address wallet)
+        external
+        view
+        returns (uint8)
+    {
+        return _accsess[wallet][cid] ? 1 : 0;
     }
 }

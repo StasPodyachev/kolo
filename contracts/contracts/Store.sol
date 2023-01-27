@@ -12,8 +12,6 @@ contract Store is IStore, Ownable {
     mapping(uint256 => uint256) private sellerCollaterals;
     mapping(uint256 => uint256) private buyerCollaterals;
 
-    mapping(bytes => mapping(address => bool)) private accsess;
-
     function getIntegration(uint256 dealId) external view returns (address) {
         return deals[dealId];
     }
@@ -23,6 +21,10 @@ contract Store is IStore, Ownable {
         sellerCollaterals[dealId] = msg.value;
     }
 
+    function depositBuyerCollateral(uint256 dealId) external payable {
+        buyerCollaterals[dealId] = msg.value;
+    }
+
     function depositBuyer(uint256 dealId, address buyer) external payable {
         buyers[dealId][buyer] += msg.value;
     }
@@ -30,10 +32,6 @@ contract Store is IStore, Ownable {
     function withdrawBuyer(uint256 dealId, address buyer) external {
         payable(buyer).transfer(buyers[dealId][buyer]);
         buyers[dealId][buyer] = 0;
-    }
-
-    function depositBuyerCollateral(uint256 dealId) external payable {
-        buyerCollaterals[dealId] = msg.value;
     }
 
     function getSellerCollateral(uint256 dealId)
@@ -52,37 +50,25 @@ contract Store is IStore, Ownable {
         return buyerCollaterals[dealId];
     }
 
-    function transferSellerCollateral(uint256 dealId, address to)
-        external
-        returns (uint256)
-    {
-        // TODO: Security
-        payable(to).transfer(sellerCollaterals[dealId]);
-
-        return sellerCollaterals[dealId];
-    }
-
-    function transferBuyerCollateral(uint256 dealId, address to)
-        external
-        returns (uint256)
-    {
-        // TODO: Security
-        payable(to).transfer(buyerCollaterals[dealId]);
-
-        return buyerCollaterals[dealId];
-    }
-
-    function transfer(
+    function transferWinToSeller(
         uint256 dealId,
         address buyer,
-        address to
+        address seller
     ) external {
-        // TODO: security
-        payable(to).transfer(buyers[dealId][buyer]);
+        payable(seller).transfer(
+            sellerCollaterals[dealId] + buyers[dealId][buyer]
+        );
+
+        sellerCollaterals[dealId] = 0;
         buyers[dealId][buyer] = 0;
     }
 
-    function addAccsess(uint256 dealId, address wallet) external {}
+    function transferWinToBuyer(uint256 dealId, address buyer) external {
+        payable(buyer).transfer(
+            buyerCollaterals[dealId] + buyers[dealId][buyer]
+        );
 
-    function checkAccsess(uint256 dealId, address wallet) external {}
+        buyerCollaterals[dealId] = 0;
+        buyers[dealId][buyer] = 0;
+    }
 }

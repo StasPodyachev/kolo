@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "./IIntegration.sol";
-
 interface IAuctionFile {
     enum AuctionStatus {
         OPEN,
@@ -13,6 +11,7 @@ interface IAuctionFile {
     }
 
     struct AuctionFileParams {
+        uint256 id;
         string name;
         string description;
         uint256 price;
@@ -75,4 +74,11 @@ interface IAuctionFile {
         external
         view
         returns (ChatParams[] memory);
+
+    // function addAccsess(uint256 dealId, address wallet) external;
+
+    // function checkAccsess(bytes calldata cid, address wallet)
+    //     external
+    //     view
+    //     returns (uint8);
 }
