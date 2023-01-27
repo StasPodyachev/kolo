@@ -313,18 +313,22 @@ export const MyPurchasesBlocks: IBlock[] = [
 
 export const SaleTypeMenuItems: ISaleTypeMenuItems[] = [
   {
+    id: 1,
     title: "AUCTION OF FILES",
     address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
   },
   {
+    id: 2,
     title: "AUCTION OF LIVEPEER",
     address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
   },
   {
+    id: 3,
     title: "AUCTION OF HUDDLE",
     address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
   },
   {
+    id: 4,
     title: "SIMPLE TRADES OF FILES",
     address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
   }

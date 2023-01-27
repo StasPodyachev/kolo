@@ -19,7 +19,7 @@ const ButtonContractWrite = ({ title, address, abi, method }: IProps) => {
   return isSuccess ? null : isLoading ? (
     <Button textStyle="button">Loading...</Button>
   ) : (
-    <Button disabled={!write} textStyle="button" onClick={() => write?.()}>
+    <Button isDisabled={!write} textStyle="button" onClick={() => write?.()}>
       {title}
     </Button>
   );

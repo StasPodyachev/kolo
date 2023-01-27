@@ -85,7 +85,7 @@ const Product: NextPage = () => {
               </Heading>
             </Flex>
             <Button
-              disabled={!isConnected}
+              isDisabled={!isConnected}
               textStyle="button"
               bg="blue.primary"
               color="white"
@@ -127,7 +127,7 @@ const Product: NextPage = () => {
               {productItem?.description}
             </Text>
             <Button
-              disabled={!isConnected}
+              isDisabled={!isConnected}
               mt="35px"
               bg="blue.secondaryDark"
               color="white"
@@ -135,7 +135,6 @@ const Product: NextPage = () => {
               transition="all .3s"
               _hover={{ bg: "blue.active" }}
               borderRadius="md"
-              _disabled={{ bg: "gray.600", color: "black" }}
             >
               buy now
             </Button>
