@@ -13,7 +13,7 @@ import "../interfaces/IChat.sol";
 import {SizeOf} from "../libs/seriality/SizeOf.sol";
 import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
 
-contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
+contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     IFactory public _factory;
     INotary public _notary;
     IChat public _chat;
@@ -80,7 +80,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
         uint256 offset = 0;
         bytes memory data = new bytes(size);
 
-        // Serialize AuctionFileParams to bytes
+        // Serialize SimpleTradeFileParams to bytes
         // 2x string
         TypesToBytes.stringToBytes(offset, bytes(params.name), data);
         offset += SizeOf.sizeOfString(params.name);
@@ -113,7 +113,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
         offset += 32;
         deal = DealParams({
             id: dealId,
-            _type: 0,
+            _type: 1,
             data: data,
             integration: address(this),
             store: _factory.getStore(params.seller)

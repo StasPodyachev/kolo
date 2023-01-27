@@ -24,8 +24,13 @@ const contracts: ContractDeploy[] = [
   {
     contractName: deployNames.NOTARY,
   },
+  {
+    contractName: deployNames.SIMPLE_TRADE_FILE,
+  },
+  {
+    contractName: deployNames.CHAT,
+  },
 ]
-
 
 export async function main() {
   for (let i in contracts) {
@@ -52,7 +57,8 @@ export async function deployContract(
   args?: any
 ) {
   const contractFactory = await ethers.getContractFactory(
-    nameFile ?? contractName, WALLET
+    nameFile ?? contractName,
+    WALLET
   )
 
   console.log(`Contract for deployment Started`)
@@ -65,7 +71,8 @@ export async function deployContract(
     contract = await contractFactory.deploy()
   }
 
-  await writeDeployData(CHAIN_ID, contractName, contract.address, "")
+  await contract.deployed()
+  await writeDeployData(CHAIN_ID, contractName, contract.address)
 
   console.log("Contract Deployment Ended")
   console.log("***************************************")

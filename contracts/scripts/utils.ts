@@ -31,15 +31,11 @@ export interface BridgeConfig {
 export async function recordAllDeployments(
   network: string,
   contractName: string,
-  proxyAddr: string,
   implementationAddr: string
 ) {
   deployments[network][contractName] = {
-    proxy: proxyAddr,
-    implementation: [implementationAddr],
     address: implementationAddr,
     creationTime: Date.now(),
-    updatedTime: [Date.now()],
   }
 
   return deployments
@@ -52,15 +48,9 @@ export async function writeFile(path: string, data: any) {
 export async function writeDeployData(
   network: string,
   contractName: string,
-  address: string,
-  proxy: string = ""
+  address: string
 ): Promise<IDeployment> {
-  const writeData = await recordAllDeployments(
-    network,
-    contractName,
-    proxy,
-    address
-  )
+  const writeData = await recordAllDeployments(network, contractName, address)
 
   fs.writeFileSync("./deployment/deployments.json", JSON.stringify(writeData))
 
