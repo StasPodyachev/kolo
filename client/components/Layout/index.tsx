@@ -5,9 +5,10 @@ import ManageBar from "../ManageBar";
 interface IProps {
   children: JSX.Element;
   pageTitle: string;
+  isCenteredBlock?: boolean;
 }
 
-const Layout = ({ children, pageTitle }: IProps) => {
+const Layout = ({ children, pageTitle, isCenteredBlock }: IProps) => {
   return (
     <Flex>
       <Sidebar />
@@ -18,7 +19,19 @@ const Layout = ({ children, pageTitle }: IProps) => {
           </Heading>
           <ManageBar />
         </Flex>
-        <Box mt="60px">{children}</Box>
+        {isCenteredBlock ? (
+          <Flex
+            position="relative"
+            bottom="108px"
+            height="100%"
+            justifyContent="center"
+            alignItems="center"
+          >
+            {children}
+          </Flex>
+        ) : (
+          <Box mt="60px">{children}</Box>
+        )}
       </Box>
     </Flex>
   );

@@ -8,8 +8,10 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import BidsTable from "@/components/Products/BidsTable";
 import AddressCopy from "@/components/ui/AddressCopy";
+import { useAccount } from "wagmi";
 
 const Product: NextPage = () => {
+  const { isConnected } = useAccount();
   const router = useRouter();
   const productItem = auctionItems.find(
     (item) => item.id.toString() === router.query.productId
@@ -57,7 +59,9 @@ const Product: NextPage = () => {
             </Box>
           </Flex>
           <Flex flexDir="column" gap="6px" minW="278px">
-            <Heading variant="h4" color="white">{productItem?.title}</Heading>
+            <Heading variant="h4" color="white">
+              {productItem?.title}
+            </Heading>
             <HStack spacing="16px">
               <Text textStyle="mediumText" color="gray.500">
                 Owned by:
@@ -81,6 +85,7 @@ const Product: NextPage = () => {
               </Heading>
             </Flex>
             <Button
+              disabled={!isConnected}
               textStyle="button"
               bg="blue.primary"
               color="white"
@@ -122,6 +127,7 @@ const Product: NextPage = () => {
               {productItem?.description}
             </Text>
             <Button
+              disabled={!isConnected}
               mt="35px"
               bg="blue.secondaryDark"
               color="white"
@@ -129,6 +135,7 @@ const Product: NextPage = () => {
               transition="all .3s"
               _hover={{ bg: "blue.active" }}
               borderRadius="md"
+              _disabled={{ bg: "gray.600", color: "black" }}
             >
               buy now
             </Button>

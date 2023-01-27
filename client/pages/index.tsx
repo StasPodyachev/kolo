@@ -9,7 +9,7 @@ const Home: NextPage = () => {
     <Layout pageTitle="Market">
       <Grid
         gap="26px"
-        justifyContent="space-between"
+        justifyContent="space-around"
         templateColumns="repeat(auto-fill, 304px)"
         templateRows="auto"
       >
