@@ -1,17 +1,11 @@
-// const hre = require("hardhat");
-
 import "hardhat-deploy"
 import "hardhat-deploy-ethers"
 
-// const { ethers } = require("hardhat")
-
 import { deployNames } from "./constants"
-import deployment from "../deployment/deployments.json"
+import { writeDeployData } from "./utils"
 
-import { IDeployment, writeDeployData } from "./utils"
-const deployments: IDeployment = deployment
-
-let CHAIN_ID: any
+const CHAIN_ID: string = network.config.chainId
+const WALLET = new ethers.Wallet(network.config.accounts[0], ethers.provider)
 
 interface ContractDeploy {
   contractName: string
@@ -32,12 +26,8 @@ const contracts: ContractDeploy[] = [
   },
 ]
 
-const private_key = network.config.accounts[0]
-const wallet = new ethers.Wallet(private_key, ethers.provider)
 
 export async function main() {
-  CHAIN_ID = network.config.chainId
-
   for (let i in contracts) {
     const contract = contracts[i]
 
@@ -62,7 +52,7 @@ export async function deployContract(
   args?: any
 ) {
   const contractFactory = await ethers.getContractFactory(
-    nameFile ?? contractName, wallet
+    nameFile ?? contractName, WALLET
   )
 
   console.log(`Contract for deployment Started`)

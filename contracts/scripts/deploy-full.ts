@@ -2,13 +2,13 @@ const hre = require("hardhat");
 
 import deployment from "../deployment/deployments.json";
 import { main as deploy } from "./deploy";
-// import { main as configure } from "./configure";
+import { main as configure } from "./configure";
 import { IDeployment } from "./utils";
 const deployments: IDeployment = deployment;
 
 async function main() {
   await deploy();
-  // await configure();
+  await configure();
   // await verify()
 }
 
