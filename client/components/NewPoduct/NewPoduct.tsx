@@ -44,11 +44,13 @@ const NewPoduct = () => {
   const [stopDate, setStopDate] = useState("");
   const [cid, setCid] = useState("");
 
+  
+
   return (
     <Box>
-      <Heading variant="h4" color="white">
+      {/* <Heading variant="h4" color="white">
         Step 1. Input Parameters
-      </Heading>
+      </Heading> */}
       <Box ml="110px" mt="10px" maxW="585px">
         <Heading variant="h6" color="gray.200" mt="16px">
           Name
@@ -160,10 +162,10 @@ const NewPoduct = () => {
           transition="all .3s"
           _hover={{ bg: "blue.active" }}
         >
-          record item
+          start sell
         </CustomButton>
       </Box>
-      <Heading mt="60px" variant="h4" color="white">
+      {/* <Heading mt="60px" variant="h4" color="white">
         Step 2. Provide access
       </Heading>
       <CustomButton
@@ -175,8 +177,8 @@ const NewPoduct = () => {
         _hover={{ bg: "blue.active" }}
       >
         share access to protocol
-      </CustomButton>
-      <Heading mt="60px" variant="h4" color="white">
+      </CustomButton> */}
+      {/* <Heading mt="60px" variant="h4" color="white">
         Step 3. Start Sell
       </Heading>
       <CustomButton
@@ -188,7 +190,7 @@ const NewPoduct = () => {
         _hover={{ bg: "blue.active" }}
       >
         start sell
-      </CustomButton>
+      </CustomButton> */}
     </Box>
   );
 };
