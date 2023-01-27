@@ -4,8 +4,8 @@ import { useContractRead } from "wagmi";
 
 interface IProps {
   title: string;
-  address: string;
-  abi: string;
+  address: `0x${string}`;
+  abi: any;
   method: string;
 }
 

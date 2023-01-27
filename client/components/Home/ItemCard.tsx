@@ -10,7 +10,7 @@ import AddressCopy from "../ui/AddressCopy";
 interface IProps {
   to: number;
   title: string;
-  price: string;
+  price: number;
   ownedBy: string;
   saleEndDate: string;
   image?: string;
