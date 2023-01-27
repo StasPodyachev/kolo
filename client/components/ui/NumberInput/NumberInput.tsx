@@ -37,8 +37,8 @@ const NumberInput = ({
           w="100%"
           h="100%"
           p="12px 16px"
-          color="white"
           transition="all .3s"
+          color="white"
           _focusVisible={{
             boxShadow: "none",
             border: "1px solid",
