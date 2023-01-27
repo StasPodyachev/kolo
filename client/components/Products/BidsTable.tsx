@@ -17,7 +17,7 @@ const BidsTable: NextPage = () => {
               <Td textStyle="smallText" color="gray.300">
                 {item.date}
               </Td>
-              <Td fontFamily="Roboto Mono" pr={0} isNumeric>
+              <Td fontFamily="Roboto Mono" pr={0} color="white" isNumeric>
                 {numberWithCommas(item.bid)}&nbsp;FIL
               </Td>
             </Tr>

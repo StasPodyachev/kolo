@@ -31,7 +31,7 @@ const NumberInput = ({
         borderRadius="md"
         value={value}
         onChange={(value) => setValue(+value)}
-        placeholder="Amount"
+        _placeholder={{ color: "white" }}
       >
         <NumberInputField
           w="100%"
@@ -48,6 +48,7 @@ const NumberInput = ({
           <Badge
             letterSpacing="1px"
             bg="gray.800"
+            color="white"
             p="2px 8px"
             textStyle="mediumText"
           >

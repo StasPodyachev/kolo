@@ -1,23 +1,12 @@
 import { NextPage } from "next";
 import Image from "next/image";
 import Layout from "@/components/Layout";
-import {
-  Flex,
-  Text,
-  Box,
-  Heading,
-  HStack,
-  Button,
-  Badge,
-  useClipboard,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Flex, Text, Box, Heading, HStack, Button } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { auctionItems } from "@/constants/shared";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import BidsTable from "@/components/Products/BidsTable";
-import { addressTruncation } from "@/helpers";
 import AddressCopy from "@/components/ui/AddressCopy";
 
 const Product: NextPage = () => {
@@ -25,7 +14,6 @@ const Product: NextPage = () => {
   const productItem = auctionItems.find(
     (item) => item.id.toString() === router.query.productId
   );
-  const { onCopy, value, setValue, hasCopied } = useClipboard("");
   return (
     <Layout pageTitle="Item">
       <Flex flexDir="column">
@@ -69,7 +57,7 @@ const Product: NextPage = () => {
             </Box>
           </Flex>
           <Flex flexDir="column" gap="6px" minW="278px">
-            <Heading variant="h4">{productItem?.title}</Heading>
+            <Heading variant="h4" color="white">{productItem?.title}</Heading>
             <HStack spacing="16px">
               <Text textStyle="mediumText" color="gray.500">
                 Owned by:
@@ -95,6 +83,7 @@ const Product: NextPage = () => {
             <Button
               textStyle="button"
               bg="blue.primary"
+              color="white"
               mt="39px"
               borderRadius="md"
               transition="all .3s"
@@ -121,7 +110,11 @@ const Product: NextPage = () => {
                     : "red.active"
                 }
               />
-              <Text textStyle="smallText" textTransform="capitalize">
+              <Text
+                textStyle="smallText"
+                color="white"
+                textTransform="capitalize"
+              >
                 {productItem?.status}
               </Text>
             </Flex>
@@ -131,6 +124,7 @@ const Product: NextPage = () => {
             <Button
               mt="35px"
               bg="blue.secondaryDark"
+              color="white"
               textStyle="button"
               transition="all .3s"
               _hover={{ bg: "blue.active" }}
@@ -143,10 +137,14 @@ const Product: NextPage = () => {
         <Flex gap="88px">
           <Box minW="400px">
             <Flex justify="space-between" w="100%">
-              <Heading variant="h6">Bids</Heading>
+              <Heading variant="h6" color="white">
+                Bids
+              </Heading>
               <Flex alignItems="center">
                 <UserIcon width="21px" height="20px" />
-                <Heading variant="h6">{productItem?.totalBids}</Heading>
+                <Heading variant="h6" color="white">
+                  {productItem?.totalBids}
+                </Heading>
               </Flex>
             </Flex>
             <BidsTable />

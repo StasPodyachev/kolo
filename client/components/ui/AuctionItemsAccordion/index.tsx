@@ -57,7 +57,7 @@ const AuctionItemAccordion: NextPage = () => {
               <Flex p="20px 30px" alignItems="center" w="100%">
                 <Flex justifyContent="space-between" w="100%">
                   <Flex flexDir="column" gap="8px">
-                    <Text>{item.title}</Text>
+                    <Text color="white">{item.title}</Text>
                     <Flex>
                       <Text textStyle="smallText" color="gray.300">
                         CID:&nbsp;
@@ -74,7 +74,11 @@ const AuctionItemAccordion: NextPage = () => {
                       <Text textStyle="smallText" color="gray.300">
                         Last price
                       </Text>
-                      <Text fontFamily="Roboto Mono" textStyle="bigText">
+                      <Text
+                        fontFamily="Roboto Mono"
+                        textStyle="bigText"
+                        color="white"
+                      >
                         {item.currentPrice}&nbsp;FIL
                       </Text>
                     </HStack>
