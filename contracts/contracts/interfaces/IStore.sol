@@ -6,5 +6,34 @@ interface IStore {
 
     function depositBuyer(uint256 dealId, address buyer) external payable;
 
+    function depositBuyerCollateral(uint256 dealId) external payable;
+
     function withdrawBuyer(uint256 dealId, address buyer) external;
+
+    function transfer(
+        uint256 dealId,
+        address buyer,
+        address to
+    ) external;
+
+    function getSellerCollateral(uint256 dealId)
+        external
+        view
+        returns (uint256);
+
+    function getBuyerCollateral(uint256 dealId) external view returns (uint256);
+
+    function transferBuyerCollateral(uint256 dealId, address to)
+        external
+        returns (uint256);
+
+    function transferSellerCollateral(uint256 dealId, address to)
+        external
+        returns (uint256);
+
+    function addAccsess(uint256 dealId, address wallet) external;
+
+    function checkAccsess(uint256 dealId, address wallet) external;
+
+    function getIntegration(uint256 dealId) external view returns (address);
 }

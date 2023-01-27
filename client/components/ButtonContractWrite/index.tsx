@@ -4,7 +4,7 @@ import { narrow } from "abitype";
 
 interface IProps {
   title: string;
-  address: `0x${string}`;
+  address: string;
   abi: any;
   method: string;
 }
