@@ -1,3 +1,7 @@
+export interface ISaleTypeMenuItems {
+  title: string;
+  address: string;
+}
 export interface INavlink {
   url: string;
   title: string;
@@ -47,4 +51,8 @@ export interface IDepositAndWithdrawButton {
 export interface FaqAccordionItem {
   title: string;
   description: string;
+}
+
+export interface IChildren {
+  children: JSX.Element | JSX.Element[];
 }
