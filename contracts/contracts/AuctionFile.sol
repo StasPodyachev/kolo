@@ -101,7 +101,13 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         // uint
         TypesToBytes.uintToBytes(offset, uint256(params.status), data);
         offset += 32;
-        deal = DealParams({id: dealId, _type: 0, data: data});
+        deal = DealParams({
+            id: dealId,
+            _type: 0,
+            data: data,
+            integration: address(this),
+            store: _factory.getStore(params.seller)
+        });
     }
 
     function sendMessage(uint256 dealId, string calldata message) external {
