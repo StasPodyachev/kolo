@@ -12,7 +12,7 @@ const MyStorePanel: NextPage = () => {
           <Block key={block.title} title={block.title} value={block.value} />
         ))}
       </Flex>
-      <Heading mt="28px" variant="h3">
+      <Heading mt="28px" variant="h3" color="white">
         My Store
       </Heading>
       <AuctionItemsAccordion />

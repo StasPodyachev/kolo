@@ -1,10 +1,11 @@
 import { Button } from "@chakra-ui/react";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { narrow } from "abitype";
 
 interface IProps {
   title: string;
-  address: string;
-  abi: string;
+  address: any;
+  abi: any;
   method: string;
 }
 

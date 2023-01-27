@@ -13,7 +13,9 @@ const Layout = ({ children, pageTitle }: IProps) => {
       <Sidebar />
       <Box bg="gray.900" w="100%" p="56px 70px">
         <Flex w="100%" justifyContent="space-between" h="max-content">
-          <Heading variant="h3">{pageTitle}</Heading>
+          <Heading variant="h3" color="white">
+            {pageTitle}
+          </Heading>
           <ManageBar />
         </Flex>
         <Box mt="60px">{children}</Box>

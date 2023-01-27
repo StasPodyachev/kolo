@@ -28,14 +28,16 @@ const FaqAccordion: NextPage = () => {
               p="20px 30px"
               w="100%"
             >
-              <Heading minW="max-content" variant="h5">
+              <Heading minW="max-content" variant="h5" color="white">
                 {item.title}
               </Heading>
-              <AccordionIcon boxSize="36px" />
+              <AccordionIcon boxSize="36px" color="white" />
             </Flex>
           </AccordionButton>
           <AccordionPanel p="10px 46px">
-            <Text textStyle="bigText">{item.description}</Text>
+            <Text textStyle="bigText" color="white">
+              {item.description}
+            </Text>
           </AccordionPanel>
         </AccordionItem>
       ))}
