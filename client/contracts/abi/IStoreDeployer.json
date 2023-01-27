@@ -1,0 +1,15 @@
+[
+  {
+    "inputs": [],
+    "name": "parameters",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "factory",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

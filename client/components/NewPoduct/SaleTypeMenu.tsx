@@ -35,7 +35,7 @@ const SaleTypeMenu: NextPage = () => {
         bg="gray.700"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Flex justifyContent="space-between">
+        <Flex justifyContent="space-between" alignItems="center">
           <Text textStyle="mediumText">{activeItem}</Text>
           <ArrowIcon
             boxSize="30px"

@@ -48,3 +48,7 @@ export interface FaqAccordionItem {
   title: string;
   description: string;
 }
+
+export interface IChildren {
+  children: JSX.Element | JSX.Element[];
+}

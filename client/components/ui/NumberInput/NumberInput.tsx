@@ -9,6 +9,7 @@ import {
 interface IProps {
   value: number;
   setValue: (value: number) => void;
+  placeholder: string;
   isNeededMarginTop?: boolean;
   isNotFullWidth?: boolean;
 }
@@ -16,6 +17,7 @@ interface IProps {
 const NumberInput = ({
   value,
   setValue,
+  placeholder,
   isNeededMarginTop,
   isNotFullWidth,
 }: IProps) => {
@@ -25,14 +27,19 @@ const NumberInput = ({
       minH="48px"
       mt={isNeededMarginTop ? "16px" : 0}
     >
-      <ChakraNumberInput
-        w="100%"
-        bg="gray.700"
-        borderRadius="md"
-        _placeholder={{ color: "white" }}
-      >
+      <ChakraNumberInput min={0} w="100%" bg="gray.700" borderRadius="md">
         <NumberInputField
+          placeholder={placeholder}
+          _placeholder={{ color: "white" }}
           value={value}
+          onKeyPress={(event) => {
+            if (event.key === "e" || event.key === "E" || event.key === "-") {
+              setTimeout(() => {
+                setValue(0);
+              }, 100);
+              console.log("hello");
+            }
+          }}
           onChange={(value) => setValue(+value)}
           w="100%"
           h="100%"
