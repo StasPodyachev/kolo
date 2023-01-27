@@ -214,6 +214,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
 
         this.addAccsess(dealId, deal.buyer);
         deal.status = SimpleTradeFileStatus.FINALIZE;
+        deal.dateExpire = block.timestamp;
 
         _sendMessage(
             dealId,

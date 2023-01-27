@@ -336,6 +336,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         this.addAccsess(deal.id, deal.buyer);
 
         deal.status = AuctionStatus.FINALIZE;
+        deal.dateExpire = block.timestamp;
 
         _sendMessage(deal.id, "Deal finalized.");
     }
