@@ -1,12 +1,14 @@
+import addresses from "@/contracts/addresses";
 import { getTodaysDate } from "@/helpers";
 import { Box, Button, chakra, Flex, Heading, Input } from "@chakra-ui/react";
-import lighthouse from "@lighthouse-web3/sdk";
-import { ethers } from "ethers";
 import React, { ChangeEvent, useState } from "react";
 import { useAccount } from "wagmi";
+import ButtonContractWrite from "../ButtonContractWrite";
 import ConnectBtn from "../ui/ConnectBtn";
 import NumberInput from "../ui/NumberInput/NumberInput";
 import SaleTypeMenu from "./SaleTypeMenu";
+
+import ABI_FACTORY from '../../contracts/abi/Factory.json'
 
 const API_KEY = "8a415179-7ab8-47b8-83e8-d1b3975740fe";
 // const cid = "QmQT3e1Uce8gA57jvoamCUuA6otSTb6L5v2SCqsxscEtJK"
@@ -44,8 +46,7 @@ const NewPoduct = () => {
   const [myCollateral, setMyCollateral] = useState(0.0);
   const [stopDate, setStopDate] = useState("");
   const [cid, setCid] = useState("");
-
-
+  const [ access, setAcces ] = useState(false)
 
   return (
     <Flex justifyContent="center">
@@ -159,7 +160,7 @@ const NewPoduct = () => {
               </CustomButton>
             </Flex>
           ) : null}
-          {isConnected ? (
+          { isConnected && access ? (
             <CustomButton
               w="100%"
               bg="blue.primary"
@@ -167,42 +168,12 @@ const NewPoduct = () => {
               transition="all .3s"
               _hover={{ bg: "blue.active" }}
             >
-              start sell
+              <ButtonContractWrite address={addresses[0].address} abi={ABI_FACTORY} method="create"  title="start sell" />
             </CustomButton>
           ) : (
             <ConnectBtn isCentered isNeedMarginTop />
           )}
         </Box>
-        {isConnected ? (
-          <>
-            {/* <Heading mt="60px" variant="h4" color="white">
-              Step 2. Provide access
-            </Heading>
-            <CustomButton
-              ml="110px"
-              w="585px"
-              bg="blue.primary"
-              color="white"
-              transition="all .3s"
-              _hover={{ bg: "blue.active" }}
-            >
-              share access to protocol
-            </CustomButton> */}
-            {/* <Heading mt="60px" variant="h4" color="white">
-              Step 3. Start Sell
-            </Heading>
-            <CustomButton
-              ml="110px"
-              minW="585px"
-              bg="blue.primary"
-              color="white"
-              transition="all .3s"
-              _hover={{ bg: "blue.active" }}
-            >
-              start sell
-            </CustomButton> */}
-          </>
-        ) : null}
       </Box>
     </Flex>
   );

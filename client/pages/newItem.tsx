@@ -1,6 +1,9 @@
 import {NextPage} from "next";
 import Layout from "@/components/Layout";
-import NewPoduct from "@/components/NewPoduct/NewPoduct";
+import dynamic from 'next/dynamic'
+const NewPoduct = dynamic(() => import("@/components/NewPoduct/NewPoduct"), {
+  ssr: false,
+})
 
 const newItem: NextPage = () => {
   return (

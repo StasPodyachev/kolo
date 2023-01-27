@@ -47,12 +47,11 @@ const SaleTypeMenu: NextPage = () => {
         <Flex flexDir="column" w="100%">
           {SaleTypeMenuItems.map((item) => (
             <MenuItem
-              key={item?.address}
+              key={item?.title}
               onClick={() => {
                 setActiveItem(item);
                 setIsOpen(false);
-              }}
-            >
+              }}>
               {item?.title}
             </MenuItem>
           ))}
