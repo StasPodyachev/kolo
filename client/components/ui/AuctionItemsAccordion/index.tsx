@@ -129,7 +129,7 @@ const AuctionItemAccordion: NextPage = () => {
                   p={0}
                   w="max-content"
                 >
-                  <AccordionIcon ml="36px" boxSize="36px" />
+                  <AccordionIcon ml="36px" boxSize="36px" color="white" />
                 </AccordionButton>
               </Flex>
             </Flex>
@@ -188,6 +188,7 @@ const AuctionItemAccordion: NextPage = () => {
               </Flex>
               <Button
                 bg="blue.primary"
+                color="white"
                 textStyle="button"
                 minW="272px"
                 alignSelf="flex-end"
