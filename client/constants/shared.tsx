@@ -14,6 +14,7 @@ import {
   IVotesParameter,
   IDepositAndWithdrawButton,
   FaqAccordionItem,
+  ISaleTypeMenuItems
 } from "@/types";
 
 export const navLinks: INavlink[] = [
@@ -310,11 +311,23 @@ export const MyPurchasesBlocks: IBlock[] = [
   },
 ];
 
-export const SaleTypeMenuItems = [
-  "AUCTION OF FILES",
-  "AUCTION OF LIVEPEER",
-  "AUCTION OF HUDDLE",
-  "SIMPLE TRADES OF FILES",
+export const SaleTypeMenuItems: ISaleTypeMenuItems[] = [
+  {
+    title: "AUCTION OF FILES",
+    address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
+  },
+  {
+    title: "AUCTION OF LIVEPEER",
+    address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
+  },
+  {
+    title: "AUCTION OF HUDDLE",
+    address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
+  },
+  {
+    title: "SIMPLE TRADES OF FILES",
+    address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
+  }
 ];
 
 export const FaqAccodionItems: FaqAccordionItem[] = [

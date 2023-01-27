@@ -1,3 +1,7 @@
+export interface ISaleTypeMenuItems {
+  title: string;
+  address: string;
+}
 export interface INavlink {
   url: string;
   title: string;
