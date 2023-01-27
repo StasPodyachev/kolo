@@ -10,12 +10,6 @@ interface IStore {
 
     function withdrawBuyer(uint256 dealId, address buyer) external;
 
-    function transfer(
-        uint256 dealId,
-        address buyer,
-        address to
-    ) external;
-
     function getSellerCollateral(uint256 dealId)
         external
         view
@@ -23,13 +17,13 @@ interface IStore {
 
     function getBuyerCollateral(uint256 dealId) external view returns (uint256);
 
-    function transferBuyerCollateral(uint256 dealId, address to)
-        external
-        returns (uint256);
+    function transferWinToSeller(
+        uint256 dealId,
+        address buyer,
+        address seller
+    ) external;
 
-    function transferSellerCollateral(uint256 dealId, address to)
-        external
-        returns (uint256);
+    function transferWinToBuyer(uint256 dealId, address buyer) external;
 
     function addAccsess(uint256 dealId, address wallet) external;
 

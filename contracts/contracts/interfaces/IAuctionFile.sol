@@ -13,6 +13,7 @@ interface IAuctionFile {
     }
 
     struct AuctionFileParams {
+        uint256 id;
         string name;
         string description;
         uint256 price;
