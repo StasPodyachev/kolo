@@ -11,6 +11,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { AppProps } from "next/app";
 import theme from "@/theme";
 import "../styles/globals.css";
+import { SidebarContextProvider } from "@/context/SidebarContext";
 
 const { chains, provider } = configureChains(
   [
@@ -18,9 +19,7 @@ const { chains, provider } = configureChains(
       ? [filecoinHyperspace, polygonMumbai]
       : []),
   ],
-  [
-    publicProvider(),
-  ]
+  [publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({
@@ -43,14 +42,15 @@ function MyApp({ Component, pageProps }: AppProps) {
         theme={darkTheme({
           accentColor: "#3A3D4D",
           accentColorForeground: "white",
-          borderRadius: "none",
-          fontStack: "rounded",
+          borderRadius: "medium",
           overlayBlur: "none",
         })}
         chains={chains}
       >
         <ChakraProvider theme={theme}>
-          <Component {...pageProps} />
+          <SidebarContextProvider>
+            <Component {...pageProps} />
+          </SidebarContextProvider>
         </ChakraProvider>
       </RainbowKitProvider>
     </WagmiConfig>

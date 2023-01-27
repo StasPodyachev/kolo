@@ -8,15 +8,13 @@ import {
 } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { NextPage } from "next";
-import { useAccount } from "wagmi";
 import { CloseIcon, SearchIcon } from "@/icons";
 import { useState } from "react";
 
 const ManageBar: NextPage = () => {
-  const { isConnected } = useAccount();
   const [searchQuery, setSearchQuery] = useState("");
   return (
-    <Flex gap="32px" w="max-content">
+    <Flex gap="32px" ml="auto">
       <InputGroup minH="52px" data-group>
         <InputLeftElement
           position="relative"
@@ -64,12 +62,17 @@ const ManageBar: NextPage = () => {
       <Box
         w="100%"
         sx={{
+          div: {
+            height: "100%",
+            alignItems: "center",
+          },
           button: {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            minW: isConnected ? "max-content" : "194px",
-            height: "52px",
+            minW: "fit-content",
+            minH: "52px",
+            borderRadius: "md",
           },
         }}
       >

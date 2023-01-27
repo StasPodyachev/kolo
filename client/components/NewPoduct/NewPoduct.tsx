@@ -3,6 +3,7 @@ import { Box, Button, chakra, Flex, Heading, Input } from "@chakra-ui/react";
 import lighthouse from "@lighthouse-web3/sdk";
 import { ethers } from "ethers";
 import React, { ChangeEvent, useState } from "react";
+import { useAccount } from "wagmi";
 import NumberInput from "../ui/NumberInput/NumberInput";
 import SaleTypeMenu from "./SaleTypeMenu";
 
@@ -34,6 +35,7 @@ const CustomButton = chakra(Button, {
 });
 
 const NewPoduct = () => {
+  const { isConnected } = useAccount();
   const [itemName, setItemName] = useState("");
   const [itemDescription, setItemDescription] = useState("");
   const [startPrice, setStartPrice] = useState(0.0);
@@ -146,6 +148,7 @@ const NewPoduct = () => {
             <NumberInput
               value={startPrice}
               setValue={setStartPrice}
+              placeholder="Price in FIL"
               isNeededMarginTop
               isNotFullWidth
             />
@@ -157,6 +160,7 @@ const NewPoduct = () => {
             <NumberInput
               value={forceStopPrice}
               setValue={setForceStopPrice}
+              placeholder="Price in FIL"
               isNeededMarginTop
               isNotFullWidth
             />
@@ -172,10 +176,6 @@ const NewPoduct = () => {
               min={getTodaysDate()}
               value={stopDate}
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                console.log("====================================");
-                console.log("today", getTodaysDate());
-                console.log("date", event.target.value);
-                console.log("====================================");
                 setStopDate(event.target.value);
               }}
               px="16px"
@@ -189,6 +189,7 @@ const NewPoduct = () => {
             <NumberInput
               value={myCollateral}
               setValue={setMyCollateral}
+              placeholder="Amount in FIL"
               isNeededMarginTop
               isNotFullWidth
             />
