@@ -25,15 +25,26 @@ interface ISimpleTradeFile {
         SimpleTradeFileStatus status;
     }
 
+    struct ConfigureParams {
+        uint256 periodDispute;
+        uint256 collateralAmount;
+        uint256 collateralPercent;
+    }
+
     event DisputeCreated(uint256 id);
     event DealCreated(uint256 dealId, address sender);
     event DealCanceled(uint256 dealId, address sender);
+
+    function getIntegrationInfo()
+        external
+        view
+        returns (ConfigureParams memory);
 
     function setFactory(address factory) external;
 
     function setPeriodDispute(uint256 value) external;
 
-    function setColletoralAmount(uint256 value) external;
+    function setCollateralAmount(uint256 value) external;
 
     function sendMessage(uint256 dealId, string calldata message) external;
 
@@ -52,9 +63,4 @@ interface ISimpleTradeFile {
     function dispute(uint256 dealId) external payable;
 
     function finalize(uint256 dealId) external;
-
-    function getChat(uint256 dealId)
-        external
-        view
-        returns (IIntegration.ChatParams[] memory);
 }

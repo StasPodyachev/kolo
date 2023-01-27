@@ -52,8 +52,7 @@ const SaleTypeMenu: NextPage = () => {
               onClick={() => {
                 setActiveItem(item);
                 setIsOpen(false);
-              }}
-            >
+              }}>
               {item?.title}
             </MenuItem>
           ))}
