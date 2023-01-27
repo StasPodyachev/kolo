@@ -144,16 +144,42 @@ contract Notary is INotary, Ownable {
 
         address storeAddress = _factory.getStore(dealId);
         IStore store = IStore(storeAddress);
+        IIntegration integration = IIntegration(store.getIntegration(dealId));
 
         for (uint256 i = 0; i < _countInvaitedNotary; i++) {
             notaries[dealId][arr[i]] = true;
-            store.addAccsess(dealId, arr[i]);
+            IIntegration(integration).addAccsess(dealId, arr[i]);
         }
     }
 
-    function _getRandomNotaries() internal returns (address[] memory) {
-        //  length == _countInvaitedNotary
-        //  Check deposit!
-        //  if (deposits[notaries[i]] < _penalty) continue;
+    function _getRandomNotaries()
+        internal
+        view
+        returns (address[] memory result)
+    {
+        uint256 min = _countInvaitedNotary < notariesArr.length
+            ? _countInvaitedNotary
+            : notariesArr.length;
+        uint256 max = notariesArr.length;
+
+        result = new address[](min);
+
+        for (uint256 i = 0; i < min; i++) {
+            result[i] = notariesArr[_random(max, i)];
+        }
+    }
+
+    function _random(uint256 max, uint256 salt)
+        internal
+        view
+        returns (uint256)
+    {
+        // sha3 and now have been deprecated
+        return
+            uint256(
+                keccak256(
+                    abi.encodePacked(block.difficulty, block.timestamp, salt)
+                )
+            ) % max;
     }
 }
