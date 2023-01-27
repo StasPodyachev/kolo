@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 import "./interfaces/INotary.sol";
 import "./interfaces/IStore.sol";
 import "./interfaces/IFactory.sol";
-import "./interfaces/IIntegration.sol";
+import "./interfaces/integrations/IIntegration.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 

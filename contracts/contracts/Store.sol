@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IStore.sol";
-import "./interfaces/IIntegration.sol";
+import "./interfaces/integrations/IIntegration.sol";
 
 contract Store is IStore, Ownable {
     mapping(uint256 => address) private deals;

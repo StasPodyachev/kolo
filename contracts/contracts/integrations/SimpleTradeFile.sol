@@ -3,16 +3,16 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./interfaces/IAuctionFile.sol";
-import "./interfaces/IIntegration.sol";
-import "./interfaces/IStore.sol";
-import "./interfaces/IFactory.sol";
-import "./interfaces/INotary.sol";
+import "../interfaces/integrations/ISimpleTradeFile.sol";
+import "../interfaces/integrations/IIntegration.sol";
+import "../interfaces/IStore.sol";
+import "../interfaces/IFactory.sol";
+import "../interfaces/INotary.sol";
 
-import {SizeOf} from "./libs/seriality/SizeOf.sol";
-import {TypesToBytes} from "./libs/seriality/TypesToBytes.sol";
+import {SizeOf} from "../libs/seriality/SizeOf.sol";
+import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
 
-contract AuctionFile is IAuctionFile, IIntegration, Ownable {
+contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
     IFactory public _factory;
     INotary public _notary;
 
@@ -21,14 +21,9 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     uint256 public _colletoralAmount = 1e17;
     uint256 public _colletoralPercent = 1e17;
 
-    mapping(uint256 => AuctionFileParams) private deals;
+    mapping(uint256 => SimpleTradeFileParams) private deals;
     mapping(uint256 => ChatParams[]) private chats;
-    mapping(uint256 => mapping(address => uint256)) private bids;
-    mapping(uint256 => BidParams[]) private bidHistory;
-    mapping(uint256 => address[]) private bidBuyers;
     mapping(address => mapping(bytes => bool)) private _accsess;
-
-    uint256 id;
 
     function setPeriodDispute(uint256 value) external onlyOwner {
         _periodDispute = value;
@@ -55,12 +50,12 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         view
         returns (DealParams memory deal)
     {
-        AuctionFileParams memory params = deals[dealId];
+        SimpleTradeFileParams memory params = deals[dealId];
 
         uint256 size = SizeOf.sizeOfString(params.name) +
             SizeOf.sizeOfString(params.description) +
             SizeOf.sizeOfBytes(params.cid) +
-            6 *
+            4 *
             32 +
             20 *
             2;
@@ -77,10 +72,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         // 4x uint256
         TypesToBytes.uintToBytes(offset, params.price, data);
         offset += 32;
-        TypesToBytes.uintToBytes(offset, params.priceStart, data);
-        offset += 32;
-        TypesToBytes.uintToBytes(offset, params.priceForceStop, data);
-        offset += 32;
+
         TypesToBytes.uintToBytes(offset, params.collateralAmount, data);
         offset += 32;
 
@@ -111,13 +103,13 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function sendMessage(uint256 dealId, string calldata message) external {
-        AuctionFileParams memory deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
+        SimpleTradeFileParams memory deal = deals[dealId];
+        require(deal.price != 0, "SimpleTradeFileFile: Id not found");
 
         require(
-            deal.status != AuctionStatus.CLOSE &&
-                deal.status != AuctionStatus.CANCEL,
-            "AuctionFile: Wrong status"
+            deal.status != SimpleTradeFileStatus.CLOSE &&
+                deal.status != SimpleTradeFileStatus.CANCEL,
+            "SimpleTradeFileFile: Wrong status"
         );
 
         _sendMessage(dealId, message);
@@ -136,8 +128,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     function create(
         string calldata name,
         string calldata description,
-        uint256 priceStart,
-        uint256 priceForceStop,
+        uint256 price,
         uint256 dateExpire,
         bytes calldata cid
     ) external payable returns (uint256) {
@@ -145,33 +136,34 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         require(
             storeAddress != address(0),
-            "AuctionFile: Caller does not have a store"
+            "SimpleTradeFileFile: Caller does not have a store"
         );
 
         require(
-            msg.value >= (priceStart * _colletoralPercent) / 1e18 &&
+            msg.value >= (price * _colletoralPercent) / 1e18 &&
                 msg.value >= _colletoralAmount,
-            "AuctionFile: Wrong colletoral"
+            "SimpleTradeFileFile: Wrong colletoral"
         );
 
-        require(priceStart != 0, "AuctionFile: Wrong priceStart");
+        require(
+            price != 0 && dateExpire > block.timestamp,
+            "SimpleTradeFileFile: Wrong params"
+        );
 
-        deals[++id] = AuctionFileParams({
+        uint256 id = _factory.addDeal(storeAddress);
+
+        deals[id] = SimpleTradeFileParams({
             id: id,
             name: name,
             description: description,
             collateralAmount: msg.value,
-            price: 0,
-            priceForceStop: priceForceStop,
-            priceStart: priceStart,
+            price: price,
             dateExpire: dateExpire,
             seller: msg.sender,
             buyer: address(0),
             cid: cid,
-            status: AuctionStatus.OPEN
+            status: SimpleTradeFileStatus.OPEN
         });
-
-        _factory.addDeal(id, storeAddress);
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
         _sendMessage(id, "Deal created.");
@@ -181,71 +173,55 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         return id;
     }
 
-    function bid(uint256 dealId) external payable {
-        AuctionFileParams memory deal = deals[dealId];
+    function buy(uint256 dealId) external payable {
+        SimpleTradeFileParams memory deal = deals[dealId];
+        require(deal.price != 0, "SimpleTradeFile: Id not found");
 
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
-
-        require(deal.status == AuctionStatus.OPEN, "AuctionFile: Wrong status");
+        require(
+            deal.status == SimpleTradeFileStatus.OPEN,
+            "SimpleTradeFile: Wrong status"
+        );
 
         require(
             deal.seller != msg.sender,
-            "AuctionFile: Seller cannot be a buyer"
+            "SimpleTradeFile: Seller cannot be a buyer"
         );
-
-        require(block.timestamp < deal.dateExpire, "AuctionFile: Time is up");
-
-        uint256 currentBid = bids[dealId][msg.sender] + msg.value;
-
-        require(currentBid >= deal.priceStart, "AuctionFile: Wrong amount");
 
         require(
-            currentBid > deal.price,
-            "AuctionFile: Current bid cannot be less then previous bid"
+            block.timestamp < deal.dateExpire,
+            "SimpleTradeFile: Time is up"
         );
+
+        require(msg.value == deal.price, "SimpleTradeFile: Wrong msg.value");
 
         address storeAddress = _factory.getStore(deal.seller);
         IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
-        deal.price = currentBid;
         deal.buyer = msg.sender;
 
-        bids[dealId][msg.sender] = currentBid;
-
-        bidHistory[dealId].push(
-            BidParams({
-                timestamp: block.timestamp,
-                buyer: msg.sender,
-                bid: currentBid
-            })
-        );
-
-        bidBuyers[dealId].push(msg.sender);
+        this.addAccsess(dealId, deal.buyer);
+        deal.status = SimpleTradeFileStatus.FINALIZE;
 
         _sendMessage(
             dealId,
-            string(abi.encodePacked("Bid added by ", deal.buyer))
+            string(abi.encodePacked(deal.buyer, "bought an item"))
         );
-
-        if (currentBid >= deal.priceForceStop) {
-            _finalize(deal, IStore(storeAddress));
-        }
     }
 
     function cancel(uint256 dealId) external {
-        AuctionFileParams memory deal = deals[dealId];
+        SimpleTradeFileParams memory deal = deals[dealId];
 
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
+        require(deal.price != 0, "SimpleTradeFile: Id not found");
         require(
             deal.seller == msg.sender,
-            "AuctionFile: Caller is not a seller"
+            "SimpleTradeFile: Caller is not a seller"
         );
         require(
-            deal.buyer == address(0),
-            "AuctionFile: Auction already have a bid"
+            deal.status == SimpleTradeFileStatus.OPEN,
+            "SimpleTradeFile: Wrong status"
         );
 
-        deal.status = AuctionStatus.CANCEL;
+        deal.status = SimpleTradeFileStatus.CANCEL;
 
         _sendMessage(deal.id, "Deal canceled.");
 
@@ -253,100 +229,47 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function dispute(uint256 dealId) external payable {
-        AuctionFileParams memory deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
+        SimpleTradeFileParams memory deal = deals[dealId];
+        require(deal.price != 0, "SimpleTradeFile: Id not found");
 
-        require(deal.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
+        require(
+            deal.buyer == msg.sender,
+            "SimpleTradeFile: Caller is not a buyer"
+        );
         require(
             block.timestamp < deal.dateExpire + _periodDispute,
-            "AuctionFile: Time for dispute is up"
+            "SimpleTradeFile: Time for dispute is up"
         );
 
         require(
-            deal.status == AuctionStatus.FINALIZE,
-            "AuctionFile: Wrong status"
+            deal.status == SimpleTradeFileStatus.FINALIZE,
+            "SimpleTradeFile: Wrong status"
         );
 
         require(
             msg.value == deal.collateralAmount,
-            "AuctionFile: Wrong colletoral"
+            "SimpleTradeFile: Wrong colletoral"
         );
 
         address storeAddress = _factory.getStore(deal.seller);
         IStore(storeAddress).depositBuyerCollateral{value: msg.value}(dealId);
 
-        deal.status = AuctionStatus.DISPUTE;
+        deal.status = SimpleTradeFileStatus.DISPUTE;
 
         _notary.chooseNotaries(dealId);
 
         _sendMessage(deal.id, "Dispute started.");
     }
 
-    function finalize(uint256 dealId) external {
-        AuctionFileParams memory deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
-
-        require(
-            block.timestamp > deal.dateExpire,
-            "AuctionFile: Date is not expire"
-        );
-
-        require(
-            deal.status == AuctionStatus.OPEN,
-            "AuctionFile: Auction is not open"
-        );
-
-        address storeAddress = _factory.getStore(deal.seller);
-
-        if (deal.buyer == address(0)) {
-            IStore(storeAddress).transferWinToSeller(
-                dealId,
-                address(0),
-                deal.seller
-            );
-
-            deal.status = AuctionStatus.CLOSE;
-
-            _sendMessage(deal.id, "Deal closed.");
-
-            return;
-        }
-
-        _finalize(deal, IStore(storeAddress));
-    }
-
-    function _finalize(AuctionFileParams memory deal, IStore store) internal {
-        _withdrawBids(deal.id, deal.buyer, store);
-        this.addAccsess(deal.id, deal.buyer);
-
-        deal.status = AuctionStatus.FINALIZE;
-
-        _sendMessage(deal.id, "Deal finalized.");
-    }
-
-    function _withdrawBids(
-        uint256 dealId,
-        address buyer,
-        IStore store
-    ) internal {
-        address[] memory buyers = bidBuyers[dealId];
-
-        for (uint256 i = 0; i < buyers.length; i++) {
-            if (buyers[i] == buyer) continue;
-
-            store.withdrawBuyer(dealId, buyers[i]);
-        }
-    }
-
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
     {
-        AuctionFileParams memory deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
+        SimpleTradeFileParams memory deal = deals[dealId];
+        require(deal.price != 0, "SimpleTradeFile: Id not found");
 
         require(
-            deal.status == AuctionStatus.DISPUTE,
-            "AuctionFile: Wrong status"
+            deal.status == SimpleTradeFileStatus.DISPUTE,
+            "SimpleTradeFile: Wrong status"
         );
 
         address storeAddress = _factory.getStore(deal.seller);
@@ -358,7 +281,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             store.transferWinToSeller(dealId, deal.buyer, deal.seller);
         }
 
-        deal.status = AuctionStatus.CLOSE;
+        deal.status = SimpleTradeFileStatus.CLOSE;
 
         _sendMessage(
             deal.id,
@@ -374,34 +297,34 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         );
     }
 
-    function receiveReward(uint256 dealId) external {
-        AuctionFileParams memory deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
+    function finalize(uint256 dealId) external {
+        SimpleTradeFileParams memory deal = deals[dealId];
+        require(deal.price != 0, "SimpleTradeFile: Id not found");
+
         require(
-            deal.status == AuctionStatus.FINALIZE,
-            "AuctionFile: Wrong status"
+            block.timestamp > deal.dateExpire,
+            "SimpleTradeFile: Date is not expire"
         );
+
         require(
-            block.timestamp > deal.dateExpire + _periodDispute,
-            "AuctionFile: Time for dispute"
+            (block.timestamp > deal.dateExpire &&
+                deal.status == SimpleTradeFileStatus.OPEN) ||
+                (block.timestamp > deal.dateExpire + _periodDispute &&
+                    deal.status == SimpleTradeFileStatus.FINALIZE),
+            "SimpleTradeFile: Error"
         );
 
         address storeAddress = _factory.getStore(deal.seller);
-        IStore store = IStore(storeAddress);
 
-        store.transferWinToSeller(dealId, deal.buyer, deal.seller);
+        IStore(storeAddress).transferWinToSeller(
+            dealId,
+            deal.buyer,
+            deal.seller
+        );
 
-        deal.status = AuctionStatus.CLOSE;
+        deal.status = SimpleTradeFileStatus.CLOSE;
 
         _sendMessage(deal.id, "Deal closed.");
-    }
-
-    function getBidHistory(uint256 dealId)
-        external
-        view
-        returns (BidParams[] memory)
-    {
-        return bidHistory[dealId];
     }
 
     function getChat(uint256 dealId)

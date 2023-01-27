@@ -13,7 +13,12 @@ interface IIntegration {
         bytes data; // all propertiest for target integration deal
         address integration;
         address store;
-        // DealStatus status;
+    }
+
+    struct ChatParams {
+        uint256 timestamp;
+        address sender;
+        string message;
     }
 
     function getDeal(uint256 dealId) external view returns (DealParams memory);
