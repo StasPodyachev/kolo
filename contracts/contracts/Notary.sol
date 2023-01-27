@@ -70,6 +70,9 @@ contract Notary is Ownable {
         serviceFee -= amount;
     }
 
+    /**
+     * @param mark True is vote for buyer, False - for seller
+     */
     function vote(uint256 dealId, bool mark) external {
         require(notaries[dealId][msg.sender], "Notary: No accsess");
 
