@@ -58,6 +58,10 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             "AuctionFile: Wrong status"
         );
 
+        _sendMessage(dealId, message);
+    }
+
+    function _sendMessage(uint256 dealId, string memory message) internal {
         chats[dealId].push(
             ChatParams({
                 timestamp: block.timestamp,
@@ -108,6 +112,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         _factory.addDeal(id, storeAddress);
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
+        _sendMessage(id, "Deal created.");
 
         emit DealCreated(id, msg.sender);
 
@@ -155,6 +160,11 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         bidBuyers[dealId].push(msg.sender);
 
+        _sendMessage(
+            dealId,
+            string(abi.encodePacked("Bid added by ", deal.buyer))
+        );
+
         if (currentBid >= deal.priceForceStop) {
             _finalize(deal, IStore(storeAddress));
         }
@@ -174,6 +184,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         );
 
         deal.status = AuctionStatus.CANCEL;
+
+        _sendMessage(deal.id, "Deal canceled.");
 
         emit DealCanceled(dealId, msg.sender);
     }
@@ -204,6 +216,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         deal.status = AuctionStatus.DISPUTE;
 
         _notary.chooseNotaries(dealId);
+
+        _sendMessage(deal.id, "Dispute started.");
     }
 
     function finalize(uint256 dealId) external {
@@ -231,6 +245,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
             deal.status = AuctionStatus.CLOSE;
 
+            _sendMessage(deal.id, "Deal closed.");
+
             return;
         }
 
@@ -242,6 +258,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         store.addAccsess(deal.id, deal.buyer);
 
         deal.status = AuctionStatus.FINALIZE;
+
+        _sendMessage(deal.id, "Deal finalized.");
     }
 
     function _withdrawBids(
@@ -279,6 +297,19 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         }
 
         deal.status = AuctionStatus.CLOSE;
+
+        _sendMessage(
+            deal.id,
+            string(
+                abi.encodePacked(
+                    "Dispute closed",
+                    winner == IIntegration.DisputeWinner.Buyer
+                        ? deal.buyer
+                        : deal.seller,
+                    "wins."
+                )
+            )
+        );
     }
 
     function receiveReward(uint256 dealId) external {
@@ -299,6 +330,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         store.transferWinToSeller(dealId, deal.buyer, deal.seller);
 
         deal.status = AuctionStatus.CLOSE;
+
+        _sendMessage(deal.id, "Deal closed.");
     }
 
     function getBidHistory(uint256 dealId)
