@@ -48,6 +48,8 @@ interface IAuctionFile {
 
     function setColletoralAmount(uint256 value) external;
 
+    function sendMessage(uint256 dealId, string calldata message) external;
+
     function create(
         string calldata name,
         string calldata description,
@@ -68,4 +70,9 @@ interface IAuctionFile {
     function getBidHistory(uint256 dealId)
         external
         returns (BidParams[] memory);
+
+    function getChat(uint256 dealId)
+        external
+        view
+        returns (ChatParams[] memory);
 }

@@ -16,6 +16,13 @@ interface IStore {
         address to
     ) external;
 
+    function getSellerCollateral(uint256 dealId)
+        external
+        view
+        returns (uint256);
+
+    function getBuyerCollateral(uint256 dealId) external view returns (uint256);
+
     function transferBuyerCollateral(uint256 dealId, address to)
         external
         returns (uint256);

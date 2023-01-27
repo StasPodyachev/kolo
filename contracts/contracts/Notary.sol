@@ -96,10 +96,7 @@ contract Notary is Ownable {
             IIntegration.DisputeWinner winner;
 
             if (votesForBuyer[dealId].length == _consensusCount) {
-                uint256 collateral = store.transferSellerCollateral(
-                    dealId,
-                    address(this)
-                );
+                uint256 collateral = store.getSellerCollateral(dealId);
                 uint256 reward = collateral / votesForBuyer[dealId].length;
 
                 for (uint256 i = 0; i < votesForBuyer[dealId].length; i++) {
@@ -115,10 +112,7 @@ contract Notary is Ownable {
 
                 winner = IIntegration.DisputeWinner.Buyer;
             } else if (votesForSeller[dealId].length == _consensusCount) {
-                uint256 collateral = store.transferBuyerCollateral(
-                    dealId,
-                    address(this)
-                );
+                uint256 collateral = store.getBuyerCollateral(dealId);
                 uint256 reward = collateral / votesForSeller[dealId].length;
 
                 for (uint256 i = 0; i < votesForSeller[dealId].length; i++) {
@@ -155,7 +149,8 @@ contract Notary is Ownable {
     }
 
     function _getRandomNotaries() internal returns (address[] memory) {
-        //
+        //  length == _countInvaitedNotary
+        //  Check deposit!
         //  if (deposits[notaries[i]] < _penalty) continue;
     }
 }

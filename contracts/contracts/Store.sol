@@ -29,12 +29,27 @@ contract Store is IStore, Ownable {
 
     function withdrawBuyer(uint256 dealId, address buyer) external {
         payable(buyer).transfer(buyers[dealId][buyer]);
-
         buyers[dealId][buyer] = 0;
     }
 
     function depositBuyerCollateral(uint256 dealId) external payable {
         buyerCollaterals[dealId] = msg.value;
+    }
+
+    function getSellerCollateral(uint256 dealId)
+        external
+        view
+        returns (uint256)
+    {
+        return sellerCollaterals[dealId];
+    }
+
+    function getBuyerCollateral(uint256 dealId)
+        external
+        view
+        returns (uint256)
+    {
+        return buyerCollaterals[dealId];
     }
 
     function transferSellerCollateral(uint256 dealId, address to)
