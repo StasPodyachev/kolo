@@ -168,7 +168,7 @@ const NewPoduct = () => {
               transition="all .3s"
               _hover={{ bg: "blue.active" }}
             >
-              <ButtonContractWrite address={addresses[0].address} abi={ABI_FACTORY} method="create"  title="start sell" />
+              <ButtonContractWrite address={addresses[0]?.address} abi={ABI_FACTORY} method="create"  title="start sell" />
             </CustomButton>
           ) : (
             <ConnectBtn isCentered isNeedMarginTop />
