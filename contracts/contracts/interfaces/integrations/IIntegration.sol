@@ -15,12 +15,6 @@ interface IIntegration {
         address store;
     }
 
-    struct ChatParams {
-        uint256 timestamp;
-        address sender;
-        string message;
-    }
-
     function getDeal(uint256 dealId) external view returns (DealParams memory);
 
     function finalizeDispute(uint256 dealId, DisputeWinner winner) external;

@@ -8,6 +8,7 @@ import "../interfaces/integrations/IIntegration.sol";
 import "../interfaces/IStore.sol";
 import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
+import "../interfaces/IChat.sol";
 
 import {SizeOf} from "../libs/seriality/SizeOf.sol";
 import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
@@ -15,14 +16,14 @@ import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
 contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     IFactory public _factory;
     INotary public _notary;
+    IChat public _chat;
 
     uint256 public _periodDispute = 5 days;
 
-    uint256 public _colletoralAmount = 1e17;
-    uint256 public _colletoralPercent = 1e17;
+    uint256 public _collateralAmount = 1e17;
+    uint256 public _collateralPercent = 1e17;
 
     mapping(uint256 => AuctionFileParams) private deals;
-    mapping(uint256 => ChatParams[]) private chats;
     mapping(uint256 => mapping(address => uint256)) private bids;
     mapping(uint256 => BidParams[]) private bidHistory;
     mapping(uint256 => address[]) private bidBuyers;
@@ -32,20 +33,37 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         _periodDispute = value;
     }
 
-    function setColletoralAmount(uint256 value) external onlyOwner {
-        _colletoralAmount = value;
+    function setCollateralAmount(uint256 value) external onlyOwner {
+        _collateralAmount = value;
     }
 
-    function setColletoralPercent(uint256 value) external onlyOwner {
-        _colletoralPercent = value;
+    function setCollateralPercent(uint256 value) external onlyOwner {
+        _collateralPercent = value;
     }
 
     function setFactory(address factory) external onlyOwner {
         _factory = IFactory(factory);
     }
 
+    function setChat(address chat) external onlyOwner {
+        _chat = IChat(chat);
+    }
+
     function setNotary(address notary) external onlyOwner {
         _notary = INotary(notary);
+    }
+
+    function getIntegrationInfo()
+        external
+        view
+        returns (ConfigureParams memory)
+    {
+        return
+            ConfigureParams({
+                periodDispute: _periodDispute,
+                collateralAmount: _collateralAmount,
+                collateralPercent: _collateralPercent
+            });
     }
 
     function getDeal(uint256 dealId)
@@ -118,17 +136,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             "AuctionFile: Wrong status"
         );
 
-        _sendMessage(dealId, message);
-    }
-
-    function _sendMessage(uint256 dealId, string memory message) internal {
-        chats[dealId].push(
-            ChatParams({
-                timestamp: block.timestamp,
-                message: message,
-                sender: msg.sender
-            })
-        );
+        _chat.sendMessage(dealId, message, msg.sender);
     }
 
     function create(
@@ -147,9 +155,9 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         );
 
         require(
-            msg.value >= (priceStart * _colletoralPercent) / 1e18 &&
-                msg.value >= _colletoralAmount,
-            "AuctionFile: Wrong colletoral"
+            msg.value >= (priceStart * _collateralPercent) / 1e18 &&
+                msg.value >= _collateralAmount,
+            "AuctionFile: Wrong collateral"
         );
 
         require(
@@ -177,7 +185,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         });
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
-        _sendMessage(id, "Deal created.");
+        _chat.sendSystemMessage(id, "Deal created.");
 
         emit DealCreated(id, msg.sender);
 
@@ -225,7 +233,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         bidBuyers[dealId].push(msg.sender);
 
-        _sendMessage(
+        _chat.sendSystemMessage(
             dealId,
             string(abi.encodePacked("Bid added by ", deal.buyer))
         );
@@ -250,7 +258,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         deal.status = AuctionStatus.CANCEL;
 
-        _sendMessage(deal.id, "Deal canceled.");
+        _chat.sendSystemMessage(dealId, "Deal canceled.");
 
         emit DealCanceled(dealId, msg.sender);
     }
@@ -272,7 +280,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         require(
             msg.value == deal.collateralAmount,
-            "AuctionFile: Wrong colletoral"
+            "AuctionFile: Wrong collateral"
         );
 
         address storeAddress = _factory.getStore(deal.seller);
@@ -282,7 +290,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         _notary.chooseNotaries(dealId);
 
-        _sendMessage(deal.id, "Dispute started.");
+        _chat.sendSystemMessage(dealId, "Dispute started.");
     }
 
     function finalize(uint256 dealId) external {
@@ -309,8 +317,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             );
 
             deal.status = AuctionStatus.CLOSE;
-
-            _sendMessage(deal.id, "Deal closed.");
+            _chat.sendSystemMessage(dealId, "Deal closed.");
 
             return;
         }
@@ -323,8 +330,9 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         this.addAccsess(deal.id, deal.buyer);
 
         deal.status = AuctionStatus.FINALIZE;
+        deal.dateExpire = block.timestamp;
 
-        _sendMessage(deal.id, "Deal finalized.");
+        _chat.sendSystemMessage(deal.id, "Deal finalized.");
     }
 
     function _withdrawBids(
@@ -363,8 +371,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         deal.status = AuctionStatus.CLOSE;
 
-        _sendMessage(
-            deal.id,
+        _chat.sendSystemMessage(
+            dealId,
             string(
                 abi.encodePacked(
                     "Dispute closed",
@@ -396,7 +404,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         deal.status = AuctionStatus.CLOSE;
 
-        _sendMessage(deal.id, "Deal closed.");
+        _chat.sendSystemMessage(dealId, "Dispute closed.");
     }
 
     function getBidHistory(uint256 dealId)
@@ -405,14 +413,6 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         returns (BidParams[] memory)
     {
         return bidHistory[dealId];
-    }
-
-    function getChat(uint256 dealId)
-        external
-        view
-        returns (ChatParams[] memory)
-    {
-        return chats[dealId];
     }
 
     function addAccsess(uint256 dealId, address wallet) external {

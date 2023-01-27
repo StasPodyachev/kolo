@@ -8,6 +8,7 @@ import "../interfaces/integrations/IIntegration.sol";
 import "../interfaces/IStore.sol";
 import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
+import "../interfaces/IChat.sol";
 
 import {SizeOf} from "../libs/seriality/SizeOf.sol";
 import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
@@ -15,26 +16,26 @@ import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
 contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
     IFactory public _factory;
     INotary public _notary;
+    IChat public _chat;
 
     uint256 public _periodDispute = 5 days;
 
-    uint256 public _colletoralAmount = 1e17;
-    uint256 public _colletoralPercent = 1e17;
+    uint256 public _collateralAmount = 1e17;
+    uint256 public _collateralPercent = 1e17;
 
     mapping(uint256 => SimpleTradeFileParams) private deals;
-    mapping(uint256 => ChatParams[]) private chats;
     mapping(address => mapping(bytes => bool)) private _accsess;
 
     function setPeriodDispute(uint256 value) external onlyOwner {
         _periodDispute = value;
     }
 
-    function setColletoralAmount(uint256 value) external onlyOwner {
-        _colletoralAmount = value;
+    function setCollateralAmount(uint256 value) external onlyOwner {
+        _collateralAmount = value;
     }
 
-    function setColletoralPercent(uint256 value) external onlyOwner {
-        _colletoralPercent = value;
+    function setCollateralPercent(uint256 value) external onlyOwner {
+        _collateralPercent = value;
     }
 
     function setFactory(address factory) external onlyOwner {
@@ -43,6 +44,23 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
 
     function setNotary(address notary) external onlyOwner {
         _notary = INotary(notary);
+    }
+
+    function setChat(address chat) external onlyOwner {
+        _chat = IChat(chat);
+    }
+
+    function getIntegrationInfo()
+        external
+        view
+        returns (ConfigureParams memory)
+    {
+        return
+            ConfigureParams({
+                periodDispute: _periodDispute,
+                collateralAmount: _collateralAmount,
+                collateralPercent: _collateralPercent
+            });
     }
 
     function getDeal(uint256 dealId)
@@ -112,17 +130,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
             "SimpleTradeFileFile: Wrong status"
         );
 
-        _sendMessage(dealId, message);
-    }
-
-    function _sendMessage(uint256 dealId, string memory message) internal {
-        chats[dealId].push(
-            ChatParams({
-                timestamp: block.timestamp,
-                message: message,
-                sender: msg.sender
-            })
-        );
+        _chat.sendMessage(dealId, message, msg.sender);
     }
 
     function create(
@@ -140,9 +148,9 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
         );
 
         require(
-            msg.value >= (price * _colletoralPercent) / 1e18 &&
-                msg.value >= _colletoralAmount,
-            "SimpleTradeFileFile: Wrong colletoral"
+            msg.value >= (price * _collateralPercent) / 1e18 &&
+                msg.value >= _collateralAmount,
+            "SimpleTradeFileFile: Wrong collateral"
         );
 
         require(
@@ -166,7 +174,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
         });
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
-        _sendMessage(id, "Deal created.");
+        _chat.sendSystemMessage(id, "Deal created.");
 
         emit DealCreated(id, msg.sender);
 
@@ -201,8 +209,9 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
 
         this.addAccsess(dealId, deal.buyer);
         deal.status = SimpleTradeFileStatus.FINALIZE;
+        deal.dateExpire = block.timestamp;
 
-        _sendMessage(
+        _chat.sendSystemMessage(
             dealId,
             string(abi.encodePacked(deal.buyer, "bought an item"))
         );
@@ -223,7 +232,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
 
         deal.status = SimpleTradeFileStatus.CANCEL;
 
-        _sendMessage(deal.id, "Deal canceled.");
+        _chat.sendSystemMessage(dealId, "Deal canceled.");
 
         emit DealCanceled(dealId, msg.sender);
     }
@@ -248,7 +257,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
 
         require(
             msg.value == deal.collateralAmount,
-            "SimpleTradeFile: Wrong colletoral"
+            "SimpleTradeFile: Wrong collateral"
         );
 
         address storeAddress = _factory.getStore(deal.seller);
@@ -258,7 +267,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
 
         _notary.chooseNotaries(dealId);
 
-        _sendMessage(deal.id, "Dispute started.");
+        _chat.sendSystemMessage(dealId, "Dispute started.");
     }
 
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
@@ -283,8 +292,8 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
 
         deal.status = SimpleTradeFileStatus.CLOSE;
 
-        _sendMessage(
-            deal.id,
+        _chat.sendSystemMessage(
+            dealId,
             string(
                 abi.encodePacked(
                     "Dispute closed",
@@ -324,15 +333,7 @@ contract SimpleTradeFileFile is ISimpleTradeFile, IIntegration, Ownable {
 
         deal.status = SimpleTradeFileStatus.CLOSE;
 
-        _sendMessage(deal.id, "Deal closed.");
-    }
-
-    function getChat(uint256 dealId)
-        external
-        view
-        returns (ChatParams[] memory)
-    {
-        return chats[dealId];
+        _chat.sendSystemMessage(dealId, "Deal closed.");
     }
 
     function addAccsess(uint256 dealId, address wallet) external {
