@@ -2,6 +2,12 @@
 pragma solidity ^0.8.9;
 
 interface INotary {
+    struct VoteParams {
+        uint256 dealId;
+        uint8 status; // 0 - no status, 1 - win, 2 - lose
+        uint8 mark; // 0 - no mark, 1 - yes, 2 - no
+    }
+
     function setFactory(address factory) external;
 
     function setPenalty(uint256 value) external;
@@ -21,4 +27,9 @@ interface INotary {
     function vote(uint256 dealId, bool mark) external;
 
     function chooseNotaries(uint256 dealId) external;
+
+    function getDealIDbyNotary(address notary)
+        external
+        view
+        returns (INotary.VoteParams[] memory);
 }

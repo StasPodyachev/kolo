@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.9;
 
+import "./IIntegration.sol";
+
 interface IStore {
     function createDeal(uint256 dealId) external payable;
 
@@ -27,5 +29,13 @@ interface IStore {
 
     function getIntegration(uint256 dealId) external view returns (address);
 
-    // function addAccsess(bytes memory cid, address wallet) external;
+    function getDeal(uint256 dealId)
+        external
+        view
+        returns (IIntegration.DealParams memory);
+
+    function getAllDeals()
+        external
+        view
+        returns (IIntegration.DealParams[] memory result);
 }

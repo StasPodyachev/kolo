@@ -17,13 +17,15 @@ contract Notary is INotary, Ownable {
     mapping(uint256 => address[]) private votesForBuyer;
     mapping(uint256 => address[]) private votesForSeller;
 
+    mapping(address => INotary.VoteParams[]) private _notaryDeal;
+
     address[] notariesArr;
 
     uint256 public _minDeposit = 1e18;
     uint256 public _consensusCount = 5;
     uint256 public _countInvaitedNotary = 10;
 
-    uint256 serviceFee;
+    uint256 public serviceFee;
 
     uint256 public _penalty = 1e18;
 
@@ -135,6 +137,14 @@ contract Notary is INotary, Ownable {
             address integration = store.getIntegration(dealId);
             IIntegration(integration).finalizeDispute(dealId, winner);
         }
+    }
+
+    function getDealIDbyNotary(address notary)
+        external
+        view
+        returns (INotary.VoteParams[] memory)
+    {
+        return _notaryDeal[notary];
     }
 
     function chooseNotaries(uint256 dealId) external {

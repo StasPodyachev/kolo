@@ -11,6 +11,8 @@ interface IIntegration {
         uint256 id;
         uint256 _type; // 0 - AuctionFile
         bytes data; // all propertiest for target integration deal
+        address integration;
+        address store;
         // DealStatus status;
     }
 
