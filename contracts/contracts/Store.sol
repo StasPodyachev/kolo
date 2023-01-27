@@ -12,8 +12,6 @@ contract Store is IStore, Ownable {
     mapping(uint256 => uint256) private sellerCollaterals;
     mapping(uint256 => uint256) private buyerCollaterals;
 
-    // mapping(bytes => mapping(address => bool)) private accsess;
-
     function getIntegration(uint256 dealId) external view returns (address) {
         return deals[dealId];
     }
@@ -32,7 +30,6 @@ contract Store is IStore, Ownable {
     }
 
     function withdrawBuyer(uint256 dealId, address buyer) external {
-        // TODO: security
         payable(buyer).transfer(buyers[dealId][buyer]);
         buyers[dealId][buyer] = 0;
     }
@@ -74,13 +71,4 @@ contract Store is IStore, Ownable {
         buyerCollaterals[dealId] = 0;
         buyers[dealId][buyer] = 0;
     }
-
-    // function _addAccsess(
-    //     uint256 dealId,
-    //     bytes calldata cid,
-    //     address wallet
-    // ) internal {
-    //     deals[dealId]
-    //     _accsess[wallet][cid] = true;
-    // }
 }
