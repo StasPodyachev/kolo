@@ -13,6 +13,22 @@ import ABI_FACTORY from '../../contracts/abi/Factory.json'
 const API_KEY = "8a415179-7ab8-47b8-83e8-d1b3975740fe";
 // const cid = "QmQT3e1Uce8gA57jvoamCUuA6otSTb6L5v2SCqsxscEtJK"
 
+const labelStyles = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "48px",
+  minWidth: "278px",
+  cursor: "pointer",
+  background: "#004DE5",
+  color: "white",
+  fontSize: "16px",
+  lineHeight: "24px",
+  textTransform: "uppercase",
+  borderRadius: "8px",
+  marginTop: "36px",
+};
+
 const CustomInput = chakra(Input, {
   baseStyle: {
     bg: "gray.700",
@@ -140,24 +156,62 @@ const NewPoduct = () => {
           </Flex>
           {isConnected ? (
             <Flex justify="space-between">
-              <CustomButton
-                minW="278px"
-                bg="blue.primary"
-                color="white"
-                transition="all .3s"
-                _hover={{ bg: "blue.active" }}
+              <label
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "48px",
+                  minWidth: "278px",
+                  cursor: "pointer",
+                  background: "#004DE5",
+                  color: "white",
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  textTransform: "uppercase",
+                  borderRadius: "8px",
+                  marginTop: "36px",
+                }}
+                htmlFor="fileDownload"
               >
                 download file
-              </CustomButton>
-              <CustomButton
-                minW="278px"
-                bg="gray.500"
-                color="white"
-                transition="all .3s"
-                _hover={{ bg: "gray.600" }}
+              </label>
+              <Input
+                id="thubnailDownload"
+                type="file"
+                display="none"
+                onChange={(e) => {
+                  // deployEncrypted(e)
+                }}
+              />
+              <label
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "48px",
+                  minWidth: "278px",
+                  cursor: "pointer",
+                  background: "#696C80",
+                  color: "white",
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  textTransform: "uppercase",
+                  borderRadius: "8px",
+                  marginTop: "36px",
+                }}
+                htmlFor="thubnailDownload"
               >
                 download thubnail
-              </CustomButton>
+              </label>
+              <Input
+                id="fileDownload"
+                type="file"
+                display="none"
+                onChange={(e) => {
+                  // deployEncrypted(e)
+                }}
+              />
             </Flex>
           ) : null}
           { isConnected && access ? (

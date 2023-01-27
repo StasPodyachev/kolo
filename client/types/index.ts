@@ -1,4 +1,5 @@
-export interface ISaleTypeMenuItems {
+export interface ISaleTypeMenuItem {
+  id: number;
   title: string;
   address: string;
 }
