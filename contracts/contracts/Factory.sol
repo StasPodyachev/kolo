@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./interfaces/IIntegration.sol";
+import "./interfaces/integrations/IIntegration.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/IStore.sol";
 
@@ -14,6 +14,7 @@ contract Factory is IFactory, StoreDeployer, Ownable {
     mapping(uint256 => address) private _dealStore;
     mapping(uint256 => address) private _integrations;
     uint256[] private deals;
+    uint256 id;
 
     function createStore() external returns (address storeAddress) {
         require(
@@ -27,9 +28,11 @@ contract Factory is IFactory, StoreDeployer, Ownable {
         emit StoreCreated(storeAddress, msg.sender);
     }
 
-    function addDeal(uint256 dealId, address storeAddress) external {
-        _dealStore[dealId] = storeAddress;
-        deals.push(dealId);
+    function addDeal(address storeAddress) external returns (uint256) {
+        _dealStore[++id] = storeAddress;
+        deals.push(id);
+
+        return id;
     }
 
     function getStore(address wallet) external view returns (address store) {
