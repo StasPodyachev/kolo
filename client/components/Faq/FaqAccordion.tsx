@@ -31,7 +31,7 @@ const FaqAccordion: NextPage = () => {
               <Heading minW="max-content" variant="h5" color="white">
                 {item.title}
               </Heading>
-              <AccordionIcon boxSize="36px" />
+              <AccordionIcon boxSize="36px" color="white" />
             </Flex>
           </AccordionButton>
           <AccordionPanel p="10px 46px">
