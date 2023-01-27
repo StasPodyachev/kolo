@@ -5,15 +5,24 @@ import NotaryCommunityPanel from "@/components/Notary/NotaryCommunityPanel";
 import MyVotesPanel from "@/components/Notary/MyVotesPanel";
 import DepositOrWithdrawPanel from "@/components/Notary/DepositOrWithdrawPanel";
 import Tabs from "@/components/ui/Tabs";
+import { useAccount } from "wagmi";
+import ConnectBtn from "@/components/ui/ConnectBtn";
+import { Flex, Text } from "@chakra-ui/react";
+import PlugNotConnectedUser from "@/components/ui/PlugNotConnectedUser";
 
 const Notary: NextPage = () => {
+  const { isConnected } = useAccount();
   return (
-    <Layout pageTitle="Notary">
-      <Tabs tabs={NotaryTabs}>
-        <NotaryCommunityPanel />
-        <MyVotesPanel />
-        <DepositOrWithdrawPanel />
-      </Tabs>
+    <Layout pageTitle="Notary" isCenteredBlock={isConnected ? false : true}>
+      {isConnected ? (
+        <Tabs tabs={NotaryTabs}>
+          <NotaryCommunityPanel />
+          <MyVotesPanel />
+          <DepositOrWithdrawPanel />
+        </Tabs>
+      ) : (
+        <PlugNotConnectedUser />
+      )}
     </Layout>
   );
 };

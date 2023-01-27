@@ -4,6 +4,7 @@ import lighthouse from "@lighthouse-web3/sdk";
 import { ethers } from "ethers";
 import React, { ChangeEvent, useState } from "react";
 import { useAccount } from "wagmi";
+import ConnectBtn from "../ui/ConnectBtn";
 import NumberInput from "../ui/NumberInput/NumberInput";
 import SaleTypeMenu from "./SaleTypeMenu";
 
@@ -44,152 +45,166 @@ const NewPoduct = () => {
   const [stopDate, setStopDate] = useState("");
   const [cid, setCid] = useState("");
 
+
+
   return (
-    <Box>
-      <Heading variant="h4" color="white">
-        Step 1. Input Parameters
-      </Heading>
-      <Box ml="110px" mt="10px" maxW="585px">
-        <Heading variant="h6" color="gray.200" mt="16px">
-          Name
-        </Heading>
-        <CustomInput
-          maxLength={70}
-          value={itemName}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            setItemName(event?.target?.value)
-          }
-          w="100%"
-          placeholder="Item name (up to 70 characters)"
-        />
-        <Heading variant="h6" color="gray.200" mt="16px">
-          Description
-        </Heading>
-        <CustomInput
-          maxLength={256}
-          value={itemDescription}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            setItemDescription(event.target.value)
-          }
-          w="100%"
-          placeholder="Description (up to 256 characters)"
-        />
-        <Heading variant="h6" color="gray.200" mt="16px">
-          Type of Sale
-        </Heading>
-        <SaleTypeMenu />
-        <Flex justifyContent="space-between" mt="32px">
-          <Box>
-            <Heading variant="h6" color="gray.200">
-              Price Start
+    <Flex justifyContent="center">
+      <Box maxW="695px">
+        {/* <Heading variant="h4" color="white">
+          Step 1. Input Parameters
+        </Heading> */}
+        <Box ml="110px" mt="10px" maxW="585px">
+          <Heading variant="h6" color="gray.200" mt="16px">
+            Name
+          </Heading>
+          <CustomInput
+            maxLength={70}
+            value={itemName}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setItemName(event?.target?.value)
+            }
+            w="100%"
+            placeholder="Item name (up to 70 characters)"
+          />
+          <Heading variant="h6" color="gray.200" mt="16px">
+            Description
+          </Heading>
+          <CustomInput
+            maxLength={256}
+            value={itemDescription}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setItemDescription(event.target.value)
+            }
+            w="100%"
+            placeholder="Description (up to 256 characters)"
+          />
+          <Heading variant="h6" color="gray.200" mt="16px">
+            Type of Sale
+          </Heading>
+          <SaleTypeMenu />
+          <Flex justifyContent="space-between" mt="32px">
+            <Box>
+              <Heading variant="h6" color="gray.200">
+                Price Start
+              </Heading>
+              <NumberInput
+                value={startPrice}
+                setValue={setStartPrice}
+                placeholder="Price in FIL"
+                isNeededMarginTop
+                isNotFullWidth
+              />
+            </Box>
+            <Box>
+              <Heading variant="h6" color="gray.200">
+                Price Force Stop
+              </Heading>
+              <NumberInput
+                value={forceStopPrice}
+                setValue={setForceStopPrice}
+                placeholder="Price in FIL"
+                isNeededMarginTop
+                isNotFullWidth
+              />
+            </Box>
+          </Flex>
+          <Flex justifyContent="space-between" mt="16px">
+            <Box>
+              <Heading variant="h6" color="gray.200">
+                Date Stop Auction
+              </Heading>
+              <CustomInput
+                type="datetime-local"
+                min={getTodaysDate()}
+                value={stopDate}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  setStopDate(event.target.value);
+                }}
+                px="16px"
+                minW="278px"
+              />
+            </Box>
+            <Box>
+              <Heading variant="h6" color="gray.200">
+                My Collateral
+              </Heading>
+              <NumberInput
+                value={myCollateral}
+                setValue={setMyCollateral}
+                placeholder="Amount in FIL"
+                isNeededMarginTop
+                isNotFullWidth
+              />
+            </Box>
+          </Flex>
+          {isConnected ? (
+            <Flex justify="space-between">
+              <CustomButton
+                minW="278px"
+                bg="blue.primary"
+                color="white"
+                transition="all .3s"
+                _hover={{ bg: "blue.active" }}
+              >
+                download file
+              </CustomButton>
+              <CustomButton
+                minW="278px"
+                bg="gray.500"
+                color="white"
+                transition="all .3s"
+                _hover={{ bg: "gray.600" }}
+              >
+                download thubnail
+              </CustomButton>
+            </Flex>
+          ) : null}
+          {isConnected ? (
+            <CustomButton
+              w="100%"
+              bg="blue.primary"
+              color="white"
+              transition="all .3s"
+              _hover={{ bg: "blue.active" }}
+            >
+              start sell
+            </CustomButton>
+          ) : (
+            <ConnectBtn isCentered isNeedMarginTop />
+          )}
+        </Box>
+        {isConnected ? (
+          <>
+            {/* <Heading mt="60px" variant="h4" color="white">
+              Step 2. Provide access
             </Heading>
-            <NumberInput
-              value={startPrice}
-              setValue={setStartPrice}
-              placeholder="Price in FIL"
-              isNeededMarginTop
-              isNotFullWidth
-            />
-          </Box>
-          <Box>
-            <Heading variant="h6" color="gray.200">
-              Price Force Stop
+            <CustomButton
+              ml="110px"
+              w="585px"
+              bg="blue.primary"
+              color="white"
+              transition="all .3s"
+              _hover={{ bg: "blue.active" }}
+            >
+              share access to protocol
+            </CustomButton> */}
+            {/* <Heading mt="60px" variant="h4" color="white">
+              Step 3. Start Sell
             </Heading>
-            <NumberInput
-              value={forceStopPrice}
-              setValue={setForceStopPrice}
-              placeholder="Price in FIL"
-              isNeededMarginTop
-              isNotFullWidth
-            />
-          </Box>
-        </Flex>
-        <Flex justifyContent="space-between" mt="16px">
-          <Box>
-            <Heading variant="h6" color="gray.200">
-              Date Stop Auction
-            </Heading>
-            <CustomInput
-              type="datetime-local"
-              min={getTodaysDate()}
-              value={stopDate}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                setStopDate(event.target.value);
-              }}
-              px="16px"
-              minW="278px"
-            />
-          </Box>
-          <Box>
-            <Heading variant="h6" color="gray.200">
-              My Collateral
-            </Heading>
-            <NumberInput
-              value={myCollateral}
-              setValue={setMyCollateral}
-              placeholder="Amount in FIL"
-              isNeededMarginTop
-              isNotFullWidth
-            />
-          </Box>
-        </Flex>
-        <Flex justify="space-between">
-          <CustomButton
-            minW="278px"
-            bg="blue.primary"
-            color="white"
-            transition="all .3s"
-            _hover={{ bg: "blue.active" }}
-          >
-            download file
-          </CustomButton>
-          <CustomButton
-            minW="278px"
-            bg="gray.500"
-            color="white"
-            transition="all .3s"
-            _hover={{ bg: "gray.600" }}
-          >
-            download thubnail
-          </CustomButton>
-        </Flex>
-        <CustomButton
-          w="100%"
-          bg="blue.primary"
-          color="white"
-          transition="all .3s"
-          _hover={{ bg: "blue.active" }}
-        >
-          record item
-        </CustomButton>
+            <CustomButton
+              ml="110px"
+              minW="585px"
+              bg="blue.primary"
+              color="white"
+              transition="all .3s"
+              _hover={{ bg: "blue.active" }}
+            >
+              start sell
+            </CustomButton> */}
+          </>
+        ) : null}
       </Box>
-      <Heading mt="60px" variant="h4" color="white">
-        Step 2. Provide access
-      </Heading>
-      <CustomButton
-        ml="110px"
-        w="585px"
-        bg="blue.primary"
-        color="white"
-        transition="all .3s"
-        _hover={{ bg: "blue.active" }}
-      >
-        share access to protocol
-      </CustomButton>
-      <Heading mt="60px" variant="h4" color="white">
-        Step 3. Start Sell
-      </Heading>
-      <CustomButton
-        ml="110px"
-        minW="585px"
-        bg="blue.primary"
-        color="white"
-        transition="all .3s"
-        _hover={{ bg: "blue.active" }}
-      >
-        start sell
-      </CustomButton>
-    </Box>
+    </Flex>
   );
 };
 

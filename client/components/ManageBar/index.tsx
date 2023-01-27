@@ -10,6 +10,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { NextPage } from "next";
 import { CloseIcon, SearchIcon } from "@/icons";
 import { useState } from "react";
+import ConnectBtn from "../ui/ConnectBtn";
 
 const ManageBar: NextPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,25 +60,7 @@ const ManageBar: NextPage = () => {
           />
         ) : null}
       </InputGroup>
-      <Box
-        w="100%"
-        sx={{
-          div: {
-            height: "100%",
-            alignItems: "center",
-          },
-          button: {
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minW: "fit-content",
-            minH: "52px",
-            borderRadius: "md",
-          },
-        }}
-      >
-        <ConnectButton label="CONNECT WALLET" />
-      </Box>
+      <ConnectBtn />
     </Flex>
   );
 };
