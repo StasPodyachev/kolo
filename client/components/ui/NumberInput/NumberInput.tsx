@@ -29,11 +29,11 @@ const NumberInput = ({
         w="100%"
         bg="gray.700"
         borderRadius="md"
-        value={value}
-        onChange={(value) => setValue(+value)}
         _placeholder={{ color: "white" }}
       >
         <NumberInputField
+          value={value}
+          onChange={(value) => setValue(+value)}
           w="100%"
           h="100%"
           p="12px 16px"

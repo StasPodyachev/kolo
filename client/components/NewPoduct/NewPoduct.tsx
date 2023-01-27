@@ -1,3 +1,4 @@
+import { getTodaysDate } from "@/helpers";
 import { Box, Button, chakra, Flex, Heading, Input } from "@chakra-ui/react";
 import lighthouse from "@lighthouse-web3/sdk";
 import { ethers } from "ethers";
@@ -35,9 +36,9 @@ const CustomButton = chakra(Button, {
 const NewPoduct = () => {
   const [itemName, setItemName] = useState("");
   const [itemDescription, setItemDescription] = useState("");
-  const [startPrice, setStartPrice] = useState(0);
-  const [forceStopPrice, setForceStopPrice] = useState(0);
-  const [myCollateral, setMyCollateral] = useState(0);
+  const [startPrice, setStartPrice] = useState(0.0);
+  const [forceStopPrice, setForceStopPrice] = useState(0.0);
+  const [myCollateral, setMyCollateral] = useState(0.0);
   const [stopDate, setStopDate] = useState("");
   const [cid, setCid] = useState("");
   const encryptionSignature = async () => {
@@ -113,6 +114,7 @@ const NewPoduct = () => {
           Name
         </Heading>
         <CustomInput
+          maxLength={70}
           value={itemName}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setItemName(event.target.value)
@@ -124,6 +126,7 @@ const NewPoduct = () => {
           Description
         </Heading>
         <CustomInput
+          maxLength={256}
           value={itemDescription}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setItemDescription(event.target.value)
@@ -166,10 +169,15 @@ const NewPoduct = () => {
             </Heading>
             <CustomInput
               type="datetime-local"
+              min={getTodaysDate()}
               value={stopDate}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setStopDate(event.target.value)
-              }
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                console.log("====================================");
+                console.log("today", getTodaysDate());
+                console.log("date", event.target.value);
+                console.log("====================================");
+                setStopDate(event.target.value);
+              }}
               px="16px"
               minW="278px"
             />
