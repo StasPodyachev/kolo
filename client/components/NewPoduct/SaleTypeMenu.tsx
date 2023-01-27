@@ -31,6 +31,7 @@ const SaleTypeMenu: NextPage = () => {
         borderColor="gray.700"
         borderRadius="md"
         textAlign="left"
+        color="white"
         bg="gray.700"
         onClick={() => setIsOpen(!isOpen)}
       >

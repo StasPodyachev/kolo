@@ -21,7 +21,7 @@ const Block = ({ title, value }: IProps) => {
             ? "green.secondaryDark"
             : title === "Notary Balance" || title === "My Notary Balance"
             ? "green.primary"
-            : "inherit"
+            : "white"
         }
         variant="h4"
       >

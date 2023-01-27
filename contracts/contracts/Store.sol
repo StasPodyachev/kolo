@@ -23,17 +23,18 @@ contract Store is IStore, Ownable {
         sellerCollaterals[dealId] = msg.value;
     }
 
+    function depositBuyerCollateral(uint256 dealId) external payable {
+        buyerCollaterals[dealId] = msg.value;
+    }
+
     function depositBuyer(uint256 dealId, address buyer) external payable {
         buyers[dealId][buyer] += msg.value;
     }
 
     function withdrawBuyer(uint256 dealId, address buyer) external {
+        // TODO: security
         payable(buyer).transfer(buyers[dealId][buyer]);
         buyers[dealId][buyer] = 0;
-    }
-
-    function depositBuyerCollateral(uint256 dealId) external payable {
-        buyerCollaterals[dealId] = msg.value;
     }
 
     function getSellerCollateral(uint256 dealId)
@@ -52,33 +53,25 @@ contract Store is IStore, Ownable {
         return buyerCollaterals[dealId];
     }
 
-    function transferSellerCollateral(uint256 dealId, address to)
-        external
-        returns (uint256)
-    {
-        // TODO: Security
-        payable(to).transfer(sellerCollaterals[dealId]);
-
-        return sellerCollaterals[dealId];
-    }
-
-    function transferBuyerCollateral(uint256 dealId, address to)
-        external
-        returns (uint256)
-    {
-        // TODO: Security
-        payable(to).transfer(buyerCollaterals[dealId]);
-
-        return buyerCollaterals[dealId];
-    }
-
-    function transfer(
+    function transferWinToSeller(
         uint256 dealId,
         address buyer,
-        address to
+        address seller
     ) external {
-        // TODO: security
-        payable(to).transfer(buyers[dealId][buyer]);
+        payable(seller).transfer(
+            sellerCollaterals[dealId] + buyers[dealId][buyer]
+        );
+
+        sellerCollaterals[dealId] = 0;
+        buyers[dealId][buyer] = 0;
+    }
+
+    function transferWinToBuyer(uint256 dealId, address buyer) external {
+        payable(buyer).transfer(
+            buyerCollaterals[dealId] + buyers[dealId][buyer]
+        );
+
+        buyerCollaterals[dealId] = 0;
         buyers[dealId][buyer] = 0;
     }
 
