@@ -1,10 +1,13 @@
 // import "hardhat-typechain";
-import "@nomiclabs/hardhat-waffle"
-import "@nomiclabs/hardhat-etherscan"
+// import "hardhat-deploy-ethers";
 import "@typechain/hardhat"
-import "hardhat-contract-sizer"
+
 import "hardhat-deploy"
 import "hardhat-deploy-ethers"
+
+import "@nomicfoundation/hardhat-toolbox"
+import "hardhat-contract-sizer"
+// import "hardhat-deploy";
 import "hardhat-abi-exporter"
 import "hardhat-gas-reporter"
 import "solidity-coverage"
@@ -26,6 +29,11 @@ const config = {
         auto: true,
         interval: 100,
       },
+    },
+    hyperspace: {
+      chainId: 3141,
+      url: "https://api.hyperspace.node.glif.io/rpc/v1",
+      accounts: [process.env.DEPLOY_PRIVATE_KEY],
     },
     wallaby: {
       url: "https://wallaby.node.glif.io/rpc/v0",
@@ -62,17 +70,11 @@ const config = {
       },
     ],
   },
-  // contractSizer: {
-  //   alphaSort: true,
-  //   runOnCompile: true,
-  //   disambiguatePaths: false,
-  // },
-  etherscan: {
-    apiKey: {
-      optimisticEthereum: process.env.OPTIMISTIC_ETHERSCAN_API_KEY,
-      polygonMumbai: process.env.POLYGON_ETHERSCAN_API_KEY,
-      optimisticGoerli: process.env.OPTIMISTIC_ETHERSCAN_API_KEY,
-    },
+  paths: {
+    sources: "./contracts",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts",
   },
   typechain: {
     outDir: "typechain",

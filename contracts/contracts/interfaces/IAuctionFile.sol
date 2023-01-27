@@ -74,11 +74,4 @@ interface IAuctionFile {
         external
         view
         returns (ChatParams[] memory);
-
-    // function addAccsess(uint256 dealId, address wallet) external;
-
-    // function checkAccsess(bytes calldata cid, address wallet)
-    //     external
-    //     view
-    //     returns (uint8);
 }
