@@ -105,7 +105,9 @@ const NewPoduct = () => {
     //   <button onClick={()=>{applyAccessConditions()}}>Apply Access Consitions</button>
     // </div>
     <Box>
-      <Heading variant="h4">Step 1. Input Parameters</Heading>
+      <Heading variant="h4" color="white">
+        Step 1. Input Parameters
+      </Heading>
       <Box ml="110px" mt="10px" maxW="585px">
         <Heading variant="h6" color="gray.200" mt="16px">
           Name
@@ -188,41 +190,53 @@ const NewPoduct = () => {
           <CustomButton
             minW="278px"
             bg="blue.primary"
+            color="white"
             transition="all .3s"
             _hover={{ bg: "blue.active" }}
           >
             download file
           </CustomButton>
-          <CustomButton minW="278px">download thubnail</CustomButton>
+          <CustomButton
+            minW="278px"
+            bg="gray.500"
+            color="white"
+            transition="all .3s"
+            _hover={{ bg: "gray.600" }}
+          >
+            download thubnail
+          </CustomButton>
         </Flex>
         <CustomButton
           w="100%"
           bg="blue.primary"
+          color="white"
           transition="all .3s"
           _hover={{ bg: "blue.active" }}
         >
           record item
         </CustomButton>
       </Box>
-      <Heading mt="60px" variant="h4">
+      <Heading mt="60px" variant="h4" color="white">
         Step 2. Provide access
       </Heading>
       <CustomButton
         ml="110px"
         w="585px"
         bg="blue.primary"
+        color="white"
         transition="all .3s"
         _hover={{ bg: "blue.active" }}
       >
         share access to protocol
       </CustomButton>
-      <Heading mt="60px" variant="h4">
+      <Heading mt="60px" variant="h4" color="white">
         Step 3. Start Sell
       </Heading>
       <CustomButton
         ml="110px"
         minW="585px"
         bg="blue.primary"
+        color="white"
         transition="all .3s"
         _hover={{ bg: "blue.active" }}
       >

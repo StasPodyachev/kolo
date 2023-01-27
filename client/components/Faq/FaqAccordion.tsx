@@ -35,7 +35,9 @@ const FaqAccordion: NextPage = () => {
             </Flex>
           </AccordionButton>
           <AccordionPanel p="10px 46px">
-            <Text textStyle="bigText">{item.description}</Text>
+            <Text textStyle="bigText" color="white">
+              {item.description}
+            </Text>
           </AccordionPanel>
         </AccordionItem>
       ))}

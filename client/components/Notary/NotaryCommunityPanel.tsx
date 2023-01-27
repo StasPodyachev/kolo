@@ -14,12 +14,15 @@ const NotaryCommunityPanel: NextPage = () => {
           ))}
         </Flex>
         <Flex mt="28px" justifyContent="space-between" alignItems="center">
-          <Heading variant="h3">List of Notaries</Heading>
+          <Heading variant="h3" color="white">
+            List of Notaries
+          </Heading>
           <Heading
             fontFamily="Roboto Mono"
             variant="h6"
             pos="relative"
             top="2px"
+            color="white"
           >
             20/325
           </Heading>
