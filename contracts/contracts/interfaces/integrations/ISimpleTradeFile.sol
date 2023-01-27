@@ -63,9 +63,4 @@ interface ISimpleTradeFile {
     function dispute(uint256 dealId) external payable;
 
     function finalize(uint256 dealId) external;
-
-    function getChat(uint256 dealId)
-        external
-        view
-        returns (IIntegration.ChatParams[] memory);
 }

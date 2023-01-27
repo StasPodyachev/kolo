@@ -75,9 +75,4 @@ interface IAuctionFile {
     function getBidHistory(uint256 dealId)
         external
         returns (BidParams[] memory);
-
-    function getChat(uint256 dealId)
-        external
-        view
-        returns (IIntegration.ChatParams[] memory);
 }
