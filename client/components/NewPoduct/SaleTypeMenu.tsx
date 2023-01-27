@@ -13,8 +13,8 @@ import { NextPage } from "next";
 import { useRef, useState } from "react";
 
 const SaleTypeMenu: NextPage = () => {
-  const [activeItem, setActiveItem] = useState(SaleTypeMenuItems[0]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [ activeItem, setActiveItem ] = useState(SaleTypeMenuItems[0]);
+  const [ isOpen, setIsOpen ] = useState(false);
   const buttonRef = useRef(null);
   useOutsideClick({
     ref: buttonRef,
@@ -35,26 +35,25 @@ const SaleTypeMenu: NextPage = () => {
         bg="gray.700"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Flex justifyContent="space-between" alignItems="center">
-          <Text textStyle="mediumText">{activeItem}</Text>
+        <Flex justifyContent="space-between">
+          <Text textStyle="mediumText">{activeItem?.title}</Text>
           <ArrowIcon
             boxSize="30px"
             transition="all .3s"
-            transform={isOpen ? "rotate(90deg)" : "rotate(-90deg)"}
-          />
+            transform={isOpen ? "rotate(90deg)" : "rotate(-90deg)"}/>
         </Flex>
       </MenuButton>
       <MenuList>
         <Flex flexDir="column" w="100%">
           {SaleTypeMenuItems.map((item) => (
             <MenuItem
-              key={item}
+              key={item?.address}
               onClick={() => {
                 setActiveItem(item);
                 setIsOpen(false);
               }}
             >
-              {item}
+              {item?.title}
             </MenuItem>
           ))}
         </Flex>

@@ -7,7 +7,8 @@ import {
 import { IDeployment } from "./utils";
 const deployments: IDeployment = deployment;
 
-let CHAIN_ID: string;
+const CHAIN_ID: string = network.config.chainId
+const WALLET = new ethers.Wallet(network.config.accounts[0], ethers.provider)
 
 const contracts: any = [
   {
@@ -24,10 +25,7 @@ const contracts: any = [
   },
 ];
 
-const wallet = new ethers.Wallet(network.config.accounts[0], ethers.provider)
-
 export async function main() {
-  CHAIN_ID = await hre.getChainId();
   for (let i in contracts) {
     const contract = contracts[i];
 
@@ -43,14 +41,10 @@ export async function main() {
 }
 
 async function factory() {
-  const factoryDeployed = deployments[CHAIN_ID].Factory;
   const auctionDeployed = deployments[CHAIN_ID][deployNames.AUCTION_FILE];
 
-  const factoryContract = await ethers.getContractFactory(deployNames.FACTORY, wallet)
-
-  const factory = (await ethers.getContractAt(
-    "Factory",
-    factoryDeployed.address
+  const factory = (await getKnowContractAt(
+    deployNames.FACTORY
   )) as Factory;
 
   await factory.registerIntegration(0, auctionDeployed.address);
@@ -58,14 +52,10 @@ async function factory() {
 
 async function auctionFile() {
   const factoryDeployed = deployments[CHAIN_ID].Factory;
-  const auctionFileDeployed = deployments[CHAIN_ID][deployNames.AUCTION_FILE];
   const notaryDeployed = deployments[CHAIN_ID][deployNames.NOTARY];
 
-
-
-  const auction = (await ethers.getContractAt(
+  const auction = (await getKnowContractAt(
     deployNames.AUCTION_FILE,
-    auctionFileDeployed.address
   )) as AuctionFile;
 
   await auction.setFactory(factoryDeployed.address)
@@ -74,14 +64,29 @@ async function auctionFile() {
 
 async function notary() {
   const factoryDeployed = deployments[CHAIN_ID].Factory;
-  const notaryDeployed = deployments[CHAIN_ID][deployNames.NOTARY];
 
-  const notary = (await ethers.getContractAt(
+  const notary = (await getKnowContractAt(
     deployNames.NOTARY,
-    notaryDeployed.address
   )) as Notary;
 
   await notary.setFactory(factoryDeployed.address)
+}
+
+async function getContractAt(name: string, address: string) {
+  const contractFactory = await ethers.getContractFactory(name, WALLET)
+
+  return contractFactory.attach(
+    address
+  )
+}
+
+async function getKnowContractAt(name: string) {
+  const contractFactory = await ethers.getContractFactory(name, WALLET)
+  const contractDeployed = deployments[CHAIN_ID][name];
+
+  return contractFactory.attach(
+    contractDeployed.address
+  )
 }
 
 // main()

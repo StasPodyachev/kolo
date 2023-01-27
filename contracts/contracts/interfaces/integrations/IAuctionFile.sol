@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
+import "./IIntegration.sol";
 
 interface IAuctionFile {
     enum AuctionStatus {
@@ -29,12 +30,6 @@ interface IAuctionFile {
         uint256 timestamp;
         address buyer;
         uint256 bid;
-    }
-
-    struct ChatParams {
-        uint256 timestamp;
-        address sender;
-        string message;
     }
 
     event DisputeCreated(uint256 id);
@@ -73,5 +68,5 @@ interface IAuctionFile {
     function getChat(uint256 dealId)
         external
         view
-        returns (ChatParams[] memory);
+        returns (IIntegration.ChatParams[] memory);
 }
