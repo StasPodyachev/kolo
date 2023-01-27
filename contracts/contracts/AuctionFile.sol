@@ -234,7 +234,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         deal.status = AuctionStatus.FINALIZE;
     }
 
-    function _finalizeForce(
+    function _finalize(
         uint256 dealId,
         address buyerAddress,
         IStore store
@@ -310,41 +310,41 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     {
         BidParams[] memory result = bidHistory[dealId];
 
-        if (result.length == 0) {
-            BidParams[] memory res = new BidParams[](5);
+        // if (result.length == 0) {
+        //     BidParams[] memory res = new BidParams[](5);
 
-            res[0] = BidParams({
-                timestamp: block.timestamp - 100,
-                bid: 1e18,
-                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-            });
+        //     res[0] = BidParams({
+        //         timestamp: block.timestamp - 100,
+        //         bid: 1e18,
+        //         buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        //     });
 
-            res[1] = BidParams({
-                timestamp: block.timestamp - 50,
-                bid: 5e18,
-                buyer: 0x0dD6392662B132bA11e02cd5Cd628DfedF95c6f4
-            });
+        //     res[1] = BidParams({
+        //         timestamp: block.timestamp - 50,
+        //         bid: 5e18,
+        //         buyer: 0x0dD6392662B132bA11e02cd5Cd628DfedF95c6f4
+        //     });
 
-            res[2] = BidParams({
-                timestamp: block.timestamp - 30,
-                bid: 6e18,
-                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-            });
+        //     res[2] = BidParams({
+        //         timestamp: block.timestamp - 30,
+        //         bid: 6e18,
+        //         buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        //     });
 
-            res[3] = BidParams({
-                timestamp: block.timestamp - 15,
-                bid: 7e18,
-                buyer: 0x4dDf68F76aaBf2CC2DF3b9Db3BBEC26508e59a6c
-            });
+        //     res[3] = BidParams({
+        //         timestamp: block.timestamp - 15,
+        //         bid: 7e18,
+        //         buyer: 0x4dDf68F76aaBf2CC2DF3b9Db3BBEC26508e59a6c
+        //     });
 
-            res[4] = BidParams({
-                timestamp: block.timestamp,
-                bid: 10e18,
-                buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-            });
+        //     res[4] = BidParams({
+        //         timestamp: block.timestamp,
+        //         bid: 10e18,
+        //         buyer: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        //     });
 
-            return res;
-        }
+        //     return res;
+        // }
 
         return result;
     }
@@ -356,36 +356,36 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     {
         ChatParams[] memory res = new ChatParams[](5);
 
-        res[0] = ChatParams({
-            timestamp: block.timestamp - 100,
-            message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-        });
+        // res[0] = ChatParams({
+        //     timestamp: block.timestamp - 100,
+        //     message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        //     sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        // });
 
-        res[1] = ChatParams({
-            timestamp: block.timestamp - 50,
-            message: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-            sender: 0x0dD6392662B132bA11e02cd5Cd628DfedF95c6f4
-        });
+        // res[1] = ChatParams({
+        //     timestamp: block.timestamp - 50,
+        //     message: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+        //     sender: 0x0dD6392662B132bA11e02cd5Cd628DfedF95c6f4
+        // });
 
-        res[2] = ChatParams({
-            timestamp: block.timestamp - 30,
-            message: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
-            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-        });
+        // res[2] = ChatParams({
+        //     timestamp: block.timestamp - 30,
+        //     message: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
+        //     sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        // });
 
-        res[3] = ChatParams({
-            timestamp: block.timestamp - 15,
-            message: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
-            sender: 0x4dDf68F76aaBf2CC2DF3b9Db3BBEC26508e59a6c
-        });
+        // res[3] = ChatParams({
+        //     timestamp: block.timestamp - 15,
+        //     message: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
+        //     sender: 0x4dDf68F76aaBf2CC2DF3b9Db3BBEC26508e59a6c
+        // });
 
-        res[4] = ChatParams({
-            timestamp: block.timestamp,
-            message: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
-            sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
-        });
+        // res[4] = ChatParams({
+        //     timestamp: block.timestamp,
+        //     message: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
+        //     sender: 0xA93DD4D2b1F555069a9D0f1E1b19030F63e4bE41
+        // });
 
-        return res;
+        return chats[dealId];
     }
 }

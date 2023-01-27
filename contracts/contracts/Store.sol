@@ -54,24 +54,27 @@ contract Store is IStore, Ownable {
 
     function transferSellerCollateral(uint256 dealId, address to)
         external
-        returns (uint256)
+        returns (uint256 value)
     {
         // TODO: Security
         payable(to).transfer(sellerCollaterals[dealId]);
+        value = sellerCollaterals[dealId];
 
-        return sellerCollaterals[dealId];
+        sellerCollaterals[dealId] = 0;
     }
 
     function transferBuyerCollateral(uint256 dealId, address to)
         external
-        returns (uint256)
+        returns (uint256 value)
     {
         // TODO: Security
         payable(to).transfer(buyerCollaterals[dealId]);
+        value = buyerCollaterals[dealId];
 
-        return buyerCollaterals[dealId];
+        buyerCollaterals[dealId] = 0;
     }
 
+    // transfer buyer price to trandfer from bid withdrawFromBuyer
     function transfer(
         uint256 dealId,
         address buyer,
