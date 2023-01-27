@@ -11,7 +11,9 @@ import "./Store.sol";
 
 contract Factory is IFactory, StoreDeployer, Ownable {
     mapping(address => address) private stores;
-    mapping(uint256 => address) private deals;
+    mapping(uint256 => address) private _dealStore;
+    mapping(uint256 => address) private _integrations;
+    uint256[] private deals;
 
     function createStore() external returns (address storeAddress) {
         require(
@@ -26,7 +28,8 @@ contract Factory is IFactory, StoreDeployer, Ownable {
     }
 
     function addDeal(uint256 dealId, address storeAddress) external {
-        deals[dealId] = storeAddress;
+        _dealStore[dealId] = storeAddress;
+        deals.push(dealId);
     }
 
     function getStore(address wallet) external view returns (address store) {
@@ -34,16 +37,39 @@ contract Factory is IFactory, StoreDeployer, Ownable {
     }
 
     function getStore(uint256 dealId) external view returns (address store) {
-        store = deals[dealId];
+        store = _dealStore[dealId];
     }
 
     function getDeal(uint256 dealId)
         external
+        view
         returns (IIntegration.DealParams memory)
     {
-        address storeAddress = deals[dealId];
+        address storeAddress = _dealStore[dealId];
         address intgr = IStore(storeAddress).getIntegration(dealId);
 
         return IIntegration(intgr).getDeal(dealId);
+    }
+
+    function getAllDeals()
+        external
+        view
+        returns (IIntegration.DealParams[] memory result)
+    {
+        uint256 size = deals.length;
+        result = new IIntegration.DealParams[](size);
+
+        for (uint256 i = 0; i < size; i++) {
+            result[i] = this.getDeal(deals[i]);
+        }
+    }
+
+    function registerIntegration(uint256 type_, address addr) external {
+        require(
+            _integrations[type_] == address(0),
+            "Factory: Integration type exist"
+        );
+
+        _integrations[type_] = addr;
     }
 }

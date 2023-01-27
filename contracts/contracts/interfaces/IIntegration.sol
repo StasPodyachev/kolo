@@ -9,16 +9,19 @@ interface IIntegration {
 
     struct DealParams {
         uint256 id;
-        uint256 dateExpire;
-        string name;
-        string description;
-        uint256 price;
-        address seller;
-        address buyer;
+        uint256 _type; // 0 - AuctionFile
+        bytes data; // all propertiest for target integration deal
         // DealStatus status;
     }
 
-    function getDeal(uint256 dealId) external returns (DealParams memory);
+    function getDeal(uint256 dealId) external view returns (DealParams memory);
 
     function finalizeDispute(uint256 dealId, DisputeWinner winner) external;
+
+    function addAccsess(uint256 dealId, address wallet) external;
+
+    function checkAccsess(bytes calldata cid, address wallet)
+        external
+        view
+        returns (uint8);
 }

@@ -9,6 +9,9 @@ import "./interfaces/IStore.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/INotary.sol";
 
+import {SizeOf} from "./libs/seriality/SizeOf.sol";
+import {TypesToBytes} from "./libs/seriality/TypesToBytes.sol";
+
 contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     IFactory public _factory;
     INotary public _notary;
@@ -23,6 +26,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     mapping(uint256 => mapping(address => uint256)) private bids;
     mapping(uint256 => BidParams[]) private bidHistory;
     mapping(uint256 => address[]) private bidBuyers;
+    mapping(address => mapping(bytes => bool)) private _accsess;
 
     uint256 id;
 
@@ -46,7 +50,59 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         _notary = INotary(notary);
     }
 
-    function getDeal(uint256 dealId) external returns (DealParams memory) {}
+    function getDeal(uint256 dealId)
+        external
+        view
+        returns (DealParams memory deal)
+    {
+        AuctionFileParams memory params = deals[dealId];
+
+        uint256 size = SizeOf.sizeOfString(params.name) +
+            SizeOf.sizeOfString(params.description) +
+            SizeOf.sizeOfBytes(params.cid) +
+            6 *
+            32 +
+            20 *
+            2;
+        uint256 offset = 0;
+        bytes memory data = new bytes(size);
+
+        // Serialize AuctionFileParams to bytes
+        // 2x string
+        TypesToBytes.stringToBytes(offset, bytes(params.name), data);
+        offset += SizeOf.sizeOfString(params.name);
+        TypesToBytes.stringToBytes(offset, bytes(params.description), data);
+        offset += SizeOf.sizeOfString(params.description);
+
+        // 4x uint256
+        TypesToBytes.uintToBytes(offset, params.price, data);
+        offset += 32;
+        TypesToBytes.uintToBytes(offset, params.priceStart, data);
+        offset += 32;
+        TypesToBytes.uintToBytes(offset, params.priceForceStop, data);
+        offset += 32;
+        TypesToBytes.uintToBytes(offset, params.collateralAmount, data);
+        offset += 32;
+
+        // 2x address
+        TypesToBytes.addressToBytes(offset, params.seller, data);
+        offset += 20;
+        TypesToBytes.addressToBytes(offset, params.buyer, data);
+        offset += 20;
+
+        // uint
+        TypesToBytes.uintToBytes(offset, params.dateExpire, data);
+        offset += 32;
+
+        // bytes
+        TypesToBytes.stringToBytes(offset, params.cid, data);
+        offset += SizeOf.sizeOfBytes(params.cid);
+
+        // uint
+        TypesToBytes.uintToBytes(offset, uint256(params.status), data);
+        offset += 32;
+        deal = DealParams({id: dealId, _type: 0, data: data});
+    }
 
     function sendMessage(uint256 dealId, string calldata message) external {
         AuctionFileParams memory deal = deals[dealId];
@@ -107,7 +163,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         _factory.addDeal(id, storeAddress);
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
-        IStore(storeAddress).addAccsess(id, msg.sender);
+        this.addAccsess(id, msg.sender);
 
         emit DealCreated(id, msg.sender);
 
@@ -240,7 +296,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         IStore store
     ) internal {
         _withdrawBids(dealId, buyerAddress, store);
-        store.addAccsess(dealId, buyerAddress);
+        this.addAccsess(dealId, buyerAddress);
     }
 
     function _withdrawBids(
@@ -387,5 +443,19 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         });
 
         return res;
+    }
+
+    function addAccsess(uint256 dealId, address wallet) external {
+        // TODO: Security
+        bytes memory cid = deals[dealId].cid;
+        _accsess[wallet][cid] = true;
+    }
+
+    function checkAccsess(bytes calldata cid, address wallet)
+        external
+        view
+        returns (uint8)
+    {
+        return _accsess[wallet][cid] ? 1 : 0;
     }
 }

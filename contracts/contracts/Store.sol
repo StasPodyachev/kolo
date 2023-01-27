@@ -12,7 +12,7 @@ contract Store is IStore, Ownable {
     mapping(uint256 => uint256) private sellerCollaterals;
     mapping(uint256 => uint256) private buyerCollaterals;
 
-    mapping(bytes => mapping(address => bool)) private accsess;
+    // mapping(bytes => mapping(address => bool)) private accsess;
 
     function getIntegration(uint256 dealId) external view returns (address) {
         return deals[dealId];
@@ -82,7 +82,12 @@ contract Store is IStore, Ownable {
         buyers[dealId][buyer] = 0;
     }
 
-    function addAccsess(uint256 dealId, address wallet) external {}
-
-    function checkAccsess(uint256 dealId, address wallet) external {}
+    // function _addAccsess(
+    //     uint256 dealId,
+    //     bytes calldata cid,
+    //     address wallet
+    // ) internal {
+    //     deals[dealId]
+    //     _accsess[wallet][cid] = true;
+    // }
 }

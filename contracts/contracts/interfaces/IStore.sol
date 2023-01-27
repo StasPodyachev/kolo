@@ -31,9 +31,7 @@ interface IStore {
         external
         returns (uint256);
 
-    function addAccsess(uint256 dealId, address wallet) external;
-
-    function checkAccsess(uint256 dealId, address wallet) external;
-
     function getIntegration(uint256 dealId) external view returns (address);
+
+    // function addAccsess(bytes memory cid, address wallet) external;
 }
