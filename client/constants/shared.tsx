@@ -18,6 +18,8 @@ import {
   ISaleTypeMenuItem,
 } from "@/types";
 
+import ABI_FILE from '../contracts/abi/AuctionFile.json'
+
 export const navLinks: INavlink[] = [
   {
     url: "/",
@@ -321,22 +323,26 @@ export const SaleTypeMenuItems: ISaleTypeMenuItem[] = [
   {
     id: 1,
     title: "AUCTION OF FILES",
-    address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
+    address: "0xF299d6F8d597C8E0a4110181755F168cDd2F6961",
+    abi: ABI_FILE
   },
   {
     id: 2,
     title: "AUCTION OF LIVEPEER",
-    address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
+    address: "0xF299d6F8d597C8E0a4110181755F168cDd2F6961",
+    abi: ABI_FILE
   },
   {
     id: 3,
     title: "AUCTION OF HUDDLE",
-    address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
+    address: "0xF299d6F8d597C8E0a4110181755F168cDd2F6961",
+    abi: ABI_FILE
   },
   {
     id: 4,
     title: "SIMPLE TRADES OF FILES",
-    address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
+    address: "0x6E7d3321BFE7ca92a82A314E33153e7edB4B8a16",
+    abi: ABI_FILE
   },
 ];
 

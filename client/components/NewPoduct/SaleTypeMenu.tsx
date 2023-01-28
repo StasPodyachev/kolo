@@ -1,5 +1,6 @@
 import { SaleTypeMenuItems } from "@/constants/shared";
 import { ArrowIcon } from "@/icons";
+import { ISaleTypeMenuItem } from "@/types";
 import {
   Flex,
   Menu,
@@ -9,11 +10,10 @@ import {
   Text,
   useOutsideClick,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
 import { useRef, useState } from "react";
 
-const SaleTypeMenu: NextPage = () => {
-  const [activeItem, setActiveItem] = useState(SaleTypeMenuItems[0]);
+const SaleTypeMenu = ({activeItem,setActiveItem} :
+    {activeItem: ISaleTypeMenuItem, setActiveItem: (item: ISaleTypeMenuItem) => void}) => {
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef(null);
   useOutsideClick({

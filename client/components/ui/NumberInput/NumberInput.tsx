@@ -37,7 +37,6 @@ const NumberInput = ({
               setTimeout(() => {
                 setValue(0);
               }, 100);
-              console.log("hello");
             }
           }}
           onChange={(event) => setValue(+event.target.value)}
