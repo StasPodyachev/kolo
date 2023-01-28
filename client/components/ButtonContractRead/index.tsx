@@ -1,8 +1,6 @@
 import { Button } from "@chakra-ui/react";
-import { NextPage } from "next";
 import { useEffect } from "react";
 import { useContractRead } from "wagmi";
-
 interface IProps {
   title: string;
   address: any;

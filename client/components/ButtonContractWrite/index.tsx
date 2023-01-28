@@ -1,6 +1,5 @@
 import { Button } from "@chakra-ui/react";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
-
 interface IProps {
   title: string;
   address: any;
