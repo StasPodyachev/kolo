@@ -1,5 +1,5 @@
 import useDevice from "@/hooks/useDevice";
-import { Box } from "@chakra-ui/react";
+import { Box, useMediaQuery } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface IProps {
@@ -15,14 +15,16 @@ const ConnectBtn = ({
   isNeedSmallMarginTop,
   isHeaderButton,
 }: IProps) => {
-  const { isDesktopHeader } = useDevice();
+  const { isDesktopHeader, isDesktop } = useDevice();
+  const isSmallScreen = useMediaQuery("(max-width: 1370px)");
   return (
     <Box
       mt={isNeedMarginTop ? "36px" : isNeedSmallMarginTop ? "8px" : 0}
       display={isCentered ? "flex" : "block"}
       justifyContent={isCentered ? "center" : "normal"}
       alignItems={isCentered ? "center" : "normal"}
-      w="100%"
+      alignSelf={isCentered ? "center" : "baseline"}
+      w="max-content"
       sx={{
         div: {
           height: "100%",
@@ -40,7 +42,9 @@ const ConnectBtn = ({
     >
       <ConnectButton
         label="CONNECT WALLET"
-        showBalance={isHeaderButton && isDesktopHeader ? true : false}
+        showBalance={isHeaderButton && isDesktopHeader[0] ? true : false}
+        chainStatus={isHeaderButton && isDesktop[0] ? "name" : "none"}
+        accountStatus={isSmallScreen[0] ? "avatar" : "full"}
       />
     </Box>
   );

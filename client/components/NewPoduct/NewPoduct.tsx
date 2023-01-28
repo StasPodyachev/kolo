@@ -8,8 +8,9 @@ import {
   Heading,
   Input,
   Text,
+  useMediaQuery,
 } from "@chakra-ui/react";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useDebugValue, useState } from "react";
 import { useAccount } from "wagmi";
 import ButtonContractWrite from "../ButtonContractWrite";
 import ConnectBtn from "../ui/ConnectBtn";
@@ -17,6 +18,7 @@ import NumberInput from "../ui/NumberInput/NumberInput";
 import SaleTypeMenu from "./SaleTypeMenu";
 
 import ABI_FACTORY from "../../contracts/abi/Factory.json";
+import useDevice from "@/hooks/useDevice";
 
 const API_KEY = "8a415179-7ab8-47b8-83e8-d1b3975740fe";
 // const cid = "QmQT3e1Uce8gA57jvoamCUuA6otSTb6L5v2SCqsxscEtJK"
@@ -55,18 +57,21 @@ const NewPoduct = () => {
   const [stopDate, setStopDate] = useState("");
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
+  const { isDesktopHeader, isDesktop } = useDevice();
+  const isSmallTablet = useMediaQuery("(max-width: 867px)");
 
   return (
     <Flex justifyContent="center">
-      <Box maxW="695px">
-        {/* <Heading variant="h4" color="white">
+      <Box maxW="70%">
+        <Heading variant={isSmallTablet[0] ? "h5" : "h4"} color="white">
           Step 1. Input Parameters
-        </Heading> */}
-        <Box ml="110px" mt="10px" minW="585px">
+        </Heading>
+        <Box ml={isDesktopHeader[0] ? "110px" : "20px"} mt="10px" minW="100%">
           <Heading variant="h6" color="gray.200" mt="16px">
             Name
           </Heading>
           <CustomInput
+            minW="100%"
             maxLength={70}
             value={itemName}
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -79,6 +84,7 @@ const NewPoduct = () => {
             Description
           </Heading>
           <CustomInput
+            minW="100%"
             maxLength={256}
             value={itemDescription}
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -91,8 +97,17 @@ const NewPoduct = () => {
             Type of Sale
           </Heading>
           <SaleTypeMenu />
-          <Flex justifyContent="space-between" mt="32px">
-            <Box>
+          <Flex
+            w="100%"
+            flexDir={isDesktop[0] ? "row" : "column"}
+            gap={isDesktop[0] ? 0 : "16px"}
+            justifyContent="space-between"
+            mt="32px"
+          >
+            <Box
+              minW="42%"
+              maxW={isDesktop[0] && !isDesktopHeader[0] ? "42%" : "100%"}
+            >
               <Heading variant="h6" color="gray.200">
                 Price Start
               </Heading>
@@ -101,10 +116,12 @@ const NewPoduct = () => {
                 setValue={setStartPrice}
                 placeholder="Price in FIL"
                 isNeededMarginTop
-                isNotFullWidth
               />
             </Box>
-            <Box>
+            <Box
+              minW="42%"
+              maxW={isDesktop[0] && !isDesktopHeader[0] ? "42%" : "100%"}
+            >
               <Heading variant="h6" color="gray.200">
                 Price Force Stop
               </Heading>
@@ -113,12 +130,19 @@ const NewPoduct = () => {
                 setValue={setForceStopPrice}
                 placeholder="Price in FIL"
                 isNeededMarginTop
-                isNotFullWidth
               />
             </Box>
           </Flex>
-          <Flex justifyContent="space-between" mt="16px">
-            <Box>
+          <Flex
+            justifyContent="space-between"
+            mt="16px"
+            flexDir={isDesktop[0] ? "row" : "column"}
+            gap={isDesktop[0] ? 0 : "16px"}
+          >
+            <Box
+              minW="42%"
+              maxW={isDesktop[0] && !isDesktopHeader[0] ? "42%" : "100%"}
+            >
               <Heading variant="h6" color="gray.200">
                 Date Stop Auction
               </Heading>
@@ -130,10 +154,13 @@ const NewPoduct = () => {
                   setStopDate(event.target.value);
                 }}
                 px="16px"
-                minW="278px"
+                minW="100%"
               />
             </Box>
-            <Box>
+            <Box
+              minW="42%"
+              maxW={isDesktop[0] && !isDesktopHeader[0] ? "42%" : "100%"}
+            >
               <Heading variant="h6" color="gray.200">
                 My Collateral
               </Heading>
@@ -142,48 +169,52 @@ const NewPoduct = () => {
                 setValue={setMyCollateral}
                 placeholder="Amount in FIL"
                 isNeededMarginTop
-                isNotFullWidth
               />
             </Box>
           </Flex>
           {isConnected ? (
-            <Flex justify="space-between">
-              <label
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "48px",
-                  minWidth: "278px",
-                  cursor: "pointer",
-                  background: "#004DE5",
-                  color: "white",
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                  textTransform: "uppercase",
-                  borderRadius: "8px",
-                  marginTop: "36px",
-                }}
-                htmlFor="fileDownload"
-              >
-                download file
-              </label>
-              <Input
-                id="fileDownload"
-                type="file"
-                display="none"
-                onChange={(e) => {
-                  // deployEncrypted(e)
-                }}
-              />
-              <Box cursor="not-allowed">
+            <Flex
+              justify="space-between"
+              flexDir={isDesktop[0] ? "row" : "column"}
+            >
+              <Box minW="42%">
                 <label
                   style={{
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
                     height: "48px",
-                    minWidth: "278px",
+                    minWidth: "100%",
+                    cursor: "pointer",
+                    background: "#004DE5",
+                    color: "white",
+                    fontSize: "16px",
+                    lineHeight: "24px",
+                    textTransform: "uppercase",
+                    borderRadius: "8px",
+                    marginTop: "36px",
+                  }}
+                  htmlFor="fileDownload"
+                >
+                  download file
+                </label>
+                <Input
+                  id="fileDownload"
+                  type="file"
+                  display="none"
+                  onChange={(e) => {
+                    // deployEncrypted(e)
+                  }}
+                />
+              </Box>
+              <Box cursor="not-allowed" minW="42%">
+                <label
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "48px",
+                    minWidth: "100%",
                     background: "#696C80",
                     color: "white",
                     fontSize: "16px",

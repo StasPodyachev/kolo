@@ -40,7 +40,7 @@ const NumberInput = ({
               console.log("hello");
             }
           }}
-          onChange={(value) => setValue(+value)}
+          onChange={(event) => setValue(+event.target.value)}
           w="100%"
           h="100%"
           p="12px 16px"

@@ -13,7 +13,7 @@ interface IProps {
 const SidebarLink = ({ icon, title, to, isHiddenSidebar }: IProps) => {
   const router = useRouter();
   return (
-    <Link href={to}>
+    <Link href={to} target={title === "Docs" ? "_blank" : ""}>
       <Box
         display={isHiddenSidebar ? "flex" : "block"}
         justifyContent={isHiddenSidebar ? "center" : "normal"}

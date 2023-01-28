@@ -1,6 +1,7 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import Sidebar from "../ui/Sidebar";
 import ManageBar from "../ManageBar";
+import useDevice from "@/hooks/useDevice";
 
 interface IProps {
   children: JSX.Element;
@@ -9,12 +10,18 @@ interface IProps {
 }
 
 const Layout = ({ children, pageTitle, isCenteredBlock }: IProps) => {
+  const { isDesktop } = useDevice();
   return (
     <Flex>
       <Sidebar />
-      <Box bg="gray.900" w="100%" p="56px 70px">
+      <Box bg="gray.900" w="100%" p={isDesktop[0] ? "56px 70px" : "56px 50px"}>
         <Flex w="100%" h="max-content">
-          <Heading variant="h3" color="white">
+          <Heading
+            variant={isDesktop[0] ? "h3" : "h4"}
+            whiteSpace="nowrap"
+            color="white"
+            alignSelf="center"
+          >
             {pageTitle}
           </Heading>
           <ManageBar />

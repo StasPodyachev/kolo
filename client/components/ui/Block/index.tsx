@@ -28,9 +28,9 @@ const Block = ({ title, value }: IProps) => {
         {title.toLowerCase().includes("balance") ||
         title.toLowerCase().includes("total") ||
         title.toLowerCase().includes("locked") ? (
-          <Text>FIL&nbsp;{value}</Text>
+          <Text>FIL {value}</Text>
         ) : (
-          value
+          <Text>{value}</Text>
         )}
       </Heading>
       <Text color="gray.500">{title}</Text>

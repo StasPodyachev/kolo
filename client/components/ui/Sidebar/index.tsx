@@ -6,13 +6,16 @@ import SidebarLink from "./SidebarLink";
 import { navLinks } from "@/constants/shared";
 import { useState } from "react";
 import { useSidebarContext } from "@/context/SidebarContext";
+import useDevice from "@/hooks/useDevice";
 
 const SideBar: NextPage = () => {
   const { isHiddenSidebar, setIsHiddenSidebar } = useSidebarContext();
+  const { isDesktop } = useDevice();
   return (
     <Flex
       minH="100vh"
-      position="sticky"
+      minW={isHiddenSidebar ? "160px" : !isDesktop[0] ? "250px" : "336px"}
+      position="relative"
       top={0}
       left={0}
       bg="gray.900"
@@ -20,11 +23,11 @@ const SideBar: NextPage = () => {
       borderColor="gray.800"
     >
       <Box
+        w="100%"
         height="max-content"
         position="sticky"
         top={0}
         left={0}
-        minW={isHiddenSidebar ? "160px" : "336px"}
         p="68px 48px"
         transition="all .3s"
       >
@@ -51,7 +54,7 @@ const SideBar: NextPage = () => {
       </Box>
       <Box
         position="absolute"
-        left={isHiddenSidebar ? "164px" : "336px"}
+        left={isHiddenSidebar ? "160px" : !isDesktop[0] ? "250px" : "336px"}
         mt="65px"
         minW="max-content"
         minH="max-content"

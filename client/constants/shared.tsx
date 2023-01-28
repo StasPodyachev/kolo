@@ -40,7 +40,7 @@ export const navLinks: INavlink[] = [
     icon: <NotaryIcon boxSize="24px" color="white" />,
   },
   {
-    url: "",
+    url: "https://deforex-docs.gitbook.io/kolo-fevm-hackathon/welcome/project-intro",
     title: "Docs",
     icon: <DocsIcon boxSize="24px" color="white" />,
   },
