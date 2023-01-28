@@ -24,7 +24,7 @@ const Encryption = () => {
   };
 
   const deployEncrypted = async(e: any) =>{
-    const { publicKey, signedMessage } = await encryptionSignature()  ;
+    const { publicKey, signedMessage } : any = await encryptionSignature()  ;
     const response = await lighthouse.uploadEncrypted(
       e,
       publicKey,

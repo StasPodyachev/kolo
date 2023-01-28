@@ -37,10 +37,12 @@ const NumberInput = ({
               setTimeout(() => {
                 setValue(0);
               }, 100);
-              console.log("hello");
             }
           }}
-          onChange={(value) => setValue(+value)}
+          onChange={(value) => {
+            console.log(value, 'valie');
+            setValue(+value)
+          }}
           w="100%"
           h="100%"
           p="12px 16px"

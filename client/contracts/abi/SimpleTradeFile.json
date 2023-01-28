@@ -173,7 +173,7 @@
         "type": "uint256"
       }
     ],
-    "name": "bid",
+    "name": "buy",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -229,12 +229,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "priceStart",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "priceForceStop",
+        "name": "price",
         "type": "uint256"
       },
       {
@@ -311,42 +306,6 @@
         "type": "uint256"
       }
     ],
-    "name": "getBidHistory",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "buyer",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "bid",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct IAuctionFile.BidParams[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "dealId",
-        "type": "uint256"
-      }
-    ],
     "name": "getDeal",
     "outputs": [
       {
@@ -407,7 +366,7 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct IAuctionFile.ConfigureParams",
+        "internalType": "struct ISimpleTradeFile.ConfigureParams",
         "name": "",
         "type": "tuple"
       }
@@ -426,19 +385,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "dealId",
-        "type": "uint256"
-      }
-    ],
-    "name": "receiveReward",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

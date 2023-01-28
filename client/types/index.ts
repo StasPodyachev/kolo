@@ -2,6 +2,7 @@ export interface ISaleTypeMenuItem {
   id: number;
   title: string;
   address: string;
+  abi: any;
 }
 export interface INavlink {
   url: string;
