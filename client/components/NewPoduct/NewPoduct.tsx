@@ -83,7 +83,7 @@ const NewPoduct = () => {
   const [myCollateral, setMyCollateral] = useState(0.0);
   const [stopDate, setStopDate] = useState("");
   const [cid, setCid] = useState("");
-  const [ access, setAcces ] = useState(false)
+  const [access, setAcces] = useState(false);
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
