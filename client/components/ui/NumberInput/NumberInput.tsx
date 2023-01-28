@@ -27,9 +27,14 @@ const NumberInput = ({
       minH="48px"
       mt={isNeededMarginTop ? "16px" : 0}
     >
-      <ChakraNumberInput min={0} w="100%" bg="gray.700" borderRadius="md">
+      <ChakraNumberInput
+        min={0}
+        defaultValue={value}
+        w="100%"
+        bg="gray.700"
+        borderRadius="md"
+      >
         <NumberInputField
-          placeholder={placeholder}
           _placeholder={{ color: "white" }}
           value={value}
           onKeyPress={(event) => {

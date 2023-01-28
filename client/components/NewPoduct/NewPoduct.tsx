@@ -102,8 +102,8 @@ const NewPoduct = () => {
   const [itemDescription, setItemDescription] = useState("");
   const [startPrice, setStartPrice] = useState<number>(1);
   const [forceStopPrice, setForceStopPrice] = useState<number>(10);
-  const [myCollateral, setMyCollateral] = useState(0.0);
-  const [stopDate, setStopDate] = useState("");
+  const [myCollateral, setMyCollateral] = useState(1);
+  const [stopDate, setStopDate] = useState(getTodaysDate());
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
 
