@@ -9,7 +9,7 @@ import {
   Heading,
   Text,
   useMediaQuery,
-  Input
+  Input,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useDebugValue, useEffect, useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
@@ -18,10 +18,10 @@ import ConnectBtn from "../ui/ConnectBtn";
 import NumberInput from "../ui/NumberInput/NumberInput";
 import SaleTypeMenu from "./SaleTypeMenu";
 
-import { BigNumber, ethers } from 'ethers';
-import lighthouse from '@lighthouse-web3/sdk';
+import { BigNumber, ethers } from "ethers";
+import lighthouse from "@lighthouse-web3/sdk";
 
-declare var window: any
+declare var window: any;
 
 import ABI_FACTORY from "../../contracts/abi/Factory.json";
 import useDevice from "@/hooks/useDevice";
@@ -54,7 +54,13 @@ const CustomButton = chakra(Button, {
   },
 });
 
-const GetIntegrationInfo = ({activeItem, startPrice} : {activeItem: ISaleTypeMenuItem, startPrice: number}) => {
+const GetIntegrationInfo = ({
+  activeItem,
+  startPrice,
+}: {
+  activeItem: ISaleTypeMenuItem;
+  startPrice: number;
+}) => {
   const { data } = useContractRead({
     address: activeItem.address as any,
     abi: activeItem.abi,
@@ -62,19 +68,26 @@ const GetIntegrationInfo = ({activeItem, startPrice} : {activeItem: ISaleTypeMen
   });
   useEffect(() => {
     if (data) {
-      console.log(data, 'data');
-      const collateralAmountValue = BigNumber?.from(data.collateralAmount)
-      const minCollateralAmount = +ethers.utils.formatEther(collateralAmountValue)
-      const collateralPercentValue = BigNumber?.from(data.collateralAmount)
-      const minCollateralPercent = +ethers.utils.formatEther(collateralPercentValue)
-      console.log({minCollateralPercent, minCollateralAmount})
-      const value = startPrice * minCollateralPercent > minCollateralAmount ? startPrice * minCollateralPercent : minCollateralAmount
-      console.log(value, 'value');
+      console.log(data, "data");
+      const collateralAmountValue = BigNumber?.from(data.collateralAmount);
+      const minCollateralAmount = +ethers.utils.formatEther(
+        collateralAmountValue
+      );
+      const collateralPercentValue = BigNumber?.from(data.collateralAmount);
+      const minCollateralPercent = +ethers.utils.formatEther(
+        collateralPercentValue
+      );
+      console.log({ minCollateralPercent, minCollateralAmount });
+      const value =
+        startPrice * minCollateralPercent > minCollateralAmount
+          ? startPrice * minCollateralPercent
+          : minCollateralAmount;
+      console.log(value, "value");
       // value >= (priceStart * minCollateralPercent) / 1e18 && value >= minCollateralAmount
     }
-  }, [data, startPrice])
-  return <></>
-}
+  }, [data, startPrice]);
+  return <></>;
+};
 
 const NewPoduct = () => {
   const { isConnected } = useAccount();
@@ -93,22 +106,29 @@ const NewPoduct = () => {
       const provider = new ethers.providers.Web3Provider(window?.ethereum);
       const signer = provider.getSigner();
       const address = await signer.getAddress();
-      const messageRequested = (await lighthouse.getAuthMessage(address)).data.message;
+      const messageRequested = (await lighthouse.getAuthMessage(address)).data
+        .message;
       const signedMessage = await signer.signMessage(messageRequested);
-      return({
+      return {
         signedMessage: signedMessage,
-        publicKey: address
-      });
+        publicKey: address,
+      };
     }
-  }
+  };
 
-  const progressCallback = ({total, uploaded}:{total: number, uploaded: number}) => {
-    let percentageDone = 100 - (total / uploaded);
+  const progressCallback = ({
+    total,
+    uploaded,
+  }: {
+    total: number;
+    uploaded: number;
+  }) => {
+    let percentageDone = 100 - total / uploaded;
     console.log(percentageDone.toFixed(2));
   };
 
-  const deployEncrypted = async(e: any) => {
-    const { publicKey,signedMessage } : any = await encryptionSignature();
+  const deployEncrypted = async (e: any) => {
+    const { publicKey, signedMessage }: any = await encryptionSignature();
     const response = await lighthouse?.uploadEncrypted(
       e,
       publicKey,
@@ -117,11 +137,14 @@ const NewPoduct = () => {
       progressCallback
     );
     console.log(response);
-    const conditionsId = await lighthouse?.getAccessConditions(response?.data?.Hash)
-    setCid(response?.data?.Hash)
+    const conditionsId = await lighthouse?.getAccessConditions(
+      response?.data?.Hash
+    );
+    setCid(response?.data?.Hash);
     console.log({
-      activeItem: activeItem?.address, cid: response?.data?.Hash,
-      conditionsId: conditionsId
+      activeItem: activeItem?.address,
+      cid: response?.data?.Hash,
+      conditionsId: conditionsId,
     });
 
     // const accesCondition = async () => {
@@ -150,14 +173,14 @@ const NewPoduct = () => {
     //   console.log(res, 'res')
     // }
     // accesCondition()
-  }
+  };
   const { isDesktopHeader, isDesktop } = useDevice();
   const isSmallTablet = useMediaQuery("(max-width: 867px)");
 
   return (
     <Flex justifyContent="center">
       <Box maxW="70%">
-        <GetIntegrationInfo startPrice={startPrice} activeItem={activeItem}/>
+        <GetIntegrationInfo startPrice={startPrice} activeItem={activeItem} />
         <Heading variant={isSmallTablet[0] ? "h5" : "h4"} color="white">
           Step 1. Input Parameters
         </Heading>
@@ -302,34 +325,7 @@ const NewPoduct = () => {
                   }}
                 />
               </Box>
-              <Flex cursor="not-allowed" minW="42%">
-            <Flex justify="space-between">
-              <label
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "48px",
-                  minWidth: "278px",
-                  cursor: "pointer",
-                  background: "#004DE5",
-                  color: "white",
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                  textTransform: "uppercase",
-                  borderRadius: "8px",
-                  marginTop: "36px",
-                }}
-                htmlFor="fileDownload">
-                download file
-              </label>
-              <Input
-                id="fileDownload"
-                type="file"
-                display="none"
-                onChange={e => deployEncrypted(e)}
-              />
-              <Box cursor="not-allowed">
+              <Box cursor="not-allowed" minW="42%">
                 <label
                   style={{
                     display: "flex",
@@ -377,4 +373,4 @@ const NewPoduct = () => {
   );
 };
 
-export default NewPoduct
+export default NewPoduct;
