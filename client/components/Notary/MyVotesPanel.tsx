@@ -2,16 +2,12 @@ import { NotaryVotesBlocks } from "@/constants/shared";
 import { Flex, Heading, TabPanel } from "@chakra-ui/react";
 import { NextPage } from "next";
 import AuctionItemsAccordion from "../ui/AuctionItemsAccordion";
-import Block from "../ui/Block";
+import Blocks from "../ui/Blocks";
 
 const MyVotesPanel: NextPage = () => {
   return (
     <TabPanel p={0}>
-      <Flex justifyContent="space-between">
-        {NotaryVotesBlocks.map((block) => (
-          <Block key={block.title} title={block.title} value={block.value} />
-        ))}
-      </Flex>
+      <Blocks items={NotaryVotesBlocks} />
       <Heading mt="28px" variant="h3">
         My Votes
       </Heading>

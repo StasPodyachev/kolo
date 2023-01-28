@@ -5,7 +5,7 @@ import {
 import { Button, Flex, HStack, TabPanel } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useState } from "react";
-import Block from "../ui/Block";
+import Blocks from "../ui/Blocks";
 import NumberInput from "../ui/NumberInput/NumberInput";
 
 const DepositOrWithdrawPanel: NextPage = () => {
@@ -13,11 +13,7 @@ const DepositOrWithdrawPanel: NextPage = () => {
   return (
     <TabPanel p={0}>
       <Flex flexDir="column" gap="50px">
-        <Flex justifyContent="space-between">
-          {DepositOrWithdrawBlocks.map((block) => (
-            <Block key={block.title} title={block.title} value={block.value} />
-          ))}
-        </Flex>
+        <Blocks items={DepositOrWithdrawBlocks} />
         <Flex flexDir="column" gap="28px" maxW="576px">
           <NumberInput value={value} setValue={setValue} placeholder="Amount" />
           <HStack spacing="20px">
