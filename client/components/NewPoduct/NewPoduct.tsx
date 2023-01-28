@@ -1,6 +1,14 @@
 import addresses from "@/contracts/addresses";
 import { getTodaysDate } from "@/helpers";
-import { Box, Button, chakra, Flex, Heading, Input } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  chakra,
+  Flex,
+  Heading,
+  Input,
+  Text,
+} from "@chakra-ui/react";
 import React, { ChangeEvent, useState } from "react";
 import { useAccount } from "wagmi";
 import ButtonContractWrite from "../ButtonContractWrite";
@@ -8,26 +16,10 @@ import ConnectBtn from "../ui/ConnectBtn";
 import NumberInput from "../ui/NumberInput/NumberInput";
 import SaleTypeMenu from "./SaleTypeMenu";
 
-import ABI_FACTORY from '../../contracts/abi/Factory.json'
+import ABI_FACTORY from "../../contracts/abi/Factory.json";
 
 const API_KEY = "8a415179-7ab8-47b8-83e8-d1b3975740fe";
 // const cid = "QmQT3e1Uce8gA57jvoamCUuA6otSTb6L5v2SCqsxscEtJK"
-
-const labelStyles = {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: "48px",
-  minWidth: "278px",
-  cursor: "pointer",
-  background: "#004DE5",
-  color: "white",
-  fontSize: "16px",
-  lineHeight: "24px",
-  textTransform: "uppercase",
-  borderRadius: "8px",
-  marginTop: "36px",
-};
 
 const CustomInput = chakra(Input, {
   baseStyle: {
@@ -70,7 +62,7 @@ const NewPoduct = () => {
         {/* <Heading variant="h4" color="white">
           Step 1. Input Parameters
         </Heading> */}
-        <Box ml="110px" mt="10px" maxW="585px">
+        <Box ml="110px" mt="10px" minW="585px">
           <Heading variant="h6" color="gray.200" mt="16px">
             Name
           </Heading>
@@ -184,46 +176,45 @@ const NewPoduct = () => {
                   // deployEncrypted(e)
                 }}
               />
-              <label
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "48px",
-                  minWidth: "278px",
-                  cursor: "pointer",
-                  background: "#696C80",
-                  color: "white",
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                  textTransform: "uppercase",
-                  borderRadius: "8px",
-                  marginTop: "36px",
-                }}
-                htmlFor="thubnailDownload"
-              >
-                download thubnail
-              </label>
-              <Input
-                id="fileDownload"
-                type="file"
-                display="none"
-                onChange={(e) => {
-                  // deployEncrypted(e)
-                }}
-              />
+              <Box cursor="not-allowed">
+                <label
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "48px",
+                    minWidth: "278px",
+                    background: "#696C80",
+                    color: "white",
+                    fontSize: "16px",
+                    lineHeight: "24px",
+                    textTransform: "uppercase",
+                    borderRadius: "8px",
+                    marginTop: "36px",
+                    pointerEvents: "none",
+                  }}
+                  htmlFor="thubnailDownload"
+                >
+                  download thubnail
+                </label>
+                <Input
+                  id="fileDownload"
+                  type="file"
+                  display="none"
+                  onChange={(e) => {
+                    // deployEncrypted(e)
+                  }}
+                />
+              </Box>
             </Flex>
           ) : null}
-          { isConnected && access ? (
-            <CustomButton
-              w="100%"
-              bg="blue.primary"
-              color="white"
-              transition="all .3s"
-              _hover={{ bg: "blue.active" }}
-            >
-              <ButtonContractWrite address={addresses[0]?.address} abi={ABI_FACTORY} method="create"  title="start sell" />
-            </CustomButton>
+          {isConnected && access ? (
+            <ButtonContractWrite
+              address={addresses[0]?.address}
+              abi={ABI_FACTORY}
+              method="create"
+              title="start sell"
+            />
           ) : (
             <ConnectBtn isCentered isNeedMarginTop />
           )}

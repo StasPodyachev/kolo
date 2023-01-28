@@ -1,3 +1,4 @@
+import useDevice from "@/hooks/useDevice";
 import { Box } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
@@ -5,9 +6,16 @@ interface IProps {
   isCentered?: boolean;
   isNeedMarginTop?: boolean;
   isNeedSmallMarginTop?: boolean;
+  isHeaderButton?: boolean;
 }
 
-const ConnectBtn = ({ isCentered, isNeedMarginTop, isNeedSmallMarginTop }: IProps) => {
+const ConnectBtn = ({
+  isCentered,
+  isNeedMarginTop,
+  isNeedSmallMarginTop,
+  isHeaderButton,
+}: IProps) => {
+  const { isDesktopHeader } = useDevice();
   return (
     <Box
       mt={isNeedMarginTop ? "36px" : isNeedSmallMarginTop ? "8px" : 0}
@@ -30,7 +38,10 @@ const ConnectBtn = ({ isCentered, isNeedMarginTop, isNeedSmallMarginTop }: IProp
         },
       }}
     >
-      <ConnectButton label="CONNECT WALLET" />
+      <ConnectButton
+        label="CONNECT WALLET"
+        showBalance={isHeaderButton && isDesktopHeader ? true : false}
+      />
     </Box>
   );
 };

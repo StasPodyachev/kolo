@@ -9,6 +9,7 @@ import { FileIcon, UserIcon } from "@/icons";
 import BidsTable from "@/components/Products/BidsTable";
 import AddressCopy from "@/components/ui/AddressCopy";
 import { useAccount } from "wagmi";
+import Tooltip from "@/components/ui/Tooltip";
 
 const Product: NextPage = () => {
   const { isConnected } = useAccount();
@@ -84,23 +85,27 @@ const Product: NextPage = () => {
                 {productItem?.priceEnd}&nbsp;FIL
               </Heading>
             </Flex>
-            <Button
-              isDisabled={!isConnected}
-              textStyle="button"
-              bg="blue.primary"
-              color="white"
-              mt="39px"
-              borderRadius="md"
-              transition="all .3s"
-              _hover={{ bg: "blue.hover" }}
+            <Tooltip
+              isHidden={isConnected ? true : false}
+              label="Connect wallet to place bid"
             >
-              place bid
-            </Button>
+              <Button
+                isDisabled={!isConnected}
+                textStyle="button"
+                bg="blue.primary"
+                color="white"
+                mt="39px"
+                borderRadius="md"
+                transition="all .3s"
+                _hover={{ bg: "blue.hover" }}
+              >
+                place bid
+              </Button>
+            </Tooltip>
           </Flex>
-          <Flex flexDir="column" maxW="278px" gap="34px">
+          <Flex flexDir="column" w="278px" gap="34px">
             <Flex
               alignSelf="flex-end"
-              w="max-content"
               gap="8px"
               alignItems="center"
               p="8px 18px"
@@ -126,18 +131,23 @@ const Product: NextPage = () => {
             <Text textStyle="smallText" color="gray.300">
               {productItem?.description}
             </Text>
-            <Button
-              isDisabled={!isConnected}
-              mt="35px"
-              bg="blue.secondaryDark"
-              color="white"
-              textStyle="button"
-              transition="all .3s"
-              _hover={{ bg: "blue.active" }}
-              borderRadius="md"
+            <Tooltip
+              label="Connect wallet to buy"
+              isHidden={isConnected ? true : false}
             >
-              buy now
-            </Button>
+              <Button
+                isDisabled={!isConnected}
+                mt="35px"
+                bg="blue.secondaryDark"
+                color="white"
+                textStyle="button"
+                transition="all .3s"
+                _hover={{ bg: "blue.active" }}
+                borderRadius="md"
+              >
+                buy now
+              </Button>
+            </Tooltip>
           </Flex>
         </Flex>
         <Flex gap="88px">

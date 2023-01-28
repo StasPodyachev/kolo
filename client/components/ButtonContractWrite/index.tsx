@@ -9,7 +9,6 @@ interface IProps {
 }
 
 const ButtonContractWrite = ({ title, address, abi, method }: IProps) => {
-  
   const { config } = usePrepareContractWrite({
     address,
     abi,
@@ -20,7 +19,18 @@ const ButtonContractWrite = ({ title, address, abi, method }: IProps) => {
   return isSuccess ? null : isLoading ? (
     <Button textStyle="button">Loading...</Button>
   ) : (
-    <Button isDisabled={!write} textStyle="button" onClick={() => write?.()}>
+    <Button
+      isDisabled={!write}
+      textStyle="button"
+      w="100%"
+      minH="48px"
+      mt="36px"
+      bg="blue.primary"
+      color="white"
+      transition="all .3s"
+      _hover={{ bg: "blue.active" }}
+      onClick={() => write?.()}
+    >
       {title}
     </Button>
   );

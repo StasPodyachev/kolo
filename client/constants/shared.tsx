@@ -1,5 +1,6 @@
 import {
   DashboardIcon,
+  DocsIcon,
   FaqIcon,
   MarketIcon,
   NewItemIcon,
@@ -14,7 +15,7 @@ import {
   IVotesParameter,
   IDepositAndWithdrawButton,
   FaqAccordionItem,
-  ISaleTypeMenuItems
+  ISaleTypeMenuItem,
 } from "@/types";
 
 export const navLinks: INavlink[] = [
@@ -37,6 +38,11 @@ export const navLinks: INavlink[] = [
     url: "/notary",
     title: "Notary",
     icon: <NotaryIcon boxSize="24px" color="white" />,
+  },
+  {
+    url: "",
+    title: "Docs",
+    icon: <DocsIcon boxSize="24px" color="white" />,
   },
   {
     url: "/faq",
@@ -311,7 +317,7 @@ export const MyPurchasesBlocks: IBlock[] = [
   },
 ];
 
-export const SaleTypeMenuItems: ISaleTypeMenuItems[] = [
+export const SaleTypeMenuItems: ISaleTypeMenuItem[] = [
   {
     id: 1,
     title: "AUCTION OF FILES",
@@ -331,7 +337,7 @@ export const SaleTypeMenuItems: ISaleTypeMenuItems[] = [
     id: 4,
     title: "SIMPLE TRADES OF FILES",
     address: "0xE7D25a50cfDEC66E53f4AAbC95B352d12AADaE95",
-  }
+  },
 ];
 
 export const FaqAccodionItems: FaqAccordionItem[] = [

@@ -1,6 +1,7 @@
 import { addressTruncation } from "@/helpers";
-import { Tooltip, Text } from "@chakra-ui/react";
+import { Text } from "@chakra-ui/react";
 import { useState } from "react";
+import Tooltip from "../Tooltip";
 
 interface IProps {
   address: string;
@@ -11,12 +12,7 @@ interface IProps {
 const AddressCopy = ({ address, color, textStyle }: IProps) => {
   const [hasCopied, setHasCopied] = useState(false);
   return (
-    <Tooltip
-      hasArrow
-      label={hasCopied ? "Copied" : "Copy"}
-      p="4px 12px"
-      color="white"
-    >
+    <Tooltip label={hasCopied ? "Copied" : "Copy"}>
       <Text
         w="max-content"
         textStyle={textStyle ? textStyle : "mediumText"}

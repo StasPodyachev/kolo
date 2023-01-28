@@ -10,13 +10,22 @@ import { useSidebarContext } from "@/context/SidebarContext";
 const SideBar: NextPage = () => {
   const { isHiddenSidebar, setIsHiddenSidebar } = useSidebarContext();
   return (
-    <Flex minH="100vh" position="sticky">
+    <Flex
+      minH="100vh"
+      position="sticky"
+      top={0}
+      left={0}
+      bg="gray.900"
+      borderRight="1px solid"
+      borderColor="gray.800"
+    >
       <Box
+        height="max-content"
+        position="sticky"
+        top={0}
+        left={0}
         minW={isHiddenSidebar ? "160px" : "336px"}
         p="68px 48px"
-        bg="gray.900"
-        borderRight="1px solid"
-        borderColor="gray.800"
         transition="all .3s"
       >
         <Link
