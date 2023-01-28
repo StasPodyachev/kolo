@@ -57,9 +57,11 @@ const CustomButton = chakra(Button, {
 const GetIntegrationInfo = ({
   activeItem,
   startPrice,
+  setValue
 }: {
   activeItem: ISaleTypeMenuItem;
   startPrice: number;
+  setValue: (col: number) => void
 }) => {
   const { data } = useContractRead({
     address: activeItem.address as any,
@@ -68,7 +70,7 @@ const GetIntegrationInfo = ({
   });
   useEffect(() => {
     if (data) {
-      console.log(data, "data");
+      // console.log(data, "data");
       const collateralAmountValue = BigNumber?.from(data.collateralAmount);
       const minCollateralAmount = +ethers.utils.formatEther(
         collateralAmountValue
@@ -77,13 +79,17 @@ const GetIntegrationInfo = ({
       const minCollateralPercent = +ethers.utils.formatEther(
         collateralPercentValue
       );
-      console.log({ minCollateralPercent, minCollateralAmount });
-      const value =
+      // console.log({ minCollateralPercent, minCollateralAmount });
+      const minimalCollateral =
         startPrice * minCollateralPercent > minCollateralAmount
           ? startPrice * minCollateralPercent
           : minCollateralAmount;
-      console.log(value, "value");
-      // value >= (priceStart * minCollateralPercent) / 1e18 && value >= minCollateralAmount
+      console.log(minimalCollateral.toFixed(2), "value");
+      const myCollateral = minimalCollateral >= (startPrice * minCollateralPercent) / 1e18
+      console.log(myCollateral, minimalCollateral);
+      
+      // const value = myCollateral > minimalCollateral ? myCollateral.toFixed(2) : minimalCollateral.toFixed(2)
+      // setValue(myCollateral > minimalCollateral ? myCollateral.toFixed(2) : minimalCollateral)
     }
   }, [data, startPrice]);
   return <></>;
@@ -147,32 +153,32 @@ const NewPoduct = () => {
       conditionsId: conditionsId,
     });
 
-    // const accesCondition = async () => {
-    //   const { publicKey, signedMessage } : any = await encryptionSignature();
-    //   const conditions = [
-    //     {
-    //       id: 1,
-    //       chain: 'Hyperspace',
-    //       method: 'checkAccess',
-    //       standardContractType: 'Custom',
-    //       contractAddress: activeItem?.address,
-    //       returnValueTest: { comparator: '==', value: '1' },
-    //       parameters: [ [response?.data?.Hash],':userAddress'],
-    //       inputArrayType: [ 'bytes32[]', 'address' ],
-    //       outputType: 'uint8'
-    //     }
-    //   ]
-    //   const aggregator = "([1])";
-    //   const res = await lighthouse.accessCondition(
-    //     publicKey,
-    //     response?.data?.Hash,
-    //     signedMessage,
-    //     conditions,
-    //     aggregator
-    //   )
-    //   console.log(res, 'res')
-    // }
-    // accesCondition()
+    const accesCondition = async () => {
+      const { publicKey, signedMessage } : any = await encryptionSignature();
+      const conditions = [
+        {
+          id: 1,
+          chain: 'Hyperspace',
+          method: 'checkAccess',
+          standardContractType: 'Custom',
+          contractAddress: activeItem?.address,
+          returnValueTest: { comparator: '==', value: '1' },
+          parameters: [ [response?.data?.Hash],':userAddress'],
+          inputArrayType: [ 'bytes32[]', 'address' ],
+          outputType: 'uint8'
+        }
+      ]
+      const aggregator = "([1])";
+      const res = await lighthouse.accessCondition(
+        publicKey,
+        response?.data?.Hash,
+        signedMessage,
+        conditions,
+        aggregator
+      )
+      console.log(res, 'res')
+    }
+    accesCondition()
   };
   const { isDesktopHeader, isDesktop } = useDevice();
   const isSmallTablet = useMediaQuery("(max-width: 867px)");
@@ -181,9 +187,6 @@ const NewPoduct = () => {
     <Flex justifyContent="center">
       <Box maxW="70%">
         <GetIntegrationInfo startPrice={startPrice} activeItem={activeItem} />
-        <Heading variant={isSmallTablet[0] ? "h5" : "h4"} color="white">
-          Step 1. Input Parameters
-        </Heading>
         <Box ml={isDesktopHeader[0] ? "110px" : "20px"} mt="10px" minW="100%">
           <Heading variant="h6" color="gray.200" mt="16px">
             Name
