@@ -25,8 +25,6 @@ contract Notary is INotary, Ownable {
     uint256 public _consensusCount = 5;
     uint256 public _countInvaitedNotary = 10;
 
-    uint256 public serviceFee;
-
     uint256 public _penalty = 1e18;
 
     function setFactory(address factory) external onlyOwner {
@@ -65,13 +63,6 @@ contract Notary is INotary, Ownable {
         deposits[msg.sender] -= amount;
     }
 
-    function withdrawFee(uint256 amount) external onlyOwner {
-        require(serviceFee >= amount, "Notary: Not enough balance");
-
-        payable(msg.sender).transfer(amount);
-        serviceFee -= amount;
-    }
-
     /**
      * @param mark True is vote for buyer, False - for seller
      */
@@ -99,6 +90,7 @@ contract Notary is INotary, Ownable {
             address storeAddress = _factory.getStore(dealId);
             IStore store = IStore(storeAddress);
             IIntegration.DisputeWinner winner;
+            uint256 serviceFee;
 
             if (votesForBuyer[dealId].length == _consensusCount) {
                 uint256 collateral = store.getSellerCollateral(dealId);
@@ -110,7 +102,7 @@ contract Notary is INotary, Ownable {
                         reward;
                 }
 
-                serviceFee +=
+                serviceFee =
                     penaltyByDeal[dealId] *
                     votesForSeller[dealId].length +
                     (collateral - reward * votesForBuyer[dealId].length);
@@ -126,13 +118,15 @@ contract Notary is INotary, Ownable {
                         reward;
                 }
 
-                serviceFee +=
+                serviceFee =
                     penaltyByDeal[dealId] *
                     votesForBuyer[dealId].length +
                     (collateral - reward * votesForSeller[dealId].length);
 
                 winner = IIntegration.DisputeWinner.Seller;
             }
+
+            payable(_factory.treasury()).transfer(serviceFee);
 
             address integration = store.getIntegration(dealId);
             IIntegration(integration).finalizeDispute(dealId, winner);
