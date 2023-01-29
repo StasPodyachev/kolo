@@ -43,4 +43,8 @@ contract Treasury is ITreasury, Ownable {
     function _buy(uint256 amount) internal pure returns (uint256) {
         return amount;
     }
+
+    function giveGrandToTeam(address to, uint256 amount) external onlyOwner {
+        payable(to).transfer(amount);
+    }
 }
