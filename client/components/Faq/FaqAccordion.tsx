@@ -8,10 +8,12 @@ import {
   Flex,
   Heading,
   Text,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 
 const FaqAccordion: NextPage = () => {
+  const isCompactAccordion = useMediaQuery("(max-width: 900px)");
   return (
     <Accordion allowToggle>
       {FaqAccodionItems.map((item) => (
@@ -21,14 +23,18 @@ const FaqAccordion: NextPage = () => {
           borderColor="gray.800"
           _notFirst={{ mt: "34px" }}
         >
-          <AccordionButton>
+          <AccordionButton p={0}>
             <Flex
               justifyContent="space-between"
               alignItems="center"
-              p="20px 30px"
+              p={isCompactAccordion[0] ? "20px 16px" : "20px 30px"}
               w="100%"
             >
-              <Heading minW="max-content" variant="h5" color="white">
+              <Heading
+                minW="max-content"
+                variant={isCompactAccordion[0] ? "h6" : "h5"}
+                color="white"
+              >
                 {item.title}
               </Heading>
               <AccordionIcon boxSize="36px" color="white" />

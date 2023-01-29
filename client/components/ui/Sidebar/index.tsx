@@ -14,7 +14,7 @@ const SideBar: NextPage = () => {
   return (
     <Flex
       minH="100vh"
-      minW={isHiddenSidebar ? "160px" : !isDesktop[0] ? "250px" : "336px"}
+      minW={isHiddenSidebar ? "160px" : !isDesktop[0] ? "220px" : "336px"}
       position="relative"
       top={0}
       left={0}
@@ -28,14 +28,14 @@ const SideBar: NextPage = () => {
         position="sticky"
         top={0}
         left={0}
-        p="68px 48px"
+        p={isDesktop[0] ? "68px 48px" : "68px 30px"}
         transition="all .3s"
       >
         <Link
           href="/"
           style={{
             transition: "all .3s",
-            marginLeft: isHiddenSidebar ? "4px" : "26px",
+            marginLeft: isHiddenSidebar ? "20px" : "26px",
           }}
         >
           <LogoIcon color="white" width={63} height={17} />
@@ -53,8 +53,8 @@ const SideBar: NextPage = () => {
         </Flex>
       </Box>
       <Box
-        position="absolute"
-        left={isHiddenSidebar ? "160px" : !isDesktop[0] ? "250px" : "336px"}
+        position="fixed"
+        left={isHiddenSidebar ? "160px" : !isDesktop[0] ? "220px" : "336px"}
         mt="65px"
         minW="max-content"
         minH="max-content"

@@ -1,17 +1,15 @@
 import { MyPurchasesBlocks } from "@/constants/shared";
-import { Flex, Heading, TabPanel } from "@chakra-ui/react";
+import useDevice from "@/hooks/useDevice";
+import { Heading, TabPanel } from "@chakra-ui/react";
 import { NextPage } from "next";
 import AuctionItemAccordion from "../ui/AuctionItemsAccordion";
-import Block from "../ui/Block";
+import Blocks from "../ui/Blocks";
 
 const MyPurchasesPanel: NextPage = () => {
+  const { isDesktopHeader } = useDevice();
   return (
     <TabPanel p={0}>
-      <Flex justifyContent="space-between">
-        {MyPurchasesBlocks.map((block) => (
-          <Block key={block.title} title={block.title} value={block.value} />
-        ))}
-      </Flex>
+      <Blocks items={MyPurchasesBlocks} />
       <Heading mt="28px" variant="h3" color="white">
         My Bids
       </Heading>

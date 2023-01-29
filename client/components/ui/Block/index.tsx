@@ -23,7 +23,7 @@ const Block = ({ title, value }: IProps) => {
             ? "green.primary"
             : "white"
         }
-        variant="h4"
+        variant="h5"
       >
         {title.toLowerCase().includes("balance") ||
         title.toLowerCase().includes("total") ||

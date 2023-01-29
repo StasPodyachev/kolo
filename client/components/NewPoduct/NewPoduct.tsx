@@ -7,11 +7,10 @@ import {
   chakra,
   Flex,
   Heading,
-  Text,
   useMediaQuery,
   Input,
 } from "@chakra-ui/react";
-import React, { ChangeEvent, useDebugValue, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
 import ButtonContractWrite from "../ButtonContractWrite";
 import ConnectBtn from "../ui/ConnectBtn";
@@ -43,14 +42,6 @@ const CustomInput = chakra(Input, {
       border: "1px solid",
       borderColor: "gray.300",
     },
-  },
-});
-
-const CustomButton = chakra(Button, {
-  baseStyle: {
-    textStyle: "button",
-    minH: "48px",
-    mt: "36px",
   },
 });
 
@@ -87,7 +78,6 @@ const GetIntegrationInfo = ({
           ? startPrice * minCollateralPercent
           : minCollateralAmount;
       console.log({myCollateral,minimalCollateral});
-
       const value = Number(myCollateral >= minimalCollateral ? myCollateral : minimalCollateral)
       console.log(value, 'valueee');
       setValue(value)
@@ -295,71 +285,71 @@ const NewPoduct = () => {
             </Box>
           </Flex>
           {isConnected ? (
-            <Flex
-              justify="space-between"
-              flexDir={isDesktop[0] ? "row" : "column"}
-            >
-              <Box minW="42%">
-                <label
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "48px",
-                    minWidth: "100%",
-                    cursor: "pointer",
-                    background: "#004DE5",
-                    color: "white",
-                    fontSize: "16px",
-                    lineHeight: "24px",
-                    textTransform: "uppercase",
-                    borderRadius: "8px",
-                    marginTop: "36px",
-                  }}
-                  htmlFor="fileDownload"
-                >
-                  download file
-                </label>
-                <Input
-                  id="fileDownload"
-                  type="file"
-                  display="none"
-                  onChange={(e) => {
-                    deployEncrypted(e)
-                  }}
-                />
-              </Box>
-              <Box cursor="not-allowed" minW="42%">
-                <label
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "48px",
-                    minWidth: "100%",
-                    background: "#696C80",
-                    color: "white",
-                    fontSize: "16px",
-                    lineHeight: "24px",
-                    textTransform: "uppercase",
-                    borderRadius: "8px",
-                    marginTop: "36px",
-                    pointerEvents: "none",
-                  }}
-                  htmlFor="thubnailDownload"
-                >
-                  download thubnail
-                </label>
-                <Input
-                  id="fileDownload"
-                  type="file"
-                  display="none"
-                  onChange={(e) => {
-                    // deployEncrypted(e)
-                  }}
-                />
-              </Box>
-            </Flex>
+          <Flex
+            justify="space-between"
+            flexDir={isDesktop[0] ? "row" : "column"}
+          >
+            <Box minW="42%">
+              <label
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "48px",
+                  minWidth: "100%",
+                  cursor: "pointer",
+                  background: "#004DE5",
+                  color: "white",
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  textTransform: "uppercase",
+                  borderRadius: "8px",
+                  marginTop: "36px",
+                }}
+                htmlFor="fileDownload"
+              >
+                download file
+              </label>
+              <Input
+                id="fileDownload"
+                type="file"
+                display="none"
+                onChange={(e) => {
+                  deployEncrypted(e)
+                }}
+              />
+            </Box>
+            <Box cursor="not-allowed" minW="42%">
+              <label
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "48px",
+                  minWidth: "100%",
+                  background: "#696C80",
+                  color: "white",
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  textTransform: "uppercase",
+                  borderRadius: "8px",
+                  marginTop: "36px",
+                  pointerEvents: "none",
+                }}
+                htmlFor="thubnailDownload"
+              >
+                download thubnail
+              </label>
+              <Input
+                id="fileDownload"
+                type="file"
+                display="none"
+                onChange={(e) => {
+                  // deployEncrypted(e)
+                }}
+              />
+            </Box>
+          </Flex>
           ) : null}
           {isConnected && access ? (
             <ButtonContractWrite
