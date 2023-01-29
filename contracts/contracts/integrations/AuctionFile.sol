@@ -161,7 +161,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             priceStart != 0 &&
                 priceStart < priceForceStop &&
                 dateExpire > block.timestamp,
-            "SimpleTrade: Wrong params"
+            "AuctionFile: Wrong params"
         );
 
         uint256 id = _factory.addDeal(storeAddress);
