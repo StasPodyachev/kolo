@@ -49,10 +49,12 @@ const GetIntegrationInfo = ({
   activeItem,
   startPrice,
   setValue,
+  myCollateral
 }: {
   activeItem: ISaleTypeMenuItem;
   startPrice: number;
-  setValue: (col: number) => void;
+  setValue: (col: number) => void
+  myCollateral: number
 }) => {
   const { data } = useContractRead({
     address: activeItem.address as any,
@@ -70,7 +72,6 @@ const GetIntegrationInfo = ({
       const minCollateralPercent = +ethers.utils.formatEther(
         collateralPercentValue
       );
-      // console.log({ minCollateralPercent, minCollateralAmount });
       const minimalCollateral =
         startPrice * minCollateralPercent > minCollateralAmount
           ? startPrice * minCollateralPercent
@@ -87,7 +88,7 @@ const GetIntegrationInfo = ({
           : minimalCollateral.toFixed(2);
       setValue(+value);
     }
-  }, [data, startPrice]);
+  }, [data, myCollateral, setValue, startPrice]);
   return <></>;
 };
 
@@ -142,39 +143,35 @@ const NewPoduct = () => {
     const conditionsId = await lighthouse?.getAccessConditions(
       response?.data?.Hash
     );
-    setCid(response?.data?.Hash);
-    console.log({
-      activeItem: activeItem?.address,
-      cid: response?.data?.Hash,
-      conditionsId: conditionsId,
-    });
+    setCid(response?.data?.Hash)
+    setAcces(true)
 
-    const accesCondition = async () => {
-      const { publicKey, signedMessage }: any = await encryptionSignature();
-      const conditions = [
-        {
-          id: 1,
-          chain: "Hyperspace",
-          method: "checkAccess",
-          standardContractType: "Custom",
-          contractAddress: activeItem?.address,
-          returnValueTest: { comparator: "==", value: "1" },
-          parameters: [[response?.data?.Hash], ":userAddress"],
-          inputArrayType: ["bytes32[]", "address"],
-          outputType: "uint8",
-        },
-      ];
-      const aggregator = "([1])";
-      const res = await lighthouse.accessCondition(
-        publicKey,
-        response?.data?.Hash,
-        signedMessage,
-        conditions,
-        aggregator
-      );
-      console.log(res, "res");
-    };
-    accesCondition();
+    // const accesCondition = async () => {
+    //   const { publicKey, signedMessage } : any = await encryptionSignature();
+    //   const conditions = [
+    //     {
+    //       id: 1,
+    //       chain: 'Hyperspace',
+    //       method: 'checkAccess',
+    //       standardContractType: 'Custom',
+    //       contractAddress: activeItem?.address,
+    //       returnValueTest: { comparator: '==', value: '1' },
+    //       parameters: [ [response?.data?.Hash],':userAddress'],
+    //       inputArrayType: [ 'bytes32[]', 'address' ],
+    //       outputType: 'uint8'
+    //     }
+    //   ]
+    //   const aggregator = "([1])";
+    //   const res = await lighthouse.accessCondition(
+    //     publicKey,
+    //     response?.data?.Hash,
+    //     signedMessage,
+    //     conditions,
+    //     aggregator
+    //   )
+    //   console.log(res, 'res')
+    // }
+    // accesCondition()
   };
   const { isDesktopHeader, isDesktop } = useDevice();
 
@@ -269,6 +266,9 @@ const NewPoduct = () => {
                 min={getTodaysDate()}
                 value={stopDate}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  // const start = Date.now() - event.target.value
+                  console.log(event, 'event');
+
                   setStopDate(event.target.value);
                 }}
                 px="16px"
@@ -292,78 +292,90 @@ const NewPoduct = () => {
             </Box>
           </Flex>
           {isConnected ? (
-            <Flex
-              justify="space-between"
-              flexDir={isDesktop[0] ? "row" : "column"}
-            >
-              <Box minW="42%">
-                <label
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "48px",
-                    minWidth: "100%",
-                    cursor: "pointer",
-                    background: "#004DE5",
-                    color: "white",
-                    fontSize: "16px",
-                    lineHeight: "24px",
-                    textTransform: "uppercase",
-                    borderRadius: "8px",
-                    marginTop: "36px",
-                  }}
-                  htmlFor="fileDownload"
-                >
-                  download file
-                </label>
-                <Input
-                  id="fileDownload"
-                  type="file"
-                  display="none"
-                  onChange={(e) => {
-                    // deployEncrypted(e)
-                  }}
-                />
-              </Box>
-              <Box cursor="not-allowed" minW="42%">
-                <label
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "48px",
-                    minWidth: "100%",
-                    background: "#696C80",
-                    color: "white",
-                    fontSize: "16px",
-                    lineHeight: "24px",
-                    textTransform: "uppercase",
-                    borderRadius: "8px",
-                    marginTop: "36px",
-                    pointerEvents: "none",
-                  }}
-                  htmlFor="thubnailDownload"
-                >
-                  download thubnail
-                </label>
-                <Input
-                  id="fileDownload"
-                  type="file"
-                  display="none"
-                  onChange={(e) => {
-                    // deployEncrypted(e)
-                  }}
-                />
-              </Box>
-            </Flex>
+          <Flex
+            justify="space-between"
+            flexDir={isDesktop[0] ? "row" : "column"}
+          >
+            <Box minW="42%">
+              <label
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "48px",
+                  minWidth: "100%",
+                  cursor: "pointer",
+                  background: "#004DE5",
+                  color: "white",
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  textTransform: "uppercase",
+                  borderRadius: "8px",
+                  marginTop: "36px",
+                }}
+                htmlFor="fileDownload"
+              >
+                download file
+              </label>
+              <Input
+                id="fileDownload"
+                type="file"
+                display="none"
+                onChange={(e) => {
+                  deployEncrypted(e)
+                }}
+              />
+            </Box>
+            <Box cursor="not-allowed" minW="42%">
+              <label
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "48px",
+                  minWidth: "100%",
+                  background: "#696C80",
+                  color: "white",
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  textTransform: "uppercase",
+                  borderRadius: "8px",
+                  marginTop: "36px",
+                  pointerEvents: "none",
+                }}
+                htmlFor="thubnailDownload"
+              >
+                download thubnail
+              </label>
+              <Input
+                id="fileDownload"
+                type="file"
+                display="none"
+                onChange={(e) => {
+                  // deployEncrypted(e)
+                }}
+              />
+            </Box>
+          </Flex>
           ) : null}
           {isConnected && access ? (
             <ButtonContractWrite
-              address={addresses[0]?.address}
-              abi={ABI_FACTORY}
+              address={activeItem.address}
+              abi={activeItem.abi}
               method="create"
               title="start sell"
+              parrams={
+                {
+                  name: itemName,
+                  description: itemDescription,
+                  priceStart: startPrice,
+                  priceForceStop: forceStopPrice,
+                  dateExpire: stopDate,
+                  cid
+                }
+
+                // {itemName, itemDescription, startPrice, forceStopPrice, stopDate, cid}
+              }
             />
           ) : !isConnected ? (
             <ConnectBtn isCentered isNeedMarginTop />
