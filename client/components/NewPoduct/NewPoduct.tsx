@@ -11,7 +11,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContractRead, usePrepareContractWrite, useContractWrite } from "wagmi";
 import ButtonContractWrite from "../ButtonContractWrite";
 import ConnectBtn from "../ui/ConnectBtn";
 import NumberInput from "../ui/NumberInput/NumberInput";
@@ -27,8 +27,6 @@ import useDevice from "@/hooks/useDevice";
 import { ISaleTypeMenuItem } from "@/types";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
-// const cid = "QmQT3e1Uce8gA57jvoamCUuA6otSTb6L5v2SCqsxscEtJK"
-
 const CustomInput = chakra(Input, {
   baseStyle: {
     bg: "gray.700",
@@ -44,6 +42,30 @@ const CustomInput = chakra(Input, {
     },
   },
 });
+
+const CreateStore = ({address} : {address: string}) => {
+  const { config } = usePrepareContractWrite({
+    address: addresses[0].address as `0x${string}`,
+    abi: ABI_FACTORY,
+    functionName: 'createStore',
+  })
+  const { write: create } = useContractWrite(config)
+  return (
+    <Button
+      mt={10}
+      w="50%"
+      bg="blue.primary"
+      color="white"
+      textStyle="button"
+      borderRadius="md"
+      transition="all .3s"
+      _hover={{ bg: "blue.hover" }}
+      onClick={() => create?.()}
+    >
+      Create Store
+    </Button> 
+  )
+}
 
 const GetIntegrationInfo = ({
   activeItem,
@@ -95,7 +117,7 @@ const GetIntegrationInfo = ({
 };
 
 const NewPoduct = () => {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const [activeItem, setActiveItem] = useState(SaleTypeMenuItems[0]);
   const [itemName, setItemName] = useState("");
   const [itemDescription, setItemDescription] = useState("");
@@ -105,6 +127,14 @@ const NewPoduct = () => {
   const [stopDate, setStopDate] = useState(getTodaysDate());
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
+  const [ isStore, setIsStore] = useState(false)
+
+  const { data: store } = useContractRead({
+    address: addresses[0].address as `0x${string}`,
+    abi: ABI_FACTORY,
+    functionName: 'getStore',
+    args: [address]
+  })
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
@@ -176,6 +206,18 @@ const NewPoduct = () => {
     // accesCondition()
   };
   const { isDesktopHeader, isDesktop } = useDevice();
+
+  useEffect(() => {
+    console.log(store, 'store');
+    if (store === '0x0000000000000000000000000000000000000000') {
+      setIsStore(false);
+
+    } if (store !== '0x0000000000000000000000000000000000000000') {
+      setIsStore(true)
+    } else {
+
+    }
+  }, [store])
 
   return (
     <Flex justifyContent="center">
@@ -365,13 +407,12 @@ const NewPoduct = () => {
                   dateExpire: stopDate,
                   cid,
                 }
-
-                // {itemName, itemDescription, startPrice, forceStopPrice, stopDate, cid}
               }
             />
           ) : !isConnected ? (
             <ConnectBtn isCentered isNeedMarginTop />
-          ) : null}
+          ) : !isStore && address
+          ? <CreateStore address={address as `0x${string}`} /> : null}
         </Box>
       </Box>
     </Flex>

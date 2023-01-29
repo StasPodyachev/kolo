@@ -6,6 +6,10 @@ import "./integrations/IIntegration.sol";
 interface IFactory {
     event StoreCreated(address store, address wallet);
 
+    function treasury() external view returns (address);
+
+    function chat() external view returns (address);
+
     function createStore() external returns (address storeAddress);
 
     function addDeal(address storeAddress) external returns (uint256);

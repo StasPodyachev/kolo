@@ -22,8 +22,6 @@ interface INotary {
 
     function withdraw(uint256 amount) external;
 
-    function withdrawFee(uint256 amount) external;
-
     function vote(uint256 dealId, bool mark) external;
 
     function chooseNotaries(uint256 dealId) external;
