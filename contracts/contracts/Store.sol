@@ -94,15 +94,19 @@ contract Store is IStore, Ownable {
         address seller,
         uint256 serviceFee
     ) external {
-        uint256 fee = (buyers[dealId][buyer] * serviceFee) / 1e18;
-        payable(_factory.treasury()).transfer(fee);
+        uint256 amount = sellerCollaterals[dealId];
 
-        payable(seller).transfer(
-            sellerCollaterals[dealId] + buyers[dealId][buyer] - fee
-        );
+        if (buyers[dealId][buyer] != 0) {
+            uint256 fee = (buyers[dealId][buyer] * serviceFee) / 1e18;
 
+            payable(_factory.treasury()).transfer(fee);
+
+            amount += buyers[dealId][buyer] - fee;
+            buyers[dealId][buyer] = 0;
+        }
+
+        payable(seller).transfer(amount);
         sellerCollaterals[dealId] = 0;
-        buyers[dealId][buyer] = 0;
     }
 
     function transferWinToBuyer(uint256 dealId, address buyer) external {
