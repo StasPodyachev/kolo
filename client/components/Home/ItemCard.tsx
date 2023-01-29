@@ -6,7 +6,6 @@ import { FileIcon } from "@/icons";
 import Link from "next/link";
 import { addressTruncation } from "@/helpers";
 import AddressCopy from "../ui/AddressCopy";
-
 interface IProps {
   to: number;
   title: string;

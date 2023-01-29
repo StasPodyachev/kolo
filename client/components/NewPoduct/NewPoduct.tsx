@@ -27,8 +27,6 @@ import useDevice from "@/hooks/useDevice";
 import { ISaleTypeMenuItem } from "@/types";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
-// const cid = "QmQT3e1Uce8gA57jvoamCUuA6otSTb6L5v2SCqsxscEtJK"
-
 const CustomInput = chakra(Input, {
   baseStyle: {
     bg: "gray.700",
@@ -46,15 +44,12 @@ const CustomInput = chakra(Input, {
 });
 
 const CreateStore = ({address} : {address: string}) => {
-  console.log(address, 'address');
-  
   const { config } = usePrepareContractWrite({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
     functionName: 'createStore',
   })
-
-  const { data, isLoading, isSuccess, write: create } = useContractWrite(config)
+  const { write: create } = useContractWrite(config)
   return (
     <Button
       mt={10}
