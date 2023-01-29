@@ -16,6 +16,12 @@ contract Factory is IFactory, StoreDeployer, Ownable {
     uint256[] private deals;
     uint256 id;
 
+    address public treasury;
+
+    function setTreasury(address _treasury) external onlyOwner {
+        treasury = _treasury;
+    }
+
     function createStore() external returns (address storeAddress) {
         require(
             stores[msg.sender] == address(0),
