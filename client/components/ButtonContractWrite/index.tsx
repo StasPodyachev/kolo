@@ -5,9 +5,10 @@ interface IProps {
   address: any;
   abi: any;
   method: string;
+  parrams: any
 }
 
-const ButtonContractWrite = ({ title, address, abi, method }: IProps) => {
+const ButtonContractWrite = ({ title, address, abi, method, parrams }: IProps) => {
   const { config } = usePrepareContractWrite({
     address,
     abi,
