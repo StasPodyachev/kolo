@@ -49,12 +49,12 @@ const GetIntegrationInfo = ({
   activeItem,
   startPrice,
   setValue,
-  myCollateral
+  myCollateral,
 }: {
   activeItem: ISaleTypeMenuItem;
-  startPrice: number;
-  setValue: (col: number) => void
-  myCollateral: number
+  startPrice: string;
+  setValue: (col: string) => void;
+  myCollateral: string;
 }) => {
   const { data } = useContractRead({
     address: activeItem.address as any,
@@ -62,6 +62,8 @@ const GetIntegrationInfo = ({
     functionName: "getIntegrationInfo",
   });
   useEffect(() => {
+    let priceOfStart = +startPrice.split(",").join("");
+    console.log("price", priceOfStart);
     if (data) {
       // console.log(data, "data");
       const collateralAmountValue = BigNumber?.from(data.collateralAmount);
@@ -73,20 +75,20 @@ const GetIntegrationInfo = ({
         collateralPercentValue
       );
       const minimalCollateral =
-        startPrice * minCollateralPercent > minCollateralAmount
-          ? startPrice * minCollateralPercent
+        priceOfStart * minCollateralPercent > minCollateralAmount
+          ? priceOfStart * minCollateralPercent
           : minCollateralAmount;
       // console.log(minimalCollateral.toFixed(2), "value");
       const myCollateral =
-        minimalCollateral >= (startPrice * minCollateralPercent) / 1e18
+        minimalCollateral >= (priceOfStart * minCollateralPercent) / 1e18
           ? minimalCollateral
-          : startPrice * minCollateralPercent;
+          : priceOfStart * minCollateralPercent;
 
       const value =
         myCollateral > minimalCollateral
           ? myCollateral.toFixed(2)
           : minimalCollateral.toFixed(2);
-      setValue(+value);
+      setValue(value);
     }
   }, [data, myCollateral, setValue, startPrice]);
   return <></>;
@@ -97,9 +99,9 @@ const NewPoduct = () => {
   const [activeItem, setActiveItem] = useState(SaleTypeMenuItems[0]);
   const [itemName, setItemName] = useState("");
   const [itemDescription, setItemDescription] = useState("");
-  const [startPrice, setStartPrice] = useState<number>(1);
-  const [forceStopPrice, setForceStopPrice] = useState<number>(10);
-  const [myCollateral, setMyCollateral] = useState(1);
+  const [startPrice, setStartPrice] = useState<string>("1");
+  const [forceStopPrice, setForceStopPrice] = useState<string>("10");
+  const [myCollateral, setMyCollateral] = useState("1");
   const [stopDate, setStopDate] = useState(getTodaysDate());
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
@@ -143,8 +145,8 @@ const NewPoduct = () => {
     const conditionsId = await lighthouse?.getAccessConditions(
       response?.data?.Hash
     );
-    setCid(response?.data?.Hash)
-    setAcces(true)
+    setCid(response?.data?.Hash);
+    setAcces(true);
 
     // const accesCondition = async () => {
     //   const { publicKey, signedMessage } : any = await encryptionSignature();
@@ -182,8 +184,9 @@ const NewPoduct = () => {
           startPrice={startPrice}
           activeItem={activeItem}
           setValue={setMyCollateral}
+          myCollateral={myCollateral}
         />
-        <Box ml={isDesktopHeader[0] ? "110px" : "20px"} mt="10px" minW="100%">
+        <Box mt="10px" minW="100%">
           <Heading variant="h6" color="gray.200" mt="16px">
             Name
           </Heading>
@@ -221,10 +224,7 @@ const NewPoduct = () => {
             justifyContent="space-between"
             mt="32px"
           >
-            <Box
-              minW="42%"
-              maxW={isDesktop[0] && !isDesktopHeader[0] ? "42%" : "100%"}
-            >
+            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
               <Heading variant="h6" color="gray.200">
                 Price Start
               </Heading>
@@ -234,10 +234,7 @@ const NewPoduct = () => {
                 isNeededMarginTop
               />
             </Box>
-            <Box
-              minW="42%"
-              maxW={isDesktop[0] && !isDesktopHeader[0] ? "42%" : "100%"}
-            >
+            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
               <Heading variant="h6" color="gray.200">
                 Price Force Stop
               </Heading>
@@ -254,10 +251,7 @@ const NewPoduct = () => {
             flexDir={isDesktop[0] ? "row" : "column"}
             gap={isDesktop[0] ? 0 : "16px"}
           >
-            <Box
-              minW="42%"
-              maxW={isDesktop[0] && !isDesktopHeader[0] ? "42%" : "100%"}
-            >
+            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
               <Heading variant="h6" color="gray.200">
                 Date Stop Auction
               </Heading>
@@ -267,7 +261,7 @@ const NewPoduct = () => {
                 value={stopDate}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
                   // const start = Date.now() - event.target.value
-                  console.log(event, 'event');
+                  console.log(event, "event");
 
                   setStopDate(event.target.value);
                 }}
@@ -275,10 +269,7 @@ const NewPoduct = () => {
                 minW="100%"
               />
             </Box>
-            <Box
-              minW="42%"
-              maxW={isDesktop[0] && !isDesktopHeader[0] ? "42%" : "100%"}
-            >
+            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
               <Heading variant="h6" color="gray.200">
                 My Collateral
               </Heading>
@@ -286,77 +277,78 @@ const NewPoduct = () => {
                 value={myCollateral}
                 setValue={setMyCollateral}
                 isNeededMarginTop
-                minValue={startPrice * 0.1}
+                minValue={+startPrice.split(",").join("") * 0.1}
                 isCollateralInput
               />
             </Box>
           </Flex>
           {isConnected ? (
-          <Flex
-            justify="space-between"
-            flexDir={isDesktop[0] ? "row" : "column"}
-          >
-            <Box minW="42%">
-              <label
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "48px",
-                  minWidth: "100%",
-                  cursor: "pointer",
-                  background: "#004DE5",
-                  color: "white",
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                  textTransform: "uppercase",
-                  borderRadius: "8px",
-                  marginTop: "36px",
-                }}
-                htmlFor="fileDownload"
+            <Flex
+              justify="space-between"
+              flexDir={isDesktop[0] ? "row" : "column"}
+            >
+              <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
+                <label
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "48px",
+                    minWidth: "100%",
+                    cursor: "pointer",
+                    background: "#004DE5",
+                    color: "white",
+                    fontSize: "16px",
+                    lineHeight: "24px",
+                    textTransform: "uppercase",
+                    marginTop: "36px",
+                  }}
+                  htmlFor="fileDownload"
+                >
+                  download file
+                </label>
+                <Input
+                  id="fileDownload"
+                  type="file"
+                  display="none"
+                  onChange={(e) => {
+                    deployEncrypted(e);
+                  }}
+                />
+              </Box>
+              <Box
+                cursor="not-allowed"
+                w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}
               >
-                download file
-              </label>
-              <Input
-                id="fileDownload"
-                type="file"
-                display="none"
-                onChange={(e) => {
-                  deployEncrypted(e)
-                }}
-              />
-            </Box>
-            <Box cursor="not-allowed" minW="42%">
-              <label
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "48px",
-                  minWidth: "100%",
-                  background: "#696C80",
-                  color: "white",
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                  textTransform: "uppercase",
-                  borderRadius: "8px",
-                  marginTop: "36px",
-                  pointerEvents: "none",
-                }}
-                htmlFor="thubnailDownload"
-              >
-                download thubnail
-              </label>
-              <Input
-                id="fileDownload"
-                type="file"
-                display="none"
-                onChange={(e) => {
-                  // deployEncrypted(e)
-                }}
-              />
-            </Box>
-          </Flex>
+                <label
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "48px",
+                    minWidth: "100%",
+                    background: "#696C80",
+                    color: "white",
+                    fontSize: "16px",
+                    lineHeight: "24px",
+                    textTransform: "uppercase",
+                    marginTop: "36px",
+                    pointerEvents: "none",
+                  }}
+                  htmlFor="thubnailDownload"
+                >
+                  download thubnail
+                </label>
+                <Input
+                  id="fileDownload"
+                  type="file"
+                  display="none"
+                  onChange={(e) => {
+                    // deployEncrypted(e)
+                  }}
+                />
+              </Box>
+            </Flex>
           ) : null}
           {isConnected && access ? (
             <ButtonContractWrite
@@ -371,7 +363,7 @@ const NewPoduct = () => {
                   priceStart: startPrice,
                   priceForceStop: forceStopPrice,
                   dateExpire: stopDate,
-                  cid
+                  cid,
                 }
 
                 // {itemName, itemDescription, startPrice, forceStopPrice, stopDate, cid}

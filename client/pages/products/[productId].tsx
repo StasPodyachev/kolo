@@ -122,7 +122,7 @@ const Product: NextPage = () => {
                   bg="blue.primary"
                   color="white"
                   mt="39px"
-                  borderRadius="md"
+                  borderRadius={0}
                   transition="all .3s"
                   _hover={{ bg: "blue.hover" }}
                 >
@@ -176,7 +176,7 @@ const Product: NextPage = () => {
                   textStyle="button"
                   transition="all .3s"
                   _hover={{ bg: "blue.active" }}
-                  borderRadius="md"
+                  borderRadius={0}
                 >
                   buy now
                 </Button>

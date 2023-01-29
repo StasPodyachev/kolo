@@ -93,8 +93,8 @@ const ItemCard = ({
             w="100%"
             bg="blue.primary"
             color="white"
+            borderRadius={0}
             textStyle="button"
-            borderRadius="md"
             transition="all .3s"
             _hover={{ bg: "blue.hover" }}
           >

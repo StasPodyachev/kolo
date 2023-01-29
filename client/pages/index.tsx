@@ -4,33 +4,41 @@ import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
 import { auctionItems } from "@/constants/shared";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IAuctionItem } from "@/types";
 
 const Home: NextPage = () => {
   const [startCount, setStartCount] = useState(0);
-  const [count, setCount] = useState(6);
-  const [items, setItems] = useState<IAuctionItem[]>(
-    auctionItems.slice(startCount, count + 1)
-  );
+  const [endCount, setEndCount] = useState(5);
+  const [items, setItems] = useState<IAuctionItem[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    setHasMore(auctionItems.length > items.length ? true : false);
+  }, [items]);
+
+  useEffect(() => {
+    setItems(auctionItems.slice(0, 5));
+    setStartCount(5);
+    setEndCount(10);
+  }, []);
 
   const getMoreItems = () => {
-    setStartCount(count + 6);
-    setCount(count + count);
-    setItems([...items, ...auctionItems.slice(startCount, count)]);
+    setStartCount(startCount + 5);
+    setEndCount(endCount * 2);
+    setItems([...items, ...auctionItems.slice(startCount, endCount)]);
   };
   return (
     <Layout pageTitle="Market">
       <InfiniteScroll
         dataLength={items.length}
         next={getMoreItems}
-        hasMore={true}
+        hasMore={hasMore}
         loader={
-          <Heading color="white" variant="h5">
+          <Heading textAlign="center" mt="36px" color="white" variant="h5">
             Loading...
           </Heading>
         }
-        endMessage={<Text>That&apos;s end</Text>}
       >
         <Grid
           gap="26px"
