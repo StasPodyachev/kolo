@@ -15,8 +15,8 @@ import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
 
 contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     IFactory public _factory;
-    INotary public _notary;
     IChat public _chat;
+    INotary public _notary;
 
     uint256 public _periodDispute = 5 days;
 
@@ -40,14 +40,11 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
     function setFactory(address factory) external onlyOwner {
         _factory = IFactory(factory);
+        _chat = IChat(_factory.chat());
     }
 
     function setNotary(address notary) external onlyOwner {
         _notary = INotary(notary);
-    }
-
-    function setChat(address chat) external onlyOwner {
-        _chat = IChat(chat);
     }
 
     function getIntegrationInfo()

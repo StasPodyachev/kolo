@@ -4,7 +4,7 @@ import "@typechain/hardhat"
 
 import "hardhat-deploy"
 import "hardhat-deploy-ethers"
-
+import "@nomiclabs/hardhat-waffle"
 import "@nomicfoundation/hardhat-toolbox"
 import "hardhat-contract-sizer"
 // import "hardhat-deploy";

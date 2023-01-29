@@ -15,8 +15,8 @@ import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
 
 contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     IFactory public _factory;
-    INotary public _notary;
     IChat public _chat;
+    INotary public _notary;
 
     uint256 public _periodDispute = 5 days;
 
@@ -43,10 +43,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
     function setFactory(address factory) external onlyOwner {
         _factory = IFactory(factory);
-    }
-
-    function setChat(address chat) external onlyOwner {
-        _chat = IChat(chat);
+        _chat = IChat(_factory.chat());
     }
 
     function setNotary(address notary) external onlyOwner {
@@ -164,7 +161,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             priceStart != 0 &&
                 priceStart < priceForceStop &&
                 dateExpire > block.timestamp,
-            "SimpleTrade: Wrong params"
+            "AuctionFile: Wrong params"
         );
 
         uint256 id = _factory.addDeal(storeAddress);
@@ -289,7 +286,6 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         deal.status = AuctionStatus.DISPUTE;
 
         _notary.chooseNotaries(dealId);
-
         _chat.sendSystemMessage(dealId, "Dispute started.");
     }
 
