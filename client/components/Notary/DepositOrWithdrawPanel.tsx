@@ -15,7 +15,7 @@ const DepositOrWithdrawPanel: NextPage = () => {
       <Flex flexDir="column" gap="50px">
         <Blocks items={DepositOrWithdrawBlocks} />
         <Flex flexDir="column" gap="28px" maxW="576px">
-          <NumberInput value={value} setValue={setValue} placeholder="Amount" />
+          <NumberInput value={value} setValue={setValue} />
           <HStack spacing="20px">
             {DepositAndWithdrawButtons.map((btn) => (
               <Button

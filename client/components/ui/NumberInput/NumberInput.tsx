@@ -9,17 +9,19 @@ import {
 interface IProps {
   value: number;
   setValue: (value: number) => void;
-  placeholder: string;
   isNeededMarginTop?: boolean;
   isNotFullWidth?: boolean;
+  minValue?: number;
+  isCollateralInput?: boolean;
 }
 
 const NumberInput = ({
   value,
   setValue,
-  placeholder,
   isNeededMarginTop,
   isNotFullWidth,
+  minValue,
+  isCollateralInput,
 }: IProps) => {
   return (
     <InputGroup
@@ -28,23 +30,27 @@ const NumberInput = ({
       mt={isNeededMarginTop ? "16px" : 0}
     >
       <ChakraNumberInput
-        min={0}
-        defaultValue={value}
+        value={value}
+        onKeyPress={(event) => {
+          if (event.key === "e" || event.key === "E" || event.key === "-") {
+            setTimeout(() => {
+              setValue(0);
+            }, 100);
+          }
+        }}
+        onChange={(event) => {
+          if (isCollateralInput && minValue && minValue > +event) {
+            setTimeout(() => setValue(minValue), 2000);
+          } else {
+            setValue(+event);
+          }
+        }}
         w="100%"
         bg="gray.700"
         borderRadius="md"
       >
         <NumberInputField
           _placeholder={{ color: "white" }}
-          value={value}
-          onKeyPress={(event) => {
-            if (event.key === "e" || event.key === "E" || event.key === "-") {
-              setTimeout(() => {
-                setValue(0);
-              }, 100);
-            }
-          }}
-          onChange={(event) => setValue(+event.target.value)}
           w="100%"
           h="100%"
           p="12px 16px"

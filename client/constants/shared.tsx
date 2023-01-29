@@ -18,7 +18,7 @@ import {
   ISaleTypeMenuItem,
 } from "@/types";
 
-import ABI_FILE from '../contracts/abi/AuctionFile.json'
+import ABI_FILE from "../contracts/abi/AuctionFile.json";
 
 export const navLinks: INavlink[] = [
   {
@@ -121,6 +121,97 @@ export const auctionItems: IAuctionItem[] = [
   },
   {
     id: 6,
+    title: "Tree planting plan",
+    price: 11,
+    ownedBy: "0x9D21...7a88",
+    saleEndDate: "20 Feb 2023",
+    currentPrice: 300,
+    priceEnd: 1000,
+    description:
+      "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+    status: "active",
+    totalBids: 20,
+  },
+  {
+    id: 7,
+    title: "Tree planting plan",
+    price: 11,
+    ownedBy: "0x9D21...7a88",
+    saleEndDate: "20 Feb 2023",
+    currentPrice: 300,
+    priceEnd: 1000,
+    description:
+      "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+    status: "active",
+    totalBids: 20,
+  },
+  {
+    id: 8,
+    title: "Tree planting plan",
+    price: 11,
+    ownedBy: "0x9D21...7a88",
+    saleEndDate: "20 Feb 2023",
+    currentPrice: 300,
+    priceEnd: 1000,
+    description:
+      "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+    status: "active",
+    totalBids: 20,
+  },
+  {
+    id: 9,
+    title: "Tree planting plan",
+    price: 11,
+    ownedBy: "0x9D21...7a88",
+    saleEndDate: "20 Feb 2023",
+    currentPrice: 300,
+    priceEnd: 1000,
+    description:
+      "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+    status: "active",
+    totalBids: 20,
+  },
+  {
+    id: 10,
+    title: "Tree planting plan",
+    price: 11,
+    ownedBy: "0x9D21...7a88",
+    saleEndDate: "20 Feb 2023",
+    currentPrice: 300,
+    priceEnd: 1000,
+    description:
+      "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+    status: "active",
+    totalBids: 20,
+  },
+  {
+    id: 11,
+    title: "Tree planting plan",
+    price: 11,
+    ownedBy: "0x9D21...7a88",
+    saleEndDate: "20 Feb 2023",
+    currentPrice: 300,
+    priceEnd: 1000,
+    description:
+      "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+    status: "active",
+    totalBids: 20,
+  },
+  {
+    id: 12,
+    title: "Tree planting plan",
+    price: 11,
+    ownedBy: "0x9D21...7a88",
+    saleEndDate: "20 Feb 2023",
+    currentPrice: 300,
+    priceEnd: 1000,
+    description:
+      "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+    status: "active",
+    totalBids: 20,
+  },
+  {
+    id: 13,
     title: "Tree planting plan",
     price: 11,
     ownedBy: "0x9D21...7a88",
@@ -324,25 +415,25 @@ export const SaleTypeMenuItems: ISaleTypeMenuItem[] = [
     id: 1,
     title: "AUCTION OF FILES",
     address: "0xF299d6F8d597C8E0a4110181755F168cDd2F6961",
-    abi: ABI_FILE
+    abi: ABI_FILE,
   },
   {
     id: 2,
     title: "AUCTION OF LIVEPEER",
     address: "0xF299d6F8d597C8E0a4110181755F168cDd2F6961",
-    abi: ABI_FILE
+    abi: ABI_FILE,
   },
   {
     id: 3,
     title: "AUCTION OF HUDDLE",
     address: "0xF299d6F8d597C8E0a4110181755F168cDd2F6961",
-    abi: ABI_FILE
+    abi: ABI_FILE,
   },
   {
     id: 4,
     title: "SIMPLE TRADES OF FILES",
     address: "0x6E7d3321BFE7ca92a82A314E33153e7edB4B8a16",
-    abi: ABI_FILE
+    abi: ABI_FILE,
   },
 ];
 

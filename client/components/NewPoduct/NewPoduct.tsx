@@ -75,13 +75,17 @@ const GetIntegrationInfo = ({
         startPrice * minCollateralPercent > minCollateralAmount
           ? startPrice * minCollateralPercent
           : minCollateralAmount;
-      console.log(minimalCollateral.toFixed(2), "value");
+      // console.log(minimalCollateral.toFixed(2), "value");
       const myCollateral =
-        minimalCollateral >= (startPrice * minCollateralPercent) / 1e18;
-      console.log(myCollateral, minimalCollateral);
+        minimalCollateral >= (startPrice * minCollateralPercent) / 1e18
+          ? minimalCollateral
+          : startPrice * minCollateralPercent;
 
-      // const value = myCollateral > minimalCollateral ? myCollateral.toFixed(2) : minimalCollateral.toFixed(2)
-      // setValue(myCollateral > minimalCollateral ? myCollateral.toFixed(2) : minimalCollateral)
+      const value =
+        myCollateral > minimalCollateral
+          ? myCollateral.toFixed(2)
+          : minimalCollateral.toFixed(2);
+      setValue(+value);
     }
   }, [data, startPrice]);
   return <></>;
@@ -173,12 +177,15 @@ const NewPoduct = () => {
     accesCondition();
   };
   const { isDesktopHeader, isDesktop } = useDevice();
-  const isSmallTablet = useMediaQuery("(max-width: 867px)");
 
   return (
     <Flex justifyContent="center">
       <Box maxW="70%" minW={isDesktop[0] ? 0 : "70%"}>
-        {/* <GetIntegrationInfo startPrice={startPrice} activeItem={activeItem} /> */}
+        <GetIntegrationInfo
+          startPrice={startPrice}
+          activeItem={activeItem}
+          setValue={setMyCollateral}
+        />
         <Box ml={isDesktopHeader[0] ? "110px" : "20px"} mt="10px" minW="100%">
           <Heading variant="h6" color="gray.200" mt="16px">
             Name
@@ -227,7 +234,6 @@ const NewPoduct = () => {
               <NumberInput
                 value={startPrice}
                 setValue={setStartPrice}
-                placeholder="Price in FIL"
                 isNeededMarginTop
               />
             </Box>
@@ -241,7 +247,6 @@ const NewPoduct = () => {
               <NumberInput
                 value={forceStopPrice}
                 setValue={setForceStopPrice}
-                placeholder="Price in FIL"
                 isNeededMarginTop
               />
             </Box>
@@ -280,8 +285,9 @@ const NewPoduct = () => {
               <NumberInput
                 value={myCollateral}
                 setValue={setMyCollateral}
-                placeholder="Amount in FIL"
                 isNeededMarginTop
+                minValue={startPrice * 0.1}
+                isCollateralInput
               />
             </Box>
           </Flex>
