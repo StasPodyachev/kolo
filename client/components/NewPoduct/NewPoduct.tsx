@@ -72,14 +72,11 @@ const GetIntegrationInfo = ({
       const minCollateralPercent = +ethers.utils.formatEther(
         collateralPercentValue
       );
-      // console.log({ minCollateralPercent, minCollateralAmount });
       const minimalCollateral =
         startPrice * minCollateralPercent > minCollateralAmount
           ? startPrice * minCollateralPercent
           : minCollateralAmount;
-      console.log({myCollateral,minimalCollateral});
       const value = Number(myCollateral >= minimalCollateral ? myCollateral : minimalCollateral)
-      console.log(value, 'valueee');
       setValue(value)
     }
   }, [data, myCollateral, setValue, startPrice]);
@@ -263,6 +260,9 @@ const NewPoduct = () => {
                 min={getTodaysDate()}
                 value={stopDate}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  // const start = Date.now() - event.target.value
+                  console.log(event, 'event');
+                  
                   setStopDate(event.target.value);
                 }}
                 px="16px"
@@ -353,11 +353,22 @@ const NewPoduct = () => {
           ) : null}
           {isConnected && access ? (
             <ButtonContractWrite
-              address={addresses[0]?.address}
-              abi={ABI_FACTORY}
+              address={activeItem.address}
+              abi={activeItem.abi}
               method="create"
               title="start sell"
-              parrams={{itemName, itemDescription, startPrice, forceStopPrice, stopDate, cid}}
+              parrams={
+                {
+                  name: itemName,
+                  description: itemDescription,
+                  priceStart: startPrice,
+                  priceForceStop: forceStopPrice,
+                  dateExpire: stopDate,
+                  cid
+                }
+
+                // {itemName, itemDescription, startPrice, forceStopPrice, stopDate, cid}
+              }
             />
           ) : !isConnected ? (
             <ConnectBtn isCentered isNeedMarginTop />
