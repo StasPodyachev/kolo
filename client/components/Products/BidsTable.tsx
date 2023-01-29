@@ -14,7 +14,7 @@ const BidsTable: NextPage = () => {
               <Td pl={0}>
                 <AddressCopy address={item.address} />
               </Td>
-              <Td textStyle="smallText" color="gray.300">
+              <Td textStyle="smallText" color="gray.300" textAlign="center">
                 {item.date}
               </Td>
               <Td fontFamily="Roboto Mono" pr={0} color="white" isNumeric>

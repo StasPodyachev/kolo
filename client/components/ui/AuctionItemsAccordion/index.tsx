@@ -8,6 +8,7 @@ import {
   Flex,
   HStack,
   Text,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Image from "next/image";
@@ -24,6 +25,9 @@ import { useState } from "react";
 const AuctionItemAccordion: NextPage = () => {
   const [accordionIndex, setAccordionIndex] = useState(-1);
   const [numberOfClicks, setNumberOfClicks] = useState(0);
+  const isChangedAccordion = useMediaQuery("(max-width: 1000px)");
+  const isAccordionTextInColumn = useMediaQuery("(max-width: 810px)");
+
   return (
     <Accordion mt="16px" index={accordionIndex}>
       {auctionItems.map((item) => (
@@ -35,29 +39,47 @@ const AuctionItemAccordion: NextPage = () => {
           _notFirst={{ mt: "34px" }}
         >
           <Link href={`/products/${item.id}`}>
-            <Flex w="100%" alignItems="center">
+            <Flex
+              w="100%"
+              alignItems={isAccordionTextInColumn[0] ? "stretch" : "center"}
+            >
               {item.image ? (
                 <Image
                   src={item.image}
                   alt="card image"
                   width={121}
-                  height={96}
+                  sizes="100%"
                 />
               ) : (
                 <Flex
                   justifyContent="center"
                   alignItems="center"
-                  h="96px"
+                  minH="100%"
                   minW="121px"
                   bg="gray.800"
                 >
-                  <Image src={CardImage} alt="card image" />
+                  <Image src={CardImage} alt="card image" sizes="100%" />
                 </Flex>
               )}
-              <Flex p="20px 30px" alignItems="center" w="100%">
-                <Flex justifyContent="space-between" w="100%">
+              <Flex
+                p={isChangedAccordion ? "16px 10px" : "20px 30px"}
+                alignItems="center"
+                w="100%"
+              >
+                <Flex
+                  justifyContent="space-between"
+                  w="100%"
+                  flexDir={isAccordionTextInColumn[0] ? "column" : "row"}
+                >
                   <Flex flexDir="column" gap="8px">
-                    <Text color="white">{item.title}</Text>
+                    <Text
+                      textStyle={
+                        isChangedAccordion ? "smallText" : "mediumText"
+                      }
+                      color="white"
+                    >
+                      {item.title}
+                    </Text>
                     <Flex>
                       <Text textStyle="smallText" color="gray.300">
                         CID:&nbsp;
@@ -70,20 +92,28 @@ const AuctionItemAccordion: NextPage = () => {
                     </Flex>
                   </Flex>
                   <Flex flexDir="column" gap="8px">
-                    <HStack spacing="6px" alignSelf="flex-end">
+                    <HStack
+                      spacing="6px"
+                      alignSelf={
+                        isAccordionTextInColumn[0] ? "auto" : "flex-end"
+                      }
+                      mt={isAccordionTextInColumn[0] ? "8px" : 0}
+                    >
                       <Text textStyle="smallText" color="gray.300">
                         Last price
                       </Text>
                       <Text
                         fontFamily="Roboto Mono"
-                        textStyle="bigText"
+                        textStyle={
+                          isChangedAccordion ? "mediumText" : "bigText"
+                        }
                         color="white"
                       >
                         {item.currentPrice}&nbsp;FIL
                       </Text>
                     </HStack>
-                    <HStack spacing="24px">
-                      <Flex>
+                    <HStack spacing={isAccordionTextInColumn[0] ? 0 : "24px"}>
+                      <Flex display={isChangedAccordion[0] ? "none" : "flex"}>
                         <Text textStyle="smallText" color="gray.300">
                           Bids:&nbsp;
                         </Text>
@@ -129,7 +159,11 @@ const AuctionItemAccordion: NextPage = () => {
                   p={0}
                   w="max-content"
                 >
-                  <AccordionIcon ml="36px" boxSize="36px" color="white" />
+                  <AccordionIcon
+                    ml={isChangedAccordion[0] ? "10px" : "36px"}
+                    boxSize="36px"
+                    color="white"
+                  />
                 </AccordionButton>
               </Flex>
             </Flex>
@@ -138,7 +172,11 @@ const AuctionItemAccordion: NextPage = () => {
             <Text textStyle="smallText" color="white">
               Description:&nbsp;{item.description}
             </Text>
-            <Flex mt="20px" justifyContent="space-between">
+            <Flex
+              mt="20px"
+              flexDir={isChangedAccordion ? "column" : "row"}
+              justifyContent="space-between"
+            >
               <Flex flexDir="column" gap="20px">
                 <Text textStyle="bigText" color="white">
                   Parameters
@@ -164,7 +202,11 @@ const AuctionItemAccordion: NextPage = () => {
                   ))}
                 </Flex>
               </Flex>
-              <Flex flexDir="column" gap="20px">
+              <Flex
+                flexDir="column"
+                gap="20px"
+                mt={isChangedAccordion[0] ? "20px" : 0}
+              >
                 <Text textStyle="bigText" color="white">
                   Blockchain
                 </Text>
@@ -187,11 +229,12 @@ const AuctionItemAccordion: NextPage = () => {
                 </Flex>
               </Flex>
               <Button
+                mt={isChangedAccordion[0] ? "36px" : 0}
                 bg="blue.primary"
                 color="white"
                 textStyle="button"
                 minW="272px"
-                alignSelf="flex-end"
+                alignSelf={isChangedAccordion ? "center" : "flex-end"}
                 transition="all .3s"
                 _hover={{ bg: "blue.hover" }}
               >

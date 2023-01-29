@@ -7,11 +7,10 @@ import {
   chakra,
   Flex,
   Heading,
-  Text,
   useMediaQuery,
   Input,
 } from "@chakra-ui/react";
-import React, { ChangeEvent, useDebugValue, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useAccount, useContractRead } from "wagmi";
 import ButtonContractWrite from "../ButtonContractWrite";
 import ConnectBtn from "../ui/ConnectBtn";
@@ -46,22 +45,14 @@ const CustomInput = chakra(Input, {
   },
 });
 
-const CustomButton = chakra(Button, {
-  baseStyle: {
-    textStyle: "button",
-    minH: "48px",
-    mt: "36px",
-  },
-});
-
 const GetIntegrationInfo = ({
   activeItem,
   startPrice,
-  setValue
+  setValue,
 }: {
   activeItem: ISaleTypeMenuItem;
   startPrice: number;
-  setValue: (col: number) => void
+  setValue: (col: number) => void;
 }) => {
   const { data } = useContractRead({
     address: activeItem.address as any,
@@ -85,9 +76,10 @@ const GetIntegrationInfo = ({
           ? startPrice * minCollateralPercent
           : minCollateralAmount;
       console.log(minimalCollateral.toFixed(2), "value");
-      const myCollateral = minimalCollateral >= (startPrice * minCollateralPercent) / 1e18
+      const myCollateral =
+        minimalCollateral >= (startPrice * minCollateralPercent) / 1e18;
       console.log(myCollateral, minimalCollateral);
-      
+
       // const value = myCollateral > minimalCollateral ? myCollateral.toFixed(2) : minimalCollateral.toFixed(2)
       // setValue(myCollateral > minimalCollateral ? myCollateral.toFixed(2) : minimalCollateral)
     }
@@ -154,20 +146,20 @@ const NewPoduct = () => {
     });
 
     const accesCondition = async () => {
-      const { publicKey, signedMessage } : any = await encryptionSignature();
+      const { publicKey, signedMessage }: any = await encryptionSignature();
       const conditions = [
         {
           id: 1,
-          chain: 'Hyperspace',
-          method: 'checkAccess',
-          standardContractType: 'Custom',
+          chain: "Hyperspace",
+          method: "checkAccess",
+          standardContractType: "Custom",
           contractAddress: activeItem?.address,
-          returnValueTest: { comparator: '==', value: '1' },
-          parameters: [ [response?.data?.Hash],':userAddress'],
-          inputArrayType: [ 'bytes32[]', 'address' ],
-          outputType: 'uint8'
-        }
-      ]
+          returnValueTest: { comparator: "==", value: "1" },
+          parameters: [[response?.data?.Hash], ":userAddress"],
+          inputArrayType: ["bytes32[]", "address"],
+          outputType: "uint8",
+        },
+      ];
       const aggregator = "([1])";
       const res = await lighthouse.accessCondition(
         publicKey,
@@ -175,18 +167,18 @@ const NewPoduct = () => {
         signedMessage,
         conditions,
         aggregator
-      )
-      console.log(res, 'res')
-    }
-    accesCondition()
+      );
+      console.log(res, "res");
+    };
+    accesCondition();
   };
   const { isDesktopHeader, isDesktop } = useDevice();
   const isSmallTablet = useMediaQuery("(max-width: 867px)");
 
   return (
     <Flex justifyContent="center">
-      <Box maxW="70%">
-        <GetIntegrationInfo startPrice={startPrice} activeItem={activeItem} />
+      <Box maxW="70%" minW={isDesktop[0] ? 0 : "70%"}>
+        {/* <GetIntegrationInfo startPrice={startPrice} activeItem={activeItem} /> */}
         <Box ml={isDesktopHeader[0] ? "110px" : "20px"} mt="10px" minW="100%">
           <Heading variant="h6" color="gray.200" mt="16px">
             Name

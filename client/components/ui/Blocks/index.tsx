@@ -1,7 +1,5 @@
-import useDevice from "@/hooks/useDevice";
-import { IBlock, IChildren } from "@/types";
+import { IBlock } from "@/types";
 import { Grid } from "@chakra-ui/react";
-import { NextPage } from "next";
 import Block from "../Block";
 
 interface IProps {
@@ -9,13 +7,12 @@ interface IProps {
 }
 
 const Blocks = ({ items }: IProps) => {
-  const { isDesktopHeader } = useDevice();
   return (
     <Grid
       gap="32px"
       rowGap="32px"
-      justifyContent={isDesktopHeader[0] ? "space-between" : "center"}
-      templateColumns="repeat(auto-fit, 220px)"
+      justifyContent="space-around"
+      templateColumns="repeat(auto-fit, 240px)"
       templateRows="auto"
     >
       {items.map((block) => (

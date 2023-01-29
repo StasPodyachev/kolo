@@ -14,7 +14,7 @@ const Layout = ({ children, pageTitle, isCenteredBlock }: IProps) => {
   return (
     <Flex>
       <Sidebar />
-      <Box bg="gray.900" w="100%" p={isDesktop[0] ? "56px 70px" : "56px 50px"}>
+      <Box bg="gray.900" w="100%" p={isDesktop[0] ? "56px 70px" : "56px 48px"}>
         <Flex w="100%" h="max-content">
           <Heading
             variant={isDesktop[0] ? "h3" : "h4"}

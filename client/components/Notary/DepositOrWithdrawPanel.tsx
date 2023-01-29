@@ -22,7 +22,7 @@ const DepositOrWithdrawPanel: NextPage = () => {
                 key={btn.title}
                 minH="48px"
                 bg={btn.isDepositBtn ? "blue.primary" : "blue.secondaryDark"}
-                minW="278px"
+                minW="48%"
                 color="white"
                 textStyle="button"
                 transition="all .3s"
