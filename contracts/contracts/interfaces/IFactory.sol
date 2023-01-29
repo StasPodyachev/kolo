@@ -8,6 +8,8 @@ interface IFactory {
 
     function treasury() external view returns (address);
 
+    function chat() external view returns (address);
+
     function createStore() external returns (address storeAddress);
 
     function addDeal(address storeAddress) external returns (uint256);
