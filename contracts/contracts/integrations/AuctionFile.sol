@@ -22,12 +22,17 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;
+    uint256 public _serviceFee = 2e16;
 
     mapping(uint256 => AuctionFileParams) private deals;
     mapping(uint256 => mapping(address => uint256)) private bids;
     mapping(uint256 => BidParams[]) private bidHistory;
     mapping(uint256 => address[]) private bidBuyers;
     mapping(address => mapping(bytes => bool)) private _accsess;
+
+    function setServiceFee(uint256 value) external onlyOwner {
+        _serviceFee = value;
+    }
 
     function setPeriodDispute(uint256 value) external onlyOwner {
         _periodDispute = value;
@@ -309,7 +314,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             IStore(storeAddress).transferWinToSeller(
                 dealId,
                 address(0),
-                deal.seller
+                deal.seller,
+                _serviceFee
             );
 
             deal.status = AuctionStatus.CLOSE;
@@ -362,7 +368,12 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         if (winner == IIntegration.DisputeWinner.Buyer) {
             store.transferWinToBuyer(dealId, deal.buyer);
         } else {
-            store.transferWinToSeller(dealId, deal.buyer, deal.seller);
+            store.transferWinToSeller(
+                dealId,
+                deal.buyer,
+                deal.seller,
+                _serviceFee
+            );
         }
 
         deal.status = AuctionStatus.CLOSE;
@@ -396,7 +407,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         address storeAddress = _factory.getStore(deal.seller);
         IStore store = IStore(storeAddress);
 
-        store.transferWinToSeller(dealId, deal.buyer, deal.seller);
+        store.transferWinToSeller(dealId, deal.buyer, deal.seller, _serviceFee);
 
         deal.status = AuctionStatus.CLOSE;
 

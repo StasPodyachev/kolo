@@ -22,7 +22,8 @@ interface IStore {
     function transferWinToSeller(
         uint256 dealId,
         address buyer,
-        address seller
+        address seller,
+        uint256 serviceFee
     ) external;
 
     function transferWinToBuyer(uint256 dealId, address buyer) external;

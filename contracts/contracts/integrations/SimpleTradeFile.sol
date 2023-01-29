@@ -22,9 +22,14 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;
+    uint256 public _serviceFee = 2e16;
 
     mapping(uint256 => SimpleTradeFileParams) private deals;
     mapping(address => mapping(bytes => bool)) private _accsess;
+
+    function setServiceFee(uint256 value) external onlyOwner {
+        _serviceFee = value;
+    }
 
     function setPeriodDispute(uint256 value) external onlyOwner {
         _periodDispute = value;
@@ -284,7 +289,12 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         if (winner == IIntegration.DisputeWinner.Buyer) {
             store.transferWinToBuyer(dealId, deal.buyer);
         } else {
-            store.transferWinToSeller(dealId, deal.buyer, deal.seller);
+            store.transferWinToSeller(
+                dealId,
+                deal.buyer,
+                deal.seller,
+                _serviceFee
+            );
         }
 
         deal.status = SimpleTradeFileStatus.CLOSE;
@@ -325,7 +335,8 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         IStore(storeAddress).transferWinToSeller(
             dealId,
             deal.buyer,
-            deal.seller
+            deal.seller,
+            _serviceFee
         );
 
         deal.status = SimpleTradeFileStatus.CLOSE;
