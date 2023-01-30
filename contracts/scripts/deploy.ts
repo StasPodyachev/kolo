@@ -1,3 +1,6 @@
+import deployment from "../deployment/deployments.json"
+import { IDeployment } from "./utils"
+const deployments: IDeployment = deployment
 import "hardhat-deploy"
 import "hardhat-deploy-ethers"
 
@@ -13,6 +16,14 @@ interface ContractDeploy {
   args?: any
   networks?: any
 }
+
+const getArgs = () => [
+  deployments[CHAIN_ID][deployNames.KOLO_TOKEN].address,
+  deployments[CHAIN_ID][deployNames.TIME_LOCK].address,
+  51,
+  45818,
+  1,
+]
 
 const contracts: ContractDeploy[] = [
   {
@@ -35,17 +46,16 @@ const contracts: ContractDeploy[] = [
   },
 
   // dao
-
-  {
-    contractName: deployNames.GOVERNOR,
-  },
-
-  {
-    contractName: deployNames.TIME_LOCK,
-  },
-
   {
     contractName: deployNames.KOLO_TOKEN,
+  },
+  {
+    contractName: deployNames.TIME_LOCK,
+    args: [1000, [], [], "0xF552f5223D3f7cEB580fA92Fe0AFc6ED8c09179b"],
+  },
+  {
+    contractName: deployNames.GOVERNOR,
+    args: getArgs,
   },
 
   // ########

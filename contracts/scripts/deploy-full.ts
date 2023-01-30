@@ -7,7 +7,7 @@ import { IDeployment } from "./utils"
 const deployments: IDeployment = deployment
 
 async function main() {
-  await deploy()
+  // await deploy()
   await configure()
   // await verify()
 }

@@ -393,4 +393,12 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     {
         return _accsess[wallet][cid] ? 1 : 0;
     }
+
+    function checkAccsess(
+        bytes32[] calldata cid,
+        uint8 size,
+        address wallet
+    ) external view returns (uint8) {
+        return this.checkAccsess(bytes.concat(cid[0]), wallet);
+    }
 }
