@@ -9,6 +9,8 @@ import { IAuctionItem } from "@/types";
 import { useContractRead } from "wagmi";
 import ABI_FACTORY from '../contracts/abi/Factory.json' 
 import addresses from "@/contracts/addresses";
+import web3 from "web3"
+
 
 const Home: NextPage = () => {
   const [ products, setProducts ] = useState([])
@@ -25,7 +27,29 @@ const Home: NextPage = () => {
   })
 
   useEffect(() => {
-    console.log(data, 'data');
+    if (data ) {
+      data?.map((item: any) => {
+        // let itemData = web3?.utils?.hexToBytes(item.data as string)
+        // let dataDecode = web3?.utils?.bytesToHex(itemData)
+        // console.log(dataDecode, 'itemData');
+        function bin2String(array) {
+          var result = "";
+          for (var i = 0; i < array.length; i++) {
+            result += String.fromCharCode(parseInt(array[i], 2));
+          }
+          return result;
+        }
+        
+        bin2String(["01100110", "01101111", "01101111"]);
+        console.log(bin2String(item));
+        
+        return item
+      })
+      // let newCid = web3?.utils?.hexToBytes(data)
+      // console.log(data[0]?.data, 'data');
+      // console.log(newCid, 'data');
+    }
+    console.log(data, 'list');
   }, [data])
 
   const getMoreItems = () => {

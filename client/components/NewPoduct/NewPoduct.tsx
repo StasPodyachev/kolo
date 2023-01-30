@@ -176,32 +176,35 @@ const NewPoduct = () => {
     setCid(response?.data?.Hash)
     setAcces(true)
 
-    // const accesCondition = async () => {
-    //   const { publicKey, signedMessage } : any = await encryptionSignature();
-    //   const conditions = [
-    //     {
-    //       id: 1,
-    //       chain: 'Hyperspace',
-    //       method: 'checkAccess',
-    //       standardContractType: 'Custom',
-    //       contractAddress: activeItem?.address,
-    //       returnValueTest: { comparator: '==', value: '1' },
-    //       parameters: [ [response?.data?.Hash],':userAddress'],
-    //       inputArrayType: [ 'bytes32[]', 'address' ],
-    //       outputType: 'uint8'
-    //     }
-    //   ]
-    //   const aggregator = "([1])";
-    //   const res = await lighthouse.accessCondition(
-    //     publicKey,
-    //     response?.data?.Hash,
-    //     signedMessage,
-    //     conditions,
-    //     aggregator
-    //   )
-    //   console.log(res, 'res')
-    // }
-    // accesCondition()
+    const accesCondition = async () => {
+      const { publicKey, signedMessage } : any = await encryptionSignature();
+      const conditions = [
+        {
+          id: 1,
+          chain: "Hyperspace",
+          method: "checkAccess",
+          standardContractType: "Custom",
+          contractAddress: "0x49bD7e073c52cb831cBFebfc894A751a09c3521D",
+          returnValueTest: {
+          comparator: "==",
+          value: "1"
+          },
+          parameters: [':userAddress', ':userAddress',':userAddress'],
+          inputArrayType: ['bytes32[]', 'uint8', 'address'],
+          outputType: "uint8"
+      }
+      ]
+      const aggregator = "([1])";
+      const res = await lighthouse.accessCondition(
+        publicKey,
+        response?.data?.Hash,
+        signedMessage,
+        conditions,
+        aggregator
+      )
+      console.log(res, 'res')
+    }
+    accesCondition()
   };
   const { isDesktopHeader, isDesktop } = useDevice();
 
@@ -311,7 +314,6 @@ const NewPoduct = () => {
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
                   // const start = Date.now() - event.target.value
                   console.log(event, 'event');
-
                   setStopDate(event.target.value);
                 }}
                 px="16px"
@@ -414,7 +416,8 @@ const NewPoduct = () => {
                   priceStart: startPrice,
                   priceForceStop: forceStopPrice,
                   dateExpire: stopDate,
-                  cid
+                  cid,
+                  collateral :myCollateral
                 }
               }
             />

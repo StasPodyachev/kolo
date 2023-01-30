@@ -148,6 +148,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "_serviceFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -197,6 +210,35 @@
         "internalType": "bytes",
         "name": "cid",
         "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      }
+    ],
+    "name": "checkAccsess",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "cid",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint8",
+        "name": "size",
+        "type": "uint8"
       },
       {
         "internalType": "address",
@@ -469,19 +511,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "chat",
-        "type": "address"
-      }
-    ],
-    "name": "setChat",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "value",
         "type": "uint256"
@@ -540,6 +569,19 @@
       }
     ],
     "name": "setPeriodDispute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "setServiceFee",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

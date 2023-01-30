@@ -1,9 +1,10 @@
 import { Button } from "@chakra-ui/react";
 import { useEffect } from "react";
 import BigDecimal from "decimal.js-light";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useContractWrite, usePrepareContractWrite, usePrepareSendTransaction } from "wagmi";
 import { BIG_1E18 } from "@/helpers/misc";
 import web3 from "web3"
+import { BigNumber } from "ethers";
 interface IProps {
   title: string;
   address: any;
@@ -13,19 +14,21 @@ interface IProps {
 }
 
 const ButtonContractWrite = ({ title, address, abi, method, parrams }: IProps) => {
-  const { name, description, priceStart, priceForceStop, dateExpire,  cid} = parrams
+  const { name, description, priceStart, priceForceStop, dateExpire, cid, collateral} = parrams
   console.log();
   const date = new Date(dateExpire);
   const newDateExpire = date.getTime();
-  const newPriceStart = BigInt(new BigDecimal(priceStart).mul(BIG_1E18 + "").toFixed(0)) + "";
-  const newForceStop = BigInt(new BigDecimal(priceForceStop).mul(BIG_1E18 + "").toFixed(0)) + "";
+  const newPriceStart = BigInt(new BigDecimal(priceStart).mul(BIG_1E18 + "").toFixed(0)) + ""
+  const newForceStop = BigInt(new BigDecimal(priceForceStop).mul(BIG_1E18 + "").toFixed(0)) + ""
+  const newCollateral = BigInt(new BigDecimal(collateral).mul(BIG_1E18 + "").toFixed(0)) + ""
   let newCid = web3.utils.asciiToHex(cid)  
   const { config } = usePrepareContractWrite({
     address,
     abi,
     functionName: method,
-    args: [name, description, newPriceStart, newForceStop, newDateExpire, newCid]
-  });
+    args: [name, description, newPriceStart, newForceStop, newDateExpire, newCid,
+      {value: newCollateral}],
+  })
 
   const { data, isLoading, isSuccess, write } = useContractWrite(config);
 

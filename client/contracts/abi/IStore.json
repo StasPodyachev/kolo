@@ -220,6 +220,11 @@
         "internalType": "address",
         "name": "seller",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "serviceFee",
+        "type": "uint256"
       }
     ],
     "name": "transferWinToSeller",
