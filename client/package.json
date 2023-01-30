@@ -31,6 +31,6 @@
     "react-infinite-scroll-component": "^6.1.0",
     "typescript": "4.9.4",
     "wagmi": "^0.10.14",
-    "web3": "^1.8.1"
+    "web3": "^1.7.4"
   }
 }

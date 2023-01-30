@@ -7,13 +7,13 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useState } from "react";
 import { IAuctionItem } from "@/types";
 import { useContractRead } from "wagmi";
-import ABI_FACTORY from '../contracts/abi/Factory.json' 
+import ABI_FACTORY from "../contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
-import web3 from "web3"
-
+import web3 from "web3";
+import { ethers } from "ethers";
 
 const Home: NextPage = () => {
-  const [ products, setProducts ] = useState([])
+  const [products, setProducts] = useState<ethers.utils.Result[]>();
   const [startCount, setStartCount] = useState(0);
   const [endCount, setEndCount] = useState(5);
   const [items, setItems] = useState<IAuctionItem[]>([]);
@@ -32,34 +32,40 @@ const Home: NextPage = () => {
   const { data, isError, isLoading } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
-    functionName: 'getAllDeals',
-  })
+    functionName: "getAllDeals",
+  });
 
   useEffect(() => {
-    if (data ) {
-      // data?.map((item: any) => {
-      //   // let itemData = web3?.utils?.hexToBytes(item.data as string)
-      //   // let dataDecode = web3?.utils?.bytesToHex(itemData)
-      //   // console.log(dataDecode, 'itemData');
-      //   function bin2String(array) {
-      //     var result = "";
-      //     for (var i = 0; i < array.length; i++) {
-      //       result += String.fromCharCode(parseInt(array[i], 2));
-      //     }
-      //     return result;
-      //   }
-        
-      //   bin2String(["01100110", "01101111", "01101111"]);
-      //   console.log(bin2String(item));
-        
-      //   return item
-      // })
-      // let newCid = web3?.utils?.hexToBytes(data)
-      // console.log(data[0]?.data, 'data');
-      // console.log(newCid, 'data');
+    if (Array.isArray(data)) {
+      const decryptedData = data?.map((item: any, index) => {
+        const coder = ethers.utils.defaultAbiCoder;
+        const result = coder.decode([
+          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
+        ], data[index].data);
+        return result;
+        // console.log("item data", item.data);
+        // let itemData = web3?.utils?.hexToBytes(item.data as string);
+        // console.log("item data", itemData);
+        // let dataDecode = web3?.utils?.bytesToHex(itemData);
+        // console.log(dataDecode, "itemData");
+        // function bin2String(array: any) {
+        //   var result = "";
+        //   for (var i = 0; i < array.length; i++) {
+        //     result += String.fromCharCode(parseInt(array[i], 2));
+        //   }
+        //   return result;
+        // }
+
+        // bin2String(["01100110", "01101111", "01101111"]);
+        // console.log(bin2String(item), "binToString");
+
+        // return item;
+      });
+      setProducts(decryptedData);
+      // let newCid = web3?.utils?.hexToBytes((data));
+      // console.log(newCid, "data");
     }
-    console.log(data, 'list');
-  }, [data])
+  }, [data]);
 
   const getMoreItems = () => {
     setStartCount(startCount + 5);
