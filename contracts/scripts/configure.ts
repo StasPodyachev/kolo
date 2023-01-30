@@ -1,6 +1,13 @@
 import { deployNames } from "./constants"
 import deployment from "../deployment/deployments.json"
-import { AuctionFile, Factory, Notary, SimpleTradeFile } from "../typechain"
+import {
+  AuctionFile,
+  Factory,
+  KoloToken,
+  Notary,
+  SimpleTradeFile,
+  Treasury,
+} from "../typechain"
 import { IDeployment } from "./utils"
 const deployments: IDeployment = deployment
 
@@ -24,6 +31,14 @@ const contracts: any = [
     contractName: deployNames.NOTARY,
     f: notary,
   },
+  {
+    contractName: deployNames.TREASURY,
+    f: treasury,
+  },
+  {
+    contractName: deployNames.KOLO_TOKEN,
+    f: koloToken,
+  },
 ]
 
 export async function main() {
@@ -45,9 +60,13 @@ async function factory() {
   const auctionDeployed = deployments[CHAIN_ID][deployNames.AUCTION_FILE]
   const simpleTradeDeployed =
     deployments[CHAIN_ID][deployNames.SIMPLE_TRADE_FILE]
+  const chatDeployed = deployments[CHAIN_ID][deployNames.CHAT]
+  const treasuryDeployed = deployments[CHAIN_ID][deployNames.TREASURY]
 
   const factory = (await getKnowContractAt(deployNames.FACTORY)) as Factory
 
+  await factory.setChat(chatDeployed.address)
+  await factory.setTreasury(treasuryDeployed.address)
   await factory.registerIntegration(0, auctionDeployed.address)
   await factory.registerIntegration(1, simpleTradeDeployed.address)
 }
@@ -63,7 +82,7 @@ async function auctionFile() {
 
   await auction.setFactory(factoryDeployed.address)
   await auction.setNotary(notaryDeployed.address)
-  await auction.setChat(chatDeployed.address)
+  // await auction.setChat(chatDeployed.address)
 }
 
 async function simpleTrade() {
@@ -77,7 +96,7 @@ async function simpleTrade() {
 
   await auction.setFactory(factoryDeployed.address)
   await auction.setNotary(notaryDeployed.address)
-  await auction.setChat(chatDeployed.address)
+  // await auction.setChat(chatDeployed.address)
 }
 
 async function notary() {
@@ -99,6 +118,20 @@ async function getKnowContractAt(name: string) {
   const contractDeployed = deployments[CHAIN_ID][name]
 
   return contractFactory.attach(contractDeployed.address)
+}
+
+async function treasury() {
+  const koloDeployed = deployments[CHAIN_ID][deployNames.KOLO_TOKEN]
+  const treasury = (await getKnowContractAt(deployNames.TREASURY)) as Treasury
+
+  await treasury.setKoloToken(koloDeployed.address)
+}
+
+async function koloToken() {
+  const treasuryDeployed = deployments[CHAIN_ID][deployNames.TREASURY]
+  const kolo = (await getKnowContractAt(deployNames.KOLO_TOKEN)) as KoloToken
+
+  await kolo.setBurnAccess(treasuryDeployed.address, true)
 }
 
 // main()

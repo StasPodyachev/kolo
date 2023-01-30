@@ -16,7 +16,7 @@ contract Treasury is ITreasury, Ownable {
 
     function setKoloToken(address token) external onlyOwner {
         _token = token;
-        KoloToken(_token).setBurnAccess(address(this), true);
+        // KoloToken(_token).setBurnAccess(address(this), true);
     }
 
     function setRewardBurnCoef(uint256 value) external onlyOwner {
@@ -42,5 +42,9 @@ contract Treasury is ITreasury, Ownable {
 
     function _buy(uint256 amount) internal pure returns (uint256) {
         return amount;
+    }
+
+    function giveGrandToTeam(address to, uint256 amount) external onlyOwner {
+        payable(to).transfer(amount);
     }
 }

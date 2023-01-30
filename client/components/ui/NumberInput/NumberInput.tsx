@@ -5,10 +5,11 @@ import {
   NumberInputField,
   NumberInput as ChakraNumberInput,
 } from "@chakra-ui/react";
+import { numberWithCommas } from "@/helpers";
 
 interface IProps {
-  value: number;
-  setValue: (value: number) => void;
+  value: string;
+  setValue: (value: string) => void;
   isNeededMarginTop?: boolean;
   isNotFullWidth?: boolean;
   minValue?: number;
@@ -30,19 +31,21 @@ const NumberInput = ({
       mt={isNeededMarginTop ? "16px" : 0}
     >
       <ChakraNumberInput
+        step={0.01}
         value={value}
         onKeyPress={(event) => {
+          console.log("e key", event.key);
           if (event.key === "e" || event.key === "E" || event.key === "-") {
             setTimeout(() => {
-              setValue(0);
+              setValue("");
             }, 100);
           }
         }}
         onChange={(event) => {
           if (isCollateralInput && minValue && minValue > +event) {
-            setTimeout(() => setValue(minValue), 2000);
+            setTimeout(() => setValue(minValue.toString()), 2000);
           } else {
-            setValue(+event);
+            setValue(numberWithCommas(+event));
           }
         }}
         w="100%"

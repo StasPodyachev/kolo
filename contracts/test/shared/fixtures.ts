@@ -8,7 +8,6 @@ import { AuctionFile } from "../../typechain/AuctionFile"
 
 import { ethers } from "hardhat"
 
-
 interface FactoryFixture {
   factory: Factory
 }
@@ -30,13 +29,11 @@ interface TreasuryFixture {
 }
 
 interface AuctionFileFixture {
-  auctionFile: AuctionFile,
+  auctionFile: AuctionFile
   factory: Factory
 }
 
-
-export async function factoryFixture(
-): Promise<FactoryFixture> {
+export async function factoryFixture(): Promise<FactoryFixture> {
   const factoryFactory = await ethers.getContractFactory("Factory")
   const factory = (await factoryFactory.deploy()) as Factory
 
@@ -49,18 +46,16 @@ export async function factoryFixture(
   return { factory }
 }
 
-export async function storeFixture(
-): Promise<StoreFixture> {
+export async function storeFixture(): Promise<StoreFixture> {
   const factory = await ethers.getContractFactory("Store")
-  const store = await factory.deploy() as Store
+  const store = (await factory.deploy()) as Store
 
   return { store }
 }
 
-export async function notaryFixture(
-): Promise<NotaryFixture> {
+export async function notaryFixture(): Promise<NotaryFixture> {
   const notaryFactory = await ethers.getContractFactory("Notary")
-  const notary = await notaryFactory.deploy() as Notary
+  const notary = (await notaryFactory.deploy()) as Notary
 
   const { factory } = await factoryFixture()
   notary.setFactory(factory.address)
@@ -68,26 +63,23 @@ export async function notaryFixture(
   return { notary }
 }
 
-export async function treasuryFixture(
-): Promise<TreasuryFixture> {
+export async function treasuryFixture(): Promise<TreasuryFixture> {
   const factory = await ethers.getContractFactory("Treasury")
-  const treasury = await factory.deploy() as Treasury
+  const treasury = (await factory.deploy()) as Treasury
 
   return { treasury }
 }
 
-export async function chatFixture(
-): Promise<ChatFixture> {
+export async function chatFixture(): Promise<ChatFixture> {
   const factory = await ethers.getContractFactory("Chat")
-  const chat = await factory.deploy() as Chat
+  const chat = (await factory.deploy()) as Chat
 
   return { chat }
 }
 
-export async function auctionFileFixture(
-): Promise<AuctionFileFixture> {
-  const auctionfactory = await ethers.getContractFactory("AuctionFile")
-  const auctionFile = await auctionfactory.deploy() as AuctionFile
+export async function auctionFileFixture(): Promise<AuctionFileFixture> {
+  const auctionFactory = await ethers.getContractFactory("AuctionFile")
+  const auctionFile = (await auctionFactory.deploy()) as AuctionFile
 
   const { factory } = await factoryFixture()
   auctionFile.setFactory(factory.address)

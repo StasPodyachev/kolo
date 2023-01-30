@@ -15,10 +15,19 @@ import web3 from "web3"
 const Home: NextPage = () => {
   const [ products, setProducts ] = useState([])
   const [startCount, setStartCount] = useState(0);
-  const [count, setCount] = useState(6);
-  const [items, setItems] = useState<IAuctionItem[]>(
-    auctionItems.slice(startCount, count + 1)
-  );
+  const [endCount, setEndCount] = useState(5);
+  const [items, setItems] = useState<IAuctionItem[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    setHasMore(auctionItems.length > items.length ? true : false);
+  }, [items]);
+
+  useEffect(() => {
+    setItems(auctionItems.slice(0, 5));
+    setStartCount(5);
+    setEndCount(10);
+  }, []);
 
   const { data, isError, isLoading } = useContractRead({
     address: addresses[0].address as `0x${string}`,
@@ -28,23 +37,23 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (data ) {
-      data?.map((item: any) => {
-        // let itemData = web3?.utils?.hexToBytes(item.data as string)
-        // let dataDecode = web3?.utils?.bytesToHex(itemData)
-        // console.log(dataDecode, 'itemData');
-        function bin2String(array) {
-          var result = "";
-          for (var i = 0; i < array.length; i++) {
-            result += String.fromCharCode(parseInt(array[i], 2));
-          }
-          return result;
-        }
+      // data?.map((item: any) => {
+      //   // let itemData = web3?.utils?.hexToBytes(item.data as string)
+      //   // let dataDecode = web3?.utils?.bytesToHex(itemData)
+      //   // console.log(dataDecode, 'itemData');
+      //   function bin2String(array) {
+      //     var result = "";
+      //     for (var i = 0; i < array.length; i++) {
+      //       result += String.fromCharCode(parseInt(array[i], 2));
+      //     }
+      //     return result;
+      //   }
         
-        bin2String(["01100110", "01101111", "01101111"]);
-        console.log(bin2String(item));
+      //   bin2String(["01100110", "01101111", "01101111"]);
+      //   console.log(bin2String(item));
         
-        return item
-      })
+      //   return item
+      // })
       // let newCid = web3?.utils?.hexToBytes(data)
       // console.log(data[0]?.data, 'data');
       // console.log(newCid, 'data');
@@ -53,22 +62,21 @@ const Home: NextPage = () => {
   }, [data])
 
   const getMoreItems = () => {
-    setStartCount(count + 6);
-    setCount(count + count);
-    setItems([...items, ...auctionItems.slice(startCount, count)]);
+    setStartCount(startCount + 5);
+    setEndCount(endCount * 2);
+    setItems([...items, ...auctionItems.slice(startCount, endCount)]);
   };
   return (
     <Layout pageTitle="Market">
       <InfiniteScroll
         dataLength={items.length}
         next={getMoreItems}
-        hasMore={true}
+        hasMore={hasMore}
         loader={
-          <Heading color="white" variant="h5">
+          <Heading textAlign="center" mt="36px" color="white" variant="h5">
             Loading...
           </Heading>
         }
-        endMessage={<Text>That&apos;s end</Text>}
       >
         <Grid
           gap="26px"

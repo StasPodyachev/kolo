@@ -9,7 +9,7 @@ import Blocks from "../ui/Blocks";
 import NumberInput from "../ui/NumberInput/NumberInput";
 
 const DepositOrWithdrawPanel: NextPage = () => {
-  const [value, setValue] = useState(10);
+  const [value, setValue] = useState("10");
   return (
     <TabPanel p={0}>
       <Flex flexDir="column" gap="50px">
@@ -26,6 +26,7 @@ const DepositOrWithdrawPanel: NextPage = () => {
                 color="white"
                 textStyle="button"
                 transition="all .3s"
+                borderRadius={0}
                 _hover={
                   btn.isDepositBtn
                     ? { bg: "blue.hover" }

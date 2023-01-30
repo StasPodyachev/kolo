@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IStore.sol";
+import "./interfaces/IFactory.sol";
+import "./interfaces/IStoreDeployer.sol";
 import "./interfaces/integrations/IIntegration.sol";
 
 contract Store is IStore, Ownable {
@@ -14,6 +16,12 @@ contract Store is IStore, Ownable {
     mapping(uint256 => uint256) private buyerCollaterals;
 
     uint256[] private dealsArr;
+    IFactory _factory;
+
+    constructor() {
+        address factory = IStoreDeployer(msg.sender).parameters();
+        _factory = IFactory(factory);
+    }
 
     function getIntegration(uint256 dealId) external view returns (address) {
         return deals[dealId];
@@ -83,14 +91,22 @@ contract Store is IStore, Ownable {
     function transferWinToSeller(
         uint256 dealId,
         address buyer,
-        address seller
+        address seller,
+        uint256 serviceFee
     ) external {
-        payable(seller).transfer(
-            sellerCollaterals[dealId] + buyers[dealId][buyer]
-        );
+        uint256 amount = sellerCollaterals[dealId];
 
+        if (buyers[dealId][buyer] != 0) {
+            uint256 fee = (buyers[dealId][buyer] * serviceFee) / 1e18;
+
+            payable(_factory.treasury()).transfer(fee);
+
+            amount += buyers[dealId][buyer] - fee;
+            buyers[dealId][buyer] = 0;
+        }
+
+        payable(seller).transfer(amount);
         sellerCollaterals[dealId] = 0;
-        buyers[dealId][buyer] = 0;
     }
 
     function transferWinToBuyer(uint256 dealId, address buyer) external {

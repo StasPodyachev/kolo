@@ -13,6 +13,8 @@ import "../interfaces/IChat.sol";
 import {SizeOf} from "../libs/seriality/SizeOf.sol";
 import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
 
+import "hardhat/console.sol";
+
 contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     IFactory public _factory;
     IChat public _chat;
@@ -22,12 +24,17 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;
+    uint256 public _serviceFee = 2e16;
 
     mapping(uint256 => AuctionFileParams) private deals;
     mapping(uint256 => mapping(address => uint256)) private bids;
     mapping(uint256 => BidParams[]) private bidHistory;
     mapping(uint256 => address[]) private bidBuyers;
     mapping(address => mapping(bytes => bool)) private _accsess;
+
+    function setServiceFee(uint256 value) external onlyOwner {
+        _serviceFee = value;
+    }
 
     function setPeriodDispute(uint256 value) external onlyOwner {
         _periodDispute = value;
@@ -70,54 +77,10 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     {
         AuctionFileParams memory params = deals[dealId];
 
-        uint256 size = SizeOf.sizeOfString(params.name) +
-            SizeOf.sizeOfString(params.description) +
-            SizeOf.sizeOfBytes(params.cid) +
-            6 *
-            32 +
-            20 *
-            2;
-        uint256 offset = 0;
-        bytes memory data = new bytes(size);
-
-        // Serialize AuctionFileParams to bytes
-        // 2x string
-        TypesToBytes.stringToBytes(offset, bytes(params.name), data);
-        offset += SizeOf.sizeOfString(params.name);
-        TypesToBytes.stringToBytes(offset, bytes(params.description), data);
-        offset += SizeOf.sizeOfString(params.description);
-
-        // 4x uint256
-        TypesToBytes.uintToBytes(offset, params.price, data);
-        offset += 32;
-        TypesToBytes.uintToBytes(offset, params.priceStart, data);
-        offset += 32;
-        TypesToBytes.uintToBytes(offset, params.priceForceStop, data);
-        offset += 32;
-        TypesToBytes.uintToBytes(offset, params.collateralAmount, data);
-        offset += 32;
-
-        // 2x address
-        TypesToBytes.addressToBytes(offset, params.seller, data);
-        offset += 20;
-        TypesToBytes.addressToBytes(offset, params.buyer, data);
-        offset += 20;
-
-        // uint
-        TypesToBytes.uintToBytes(offset, params.dateExpire, data);
-        offset += 32;
-
-        // bytes
-        TypesToBytes.stringToBytes(offset, params.cid, data);
-        offset += SizeOf.sizeOfBytes(params.cid);
-
-        // uint
-        TypesToBytes.uintToBytes(offset, uint256(params.status), data);
-        offset += 32;
         deal = DealParams({
             id: dealId,
             _type: 0,
-            data: data,
+            data: abi.encode(params),
             integration: address(this),
             store: _factory.getStore(params.seller)
         });
@@ -309,7 +272,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             IStore(storeAddress).transferWinToSeller(
                 dealId,
                 address(0),
-                deal.seller
+                deal.seller,
+                _serviceFee
             );
 
             deal.status = AuctionStatus.CLOSE;
@@ -362,7 +326,12 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         if (winner == IIntegration.DisputeWinner.Buyer) {
             store.transferWinToBuyer(dealId, deal.buyer);
         } else {
-            store.transferWinToSeller(dealId, deal.buyer, deal.seller);
+            store.transferWinToSeller(
+                dealId,
+                deal.buyer,
+                deal.seller,
+                _serviceFee
+            );
         }
 
         deal.status = AuctionStatus.CLOSE;
@@ -396,7 +365,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         address storeAddress = _factory.getStore(deal.seller);
         IStore store = IStore(storeAddress);
 
-        store.transferWinToSeller(dealId, deal.buyer, deal.seller);
+        store.transferWinToSeller(dealId, deal.buyer, deal.seller, _serviceFee);
 
         deal.status = AuctionStatus.CLOSE;
 
@@ -423,5 +392,13 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         returns (uint8)
     {
         return _accsess[wallet][cid] ? 1 : 0;
+    }
+
+    function checkAccsess(
+        bytes32[] calldata cid,
+        uint8 size,
+        address wallet
+    ) external view returns (uint8) {
+        return this.checkAccsess(bytes.concat(cid[0]), wallet);
     }
 }

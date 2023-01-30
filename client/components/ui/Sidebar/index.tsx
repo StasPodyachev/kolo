@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowIcon, LogoIcon } from "@/icons";
 import SidebarLink from "./SidebarLink";
 import { navLinks } from "@/constants/shared";
-import { useState } from "react";
 import { useSidebarContext } from "@/context/SidebarContext";
 import useDevice from "@/hooks/useDevice";
 
@@ -23,7 +22,7 @@ const SideBar: NextPage = () => {
       borderColor="gray.800"
     >
       <Box
-        w="100%"
+        minW="100%"
         height="max-content"
         position="sticky"
         top={0}
@@ -35,7 +34,7 @@ const SideBar: NextPage = () => {
           href="/"
           style={{
             transition: "all .3s",
-            marginLeft: isHiddenSidebar ? "20px" : "26px",
+            marginLeft: isHiddenSidebar ? 0 : "26px",
           }}
         >
           <LogoIcon color="white" width={63} height={17} />
