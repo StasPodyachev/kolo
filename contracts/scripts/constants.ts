@@ -9,4 +9,8 @@ export const deployNames: any = {
   SIMPLE_TRADE_FILE: "SimpleTradeFile",
   NOTARY: "Notary",
   CHAT: "Chat",
+  TREASURY: "Treasury",
+  GOVERNOR: "GovernorContract",
+  TIME_LOCK: "TimeLock",
+  KOLO_TOKEN: "KoloToken",
 }

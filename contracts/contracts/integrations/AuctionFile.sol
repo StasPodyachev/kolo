@@ -13,6 +13,8 @@ import "../interfaces/IChat.sol";
 import {SizeOf} from "../libs/seriality/SizeOf.sol";
 import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
 
+import "hardhat/console.sol";
+
 contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     IFactory public _factory;
     IChat public _chat;
@@ -75,54 +77,10 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     {
         AuctionFileParams memory params = deals[dealId];
 
-        uint256 size = SizeOf.sizeOfString(params.name) +
-            SizeOf.sizeOfString(params.description) +
-            SizeOf.sizeOfBytes(params.cid) +
-            6 *
-            32 +
-            20 *
-            2;
-        uint256 offset = 0;
-        bytes memory data = new bytes(size);
-
-        // Serialize AuctionFileParams to bytes
-        // 2x string
-        TypesToBytes.stringToBytes(offset, bytes(params.name), data);
-        offset += SizeOf.sizeOfString(params.name);
-        TypesToBytes.stringToBytes(offset, bytes(params.description), data);
-        offset += SizeOf.sizeOfString(params.description);
-
-        // 4x uint256
-        TypesToBytes.uintToBytes(offset, params.price, data);
-        offset += 32;
-        TypesToBytes.uintToBytes(offset, params.priceStart, data);
-        offset += 32;
-        TypesToBytes.uintToBytes(offset, params.priceForceStop, data);
-        offset += 32;
-        TypesToBytes.uintToBytes(offset, params.collateralAmount, data);
-        offset += 32;
-
-        // 2x address
-        TypesToBytes.addressToBytes(offset, params.seller, data);
-        offset += 20;
-        TypesToBytes.addressToBytes(offset, params.buyer, data);
-        offset += 20;
-
-        // uint
-        TypesToBytes.uintToBytes(offset, params.dateExpire, data);
-        offset += 32;
-
-        // bytes
-        TypesToBytes.stringToBytes(offset, params.cid, data);
-        offset += SizeOf.sizeOfBytes(params.cid);
-
-        // uint
-        TypesToBytes.uintToBytes(offset, uint256(params.status), data);
-        offset += 32;
         deal = DealParams({
             id: dealId,
             _type: 0,
-            data: data,
+            data: abi.encode(params),
             integration: address(this),
             store: _factory.getStore(params.seller)
         });

@@ -19,17 +19,36 @@ const contracts: ContractDeploy[] = [
     contractName: deployNames.FACTORY,
   },
   {
-    contractName: deployNames.AUCTION_FILE,
+    contractName: deployNames.TREASURY,
   },
   {
-    contractName: deployNames.NOTARY,
+    contractName: deployNames.AUCTION_FILE,
   },
   {
     contractName: deployNames.SIMPLE_TRADE_FILE,
   },
   {
+    contractName: deployNames.NOTARY,
+  },
+  {
     contractName: deployNames.CHAT,
   },
+
+  // dao
+
+  {
+    contractName: deployNames.GOVERNOR,
+  },
+
+  {
+    contractName: deployNames.TIME_LOCK,
+  },
+
+  {
+    contractName: deployNames.KOLO_TOKEN,
+  },
+
+  // ########
 ]
 
 export async function main() {

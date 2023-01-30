@@ -72,51 +72,10 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     {
         SimpleTradeFileParams memory params = deals[dealId];
 
-        uint256 size = SizeOf.sizeOfString(params.name) +
-            SizeOf.sizeOfString(params.description) +
-            SizeOf.sizeOfBytes(params.cid) +
-            4 *
-            32 +
-            20 *
-            2;
-        uint256 offset = 0;
-        bytes memory data = new bytes(size);
-
-        // Serialize SimpleTradeFileParams to bytes
-        // 2x string
-        TypesToBytes.stringToBytes(offset, bytes(params.name), data);
-        offset += SizeOf.sizeOfString(params.name);
-        TypesToBytes.stringToBytes(offset, bytes(params.description), data);
-        offset += SizeOf.sizeOfString(params.description);
-
-        // 4x uint256
-        TypesToBytes.uintToBytes(offset, params.price, data);
-        offset += 32;
-
-        TypesToBytes.uintToBytes(offset, params.collateralAmount, data);
-        offset += 32;
-
-        // 2x address
-        TypesToBytes.addressToBytes(offset, params.seller, data);
-        offset += 20;
-        TypesToBytes.addressToBytes(offset, params.buyer, data);
-        offset += 20;
-
-        // uint
-        TypesToBytes.uintToBytes(offset, params.dateExpire, data);
-        offset += 32;
-
-        // bytes
-        TypesToBytes.stringToBytes(offset, params.cid, data);
-        offset += SizeOf.sizeOfBytes(params.cid);
-
-        // uint
-        TypesToBytes.uintToBytes(offset, uint256(params.status), data);
-        offset += 32;
         deal = DealParams({
             id: dealId,
             _type: 1,
-            data: data,
+            data: abi.encode(params),
             integration: address(this),
             store: _factory.getStore(params.seller)
         });
