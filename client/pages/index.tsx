@@ -43,6 +43,7 @@ const Home: NextPage = () => {
         ], item.data);
         const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
         const title = result[0][1]
+        const description = result[0][2]
         const ownedBy = result[0][7]
         const saleEndDateNew = result[0][9]
         const price = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
@@ -69,8 +70,7 @@ const Home: NextPage = () => {
           saleEndDate,
           currentPrice: 300,
           priceEnd: 1000,
-          description:
-            "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+          description,
           status: "active",
           totalBids: 20
         };
