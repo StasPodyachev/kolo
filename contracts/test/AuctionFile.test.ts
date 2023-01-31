@@ -1,5 +1,5 @@
 import { ethers, waffle } from "hardhat"
-import { BigNumber, constants, utils, Wallet } from "ethers"
+import { BigNumber, Wallet } from "ethers"
 import { AuctionFile } from "../typechain/AuctionFile"
 import { Factory } from "../typechain/Factory"
 import { expect } from "chai"
@@ -21,7 +21,11 @@ describe("AuctionFile", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ;({ auctionFile, factory } = await loadFixture(auctionFileFixture))
+    ;({ auctionFile, factory } = await loadFixture(async () => {
+      const { auctionFile, factory } = await auctionFileFixture()
+
+      return { auctionFile, factory }
+    }))
   })
 
   describe("#create", () => {
@@ -116,25 +120,34 @@ describe("AuctionFile", () => {
       ).to.be.revertedWith("AuctionFile: Wrong collateral")
     })
 
-    // it("fails if store is not created", async () => {
-    //   await expect(auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", { value: BigNumber.from("100000000000000000") }
-    //   ))
-    //     .to.be.revertedWith("AuctionFile: Caller does not have a store");
-    // })
+    it("fails if store is not created", async () => {
+      await expect(
+        auctionFile.create(
+          "NAME",
+          "DESCRIPTION",
+          10000000000,
+          100000000000,
+          Date.now() + 1000,
+          "0x",
+          { value: BigNumber.from("100000000000000000") }
+        )
+      ).to.be.revertedWith("AuctionFile: Caller does not have a store")
+    })
 
-    // it("fails if wrong collateral was passed", async () => {
-
-    //   await factory.createStore();
-
-    // })
+    it("fails if wrong collateral was passed", async () => {
+      await factory.createStore()
+    })
   })
 
   describe("#getDeal", () => {
-    it("correct serialize", async () => {
+    let storeAddress: any
+    beforeEach("create storage", async () => {
       const tx = await factory.createStore()
       const receipt = await tx.wait()
-      const storeAddress = receipt.events?.[2].args?.store
+      storeAddress = receipt.events?.[2].args?.store
+    })
 
+    it("correct serialize", async () => {
       const name = "NAME"
       const description = "DESCRIPTION"
       const priceStart = 10000000000
@@ -143,8 +156,6 @@ describe("AuctionFile", () => {
       const cid =
         "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
       const collateral = "100000000000000000"
-
-      console.log(await auctionFile._factory())
 
       await auctionFile.create(
         name,
