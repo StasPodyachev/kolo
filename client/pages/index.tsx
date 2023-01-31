@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { Grid, Heading, Text } from "@chakra-ui/react";
+import { Grid, Heading } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
 import { auctionItems } from "@/constants/shared";
@@ -12,11 +12,11 @@ import addresses from "@/contracts/addresses";
 import { ethers } from "ethers";
 
 const Home: NextPage = () => {
-  const [products, setProducts] = useState<ethers.utils.Result[]>();
-  const [startCount, setStartCount] = useState(0);
-  const [endCount, setEndCount] = useState(5);
-  const [items, setItems] = useState<IAuctionItem[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+  const [ products, setProducts ] = useState();
+  const [ startCount, setStartCount ] = useState(0);
+  const [ endCount, setEndCount ] = useState(5);
+  const [ items, setItems ] = useState<IAuctionItem[]>([]);
+  const [ hasMore, setHasMore ] = useState(true);
 
   useEffect(() => {
     setHasMore(auctionItems.length > items.length ? true : false);
@@ -28,7 +28,7 @@ const Home: NextPage = () => {
     setEndCount(10);
   }, []);
 
-  const { data, isError, isLoading } = useContractRead({
+  const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
     functionName: "getAllDeals",
@@ -41,10 +41,24 @@ const Home: NextPage = () => {
         const result = coder.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
         ], data[index].data);
-        return result;
+        console.log(result, 'result');
+        
+        return {
+          id: 1,
+          title: "Tree planting plan",
+          price: 32,
+          ownedBy: "0x9D21...7a88",
+          saleEndDate: "28 Feb 2023",
+          currentPrice: 300,
+          priceEnd: 1000,
+          description:
+            "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+          status: "active",
+          totalBids: 20
+        };
       });
       console.log(decryptedData, 'decryptedData');
-      setProducts(decryptedData);
+      // setProducts(decryptedData);
     }
   }, [data]);
 
