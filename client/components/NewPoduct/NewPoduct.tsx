@@ -8,6 +8,10 @@ import {
   Flex,
   Heading,
   Input,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Text,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useAccount, useContractRead, usePrepareContractWrite, useContractWrite } from "wagmi";
@@ -42,6 +46,16 @@ const CustomInput = chakra(Input, {
   },
 });
 
+const CustomFormLabel = chakra(FormLabel, {
+  baseStyle: {
+    color: 'gray.200',
+    m: 0,
+    mt: '32px',
+    fontSize: '20px',
+    lineHeight: '28px',
+  }
+});
+
 const CreateStore = ({address} : {address: string}) => {
   const { config } = usePrepareContractWrite({
     address: addresses[0].address as `0x${string}`,
@@ -52,17 +66,18 @@ const CreateStore = ({address} : {address: string}) => {
   return (
     <Button
       mt={10}
-      w="50%"
+      minH="48px"
+      w="100%"
       bg="blue.primary"
       color="white"
       textStyle="button"
-      borderRadius="md"
+      borderRadius={0}
       transition="all .3s"
       _hover={{ bg: "blue.hover" }}
       onClick={() => create?.()}
     >
       Create Store
-    </Button> 
+    </Button>
   )
 }
 
@@ -125,8 +140,10 @@ const NewPoduct = () => {
   const [myCollateral, setMyCollateral] = useState("1");
   const [stopDate, setStopDate] = useState(getTodaysDate());
   const [cid, setCid] = useState("");
-  const [access, setAcces] = useState(false);
+  const [access, setAcces] = useState(true);
   const [ isStore, setIsStore] = useState(false)
+  const [fileName, setFileName] = useState("");
+  const [thubnailName, setThubnailName] = useState("");
 
   const { data: store } = useContractRead({
     address: addresses[0].address as `0x${string}`,
@@ -161,7 +178,7 @@ const NewPoduct = () => {
     console.log(percentageDone.toFixed(2));
   };
 
-  const deployEncrypted = async (e: any) => {
+  const deployEncrypted = async (e: any, isFile: boolean) => {
     const { publicKey, signedMessage }: any = await encryptionSignature();
     const response = await lighthouse?.uploadEncrypted(
       e,
@@ -174,6 +191,11 @@ const NewPoduct = () => {
     const conditionsId = await lighthouse?.getAccessConditions(
       response?.data?.Hash
     );
+    if (response?.data && isFile) {
+      setFileName(response?.data?.Name);
+    } else {
+      setThubnailName(response?.data.Name);
+    }
     setCid(response?.data?.Hash);
     setAcces(true);
 
@@ -208,6 +230,11 @@ const NewPoduct = () => {
     // accesCondition()
   };
   const { isDesktopHeader, isDesktop } = useDevice();
+  const isItemNameError = itemName === '';
+  const isItemDescriptionError = itemDescription === '';
+  const isStartPriceError = startPrice === '0';
+  const isForceStopPriceError = forceStopPrice === '0';
+  const isDateStopError = stopDate === '';
 
   useEffect(() => {
     console.log(store, 'store');
@@ -230,98 +257,116 @@ const NewPoduct = () => {
           setValue={setMyCollateral}
           myCollateral={myCollateral}
         />
-        <Box mt="10px" minW="100%">
-          <Heading variant="h6" color="gray.200" mt="16px">
-            Name
-          </Heading>
-          <CustomInput
-            minW="100%"
-            maxLength={70}
-            value={itemName}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              setItemName(event?.target?.value)
-            }
-            w="100%"
-            placeholder="Item name (up to 70 characters)"
-          />
-          <Heading variant="h6" color="gray.200" mt="16px">
-            Description
-          </Heading>
-          <CustomInput
-            minW="100%"
-            maxLength={256}
-            value={itemDescription}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              setItemDescription(event.target.value)
-            }
-            w="100%"
-            placeholder="Description (up to 256 characters)"
-          />
-          <Heading variant="h6" color="gray.200" mt="16px">
+        {!isStore && address
+          ? <CreateStore address={address as `0x${string}`} /> : null}
+        <Box minW="100%">
+          <Heading variant="h6" color="gray.200" mt="32px">
             Type of Sale
           </Heading>
           <SaleTypeMenu activeItem={activeItem} setActiveItem={setActiveItem} />
+          <FormControl isRequired isInvalid={isItemNameError}>
+            <CustomFormLabel>
+              Name
+            </CustomFormLabel>
+            <CustomInput
+              minW="100%"
+              maxLength={70}
+              value={itemName}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setItemName(event?.target?.value)
+              }
+              w="100%"
+              placeholder="Item name (up to 70 characters)"
+            />
+            <FormErrorMessage>Name is required</FormErrorMessage>
+          </FormControl>
+          <FormControl isRequired isInvalid={isItemDescriptionError}>
+            <CustomFormLabel>
+              Description
+            </CustomFormLabel>
+            <CustomInput
+              minW="100%"
+              maxLength={256}
+              value={itemDescription}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setItemDescription(event.target.value)
+              }
+              w="100%"
+              placeholder="Description (up to 256 characters)"
+            />
+            <FormErrorMessage>Description is required</FormErrorMessage>
+          </FormControl>
           <Flex
             w="100%"
             flexDir={isDesktop[0] ? "row" : "column"}
             gap={isDesktop[0] ? 0 : "16px"}
             justifyContent="space-between"
-            mt="32px"
           >
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
-              <Heading variant="h6" color="gray.200">
-                Price Start
-              </Heading>
-              <NumberInput
-                value={startPrice}
-                setValue={setStartPrice}
-                isNeededMarginTop
-              />
+            <Box w={(isDesktop[0] || isDesktopHeader[0]) && activeItem.title !== "SIMPLE TRADES OF FILES" ? "48%" : "100%"}>
+              <FormControl isRequired isInvalid={isStartPriceError}>
+                <CustomFormLabel>
+                  Price Start
+                </CustomFormLabel>
+                <NumberInput
+                  value={startPrice}
+                  setValue={setStartPrice}
+                  isNeededMarginTop
+                  errorMessage="Price Start is required"
+                />
+              </FormControl>
             </Box>
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
-              <Heading variant="h6" color="gray.200">
-                Price Force Stop
-              </Heading>
-              <NumberInput
-                value={forceStopPrice}
-                setValue={setForceStopPrice}
-                isNeededMarginTop
-              />
-            </Box>
+            {activeItem.title !== "SIMPLE TRADES OF FILES" ? (<Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+              <FormControl isRequired isInvalid={isForceStopPriceError}>
+                <CustomFormLabel>
+                  Price Force Stop
+                </CustomFormLabel>
+                <NumberInput
+                  value={forceStopPrice}
+                  setValue={setForceStopPrice}
+                  isNeededMarginTop
+                  errorMessage="Price Force Stop is required"
+                />
+              </FormControl>
+            </Box>) : null}
           </Flex>
           <Flex
             justifyContent="space-between"
-            mt="16px"
             flexDir={isDesktop[0] ? "row" : "column"}
             gap={isDesktop[0] ? 0 : "16px"}
           >
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
-              <Heading variant="h6" color="gray.200">
-                Date Stop Auction
-              </Heading>
-              <CustomInput
-                type="datetime-local"
-                min={getTodaysDate()}
-                value={stopDate}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  // const start = Date.now() - event.target.value
-                  setStopDate(event.target.value);
-                }}
-                px="16px"
-                minW="100%"
-              />
+            <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+              <FormControl isRequired isInvalid={isDateStopError}>
+                <CustomFormLabel>
+                  Date Stop Auction
+                </CustomFormLabel>
+                <CustomInput
+                  type="datetime-local"
+                  min={getTodaysDate()}
+                  value={stopDate}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                    console.log('date time', typeof event, event)
+                    // const start = Date.now() - event.target.value
+                    setStopDate(event.target.value);
+                  }}
+                  px="16px"
+                  minW="100%"
+                />
+                <FormErrorMessage>Date Stop Auction is required</FormErrorMessage>
+              </FormControl>
             </Box>
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
-              <Heading variant="h6" color="gray.200">
-                My Collateral
-              </Heading>
-              <NumberInput
-                value={myCollateral}
-                setValue={setMyCollateral}
-                isNeededMarginTop
-                minValue={+startPrice.split(",").join("") * 0.1}
-                isCollateralInput
-              />
+            <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+              <FormControl isRequired>
+                <CustomFormLabel>
+                  My Collateral
+                </CustomFormLabel>
+                <NumberInput
+                  value={myCollateral}
+                  setValue={setMyCollateral}
+                  isNeededMarginTop
+                  minValue={+startPrice.split(",").join("") * 0.1}
+                  isCollateralInput
+                />
+              </FormControl>
             </Box>
           </Flex>
           {isConnected ? (
@@ -329,7 +374,7 @@ const NewPoduct = () => {
               justify="space-between"
               flexDir={isDesktop[0] ? "row" : "column"}
             >
-              <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
+              <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
                 <label
                   style={{
                     display: "flex",
@@ -354,13 +399,24 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
-                    deployEncrypted(e);
+                    console.log('NOW HERE', e)
+                    deployEncrypted(e, true);
                   }}
                 />
+                {fileName ? (
+                  <Text
+                    color="green.primary"
+                    textStyle="mediumText"
+                    textAlign="center"
+                    mt="16px"
+                  >
+                    {fileName}
+                  </Text>
+                ) : null}
               </Box>
               <Box
                 cursor="not-allowed"
-                w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}
+                w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}
               >
                 <label
                   style={{
@@ -386,9 +442,19 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
-                    // deployEncrypted(e)
+                    // deployEncrypted(e, false)
                   }}
                 />
+                {thubnailName ? (
+                  <Text
+                    color="green.primary"
+                    textStyle="mediumText"
+                    textAlign="center"
+                    mt="16px"
+                  >
+                    {thubnailName}
+                  </Text>
+                ) : null}
               </Box>
             </Flex>
           ) : null}
@@ -402,6 +468,7 @@ const NewPoduct = () => {
                 {
                   name: itemName,
                   description: itemDescription,
+                  collateral: myCollateral,
                   priceStart: startPrice,
                   priceForceStop: forceStopPrice,
                   dateExpire: stopDate,
@@ -409,11 +476,14 @@ const NewPoduct = () => {
                   cid,
                 }
               }
+              isDisabled={
+                (itemName && itemDescription && startPrice && forceStopPrice && stopDate && myCollateral && fileName && thubnailName)
+                 ? false : true
+              }
             />
           ) : !isConnected ? (
             <ConnectBtn isCentered isNeedMarginTop />
-          ) : !isStore && address
-          ? <CreateStore address={address as `0x${string}`} /> : null}
+          ) : null}
         </Box>
       </Box>
     </Flex>
