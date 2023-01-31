@@ -472,6 +472,7 @@ const NewPoduct = () => {
                   priceForceStop: forceStopPrice,
                   dateExpire: stopDate,
                   cid,
+                  collateral: myCollateral
                 }
               }
               isDisabled={!access &&
