@@ -471,7 +471,6 @@ const NewPoduct = () => {
                   priceStart: startPrice,
                   priceForceStop: forceStopPrice,
                   dateExpire: stopDate,
-                  collateral: myCollateral,
                   cid,
                 }
               }
