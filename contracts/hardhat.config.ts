@@ -1,19 +1,16 @@
 // import "hardhat-typechain";
 // import "hardhat-deploy-ethers";
 import "@typechain/hardhat"
-
+import "@nomiclabs/hardhat-waffle"
+// import "@nomicfoundation/hardhat-toolbox"
+import "@nomiclabs/hardhat-etherscan"
 import "hardhat-deploy"
 import "hardhat-deploy-ethers"
-import "@nomiclabs/hardhat-waffle"
-import "@nomicfoundation/hardhat-toolbox"
 import "hardhat-contract-sizer"
-// import "hardhat-deploy";
 import "hardhat-abi-exporter"
 import "hardhat-gas-reporter"
 import "solidity-coverage"
 import * as dotenv from "dotenv"
-
-import "@nomiclabs/hardhat-etherscan"
 
 dotenv.config()
 

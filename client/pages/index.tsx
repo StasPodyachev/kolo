@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { Grid, Heading, Text } from "@chakra-ui/react";
+import { Grid, Heading } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
 import { auctionItems } from "@/constants/shared";
@@ -9,15 +9,14 @@ import { IAuctionItem } from "@/types";
 import { useContractRead } from "wagmi";
 import ABI_FACTORY from "../contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
-import web3 from "web3";
 import { ethers } from "ethers";
 
 const Home: NextPage = () => {
-  const [products, setProducts] = useState<ethers.utils.Result[]>();
-  const [startCount, setStartCount] = useState(0);
-  const [endCount, setEndCount] = useState(5);
-  const [items, setItems] = useState<IAuctionItem[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+  const [ products, setProducts ] = useState();
+  const [ startCount, setStartCount ] = useState(0);
+  const [ endCount, setEndCount ] = useState(5);
+  const [ items, setItems ] = useState<IAuctionItem[]>([]);
+  const [ hasMore, setHasMore ] = useState(true);
 
   useEffect(() => {
     setHasMore(auctionItems.length > items.length ? true : false);
@@ -29,7 +28,7 @@ const Home: NextPage = () => {
     setEndCount(10);
   }, []);
 
-  const { data, isError, isLoading } = useContractRead({
+  const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
     functionName: "getAllDeals",
@@ -42,28 +41,24 @@ const Home: NextPage = () => {
         const result = coder.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
         ], data[index].data);
-        return result;
-        // console.log("item data", item.data);
-        // let itemData = web3?.utils?.hexToBytes(item.data as string);
-        // console.log("item data", itemData);
-        // let dataDecode = web3?.utils?.bytesToHex(itemData);
-        // console.log(dataDecode, "itemData");
-        // function bin2String(array: any) {
-        //   var result = "";
-        //   for (var i = 0; i < array.length; i++) {
-        //     result += String.fromCharCode(parseInt(array[i], 2));
-        //   }
-        //   return result;
-        // }
-
-        // bin2String(["01100110", "01101111", "01101111"]);
-        // console.log(bin2String(item), "binToString");
-
-        // return item;
+        console.log(result, 'result');
+        
+        return {
+          id: 1,
+          title: "Tree planting plan",
+          price: 32,
+          ownedBy: "0x9D21...7a88",
+          saleEndDate: "28 Feb 2023",
+          currentPrice: 300,
+          priceEnd: 1000,
+          description:
+            "File consists info about totaly new idea in DeFi. There are a business plan which could help earn 1B!",
+          status: "active",
+          totalBids: 20
+        };
       });
-      setProducts(decryptedData);
-      // let newCid = web3?.utils?.hexToBytes((data));
-      // console.log(newCid, "data");
+      console.log(decryptedData, 'decryptedData');
+      // setProducts(decryptedData);
     }
   }, [data]);
 

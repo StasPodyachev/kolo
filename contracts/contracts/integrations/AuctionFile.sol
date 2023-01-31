@@ -153,7 +153,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function bid(uint256 dealId) external payable {
-        AuctionFileParams memory deal = deals[dealId];
+        AuctionFileParams storage deal = deals[dealId];
 
         require(deal.priceStart != 0, "AuctionFile: Id not found");
 
@@ -198,13 +198,15 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             string(abi.encodePacked("Bid added by ", deal.buyer))
         );
 
+        emit BidCreated(dealId, deal.buyer, deal.price);
+
         if (currentBid >= deal.priceForceStop) {
             _finalize(deal, IStore(storeAddress));
         }
     }
 
     function cancel(uint256 dealId) external {
-        AuctionFileParams memory deal = deals[dealId];
+        AuctionFileParams storage deal = deals[dealId];
 
         require(deal.priceStart != 0, "AuctionFile: Id not found");
         require(
@@ -224,7 +226,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function dispute(uint256 dealId) external payable {
-        AuctionFileParams memory deal = deals[dealId];
+        AuctionFileParams storage deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
 
         require(deal.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
@@ -253,7 +255,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function finalize(uint256 dealId) external {
-        AuctionFileParams memory deal = deals[dealId];
+        AuctionFileParams storage deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
 
         require(
@@ -285,7 +287,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         _finalize(deal, IStore(storeAddress));
     }
 
-    function _finalize(AuctionFileParams memory deal, IStore store) internal {
+    function _finalize(AuctionFileParams storage deal, IStore store) internal {
         _withdrawBids(deal.id, deal.buyer, store);
         this.addAccsess(deal.id, deal.buyer);
 
@@ -312,7 +314,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
     {
-        AuctionFileParams memory deal = deals[dealId];
+        AuctionFileParams storage deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
 
         require(
@@ -351,7 +353,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function receiveReward(uint256 dealId) external {
-        AuctionFileParams memory deal = deals[dealId];
+        AuctionFileParams storage deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
         require(
             deal.status == AuctionStatus.FINALIZE,
