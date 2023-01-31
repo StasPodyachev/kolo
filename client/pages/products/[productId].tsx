@@ -171,7 +171,7 @@ const Product: NextPage = () => {
             gap={isDesktopHeader[0] ? "56px" : 0}
             justifyContent={isDesktopHeader[0] ? "normal" : "space-between"}
           >
-            <Flex flexDir="column" gap="6px" minW="278px">
+            <Flex flexDir="column" gap="6px" minW="278px" maxH="240px">
               <Heading variant="h4" color="white">
                 {item?.title}
               </Heading>
@@ -221,6 +221,7 @@ const Product: NextPage = () => {
               minW="278px"
               maxW={isItemsInColumn[0] ? "100%" : "278px"}
               gap="34px"
+              maxH="240px"
             >
               <Flex
                 alignSelf="flex-end"
