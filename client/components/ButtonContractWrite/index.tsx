@@ -10,10 +10,11 @@ interface IProps {
   address: any;
   abi: any;
   method: string;
-  parrams: any
+  parrams: any;
+  isDisabled: boolean;
 }
 
-const ButtonContractWrite = ({ title, address, abi, method, parrams }: IProps) => {
+const ButtonContractWrite = ({ title, address, abi, method, parrams, isDisabled }: IProps) => {
   const { name, description, priceStart, priceForceStop, dateExpire, cid, collateral} = parrams
   console.log();
   const date = new Date(dateExpire);
@@ -21,7 +22,7 @@ const ButtonContractWrite = ({ title, address, abi, method, parrams }: IProps) =
   const newPriceStart = BigInt(new BigDecimal(priceStart).mul(BIG_1E18 + "").toFixed(0)) + ""
   const newForceStop = BigInt(new BigDecimal(priceForceStop).mul(BIG_1E18 + "").toFixed(0)) + ""
   const newCollateral = BigInt(new BigDecimal(collateral).mul(BIG_1E18 + "").toFixed(0)) + ""
-  let newCid = web3.utils.asciiToHex(cid)  
+  let newCid = web3.utils.asciiToHex(cid)
   const { config } = usePrepareContractWrite({
     address,
     abi,
@@ -34,20 +35,21 @@ const ButtonContractWrite = ({ title, address, abi, method, parrams }: IProps) =
 
   useEffect(() => {
     console.log(data, 'data');
-    
+
   }, [data])
 
   return isSuccess ? null : isLoading ? (
     <Button textStyle="button">Loading...</Button>
   ) : (
     <Button
-      isDisabled={!write}
+      isDisabled={isDisabled}
       textStyle="button"
       w="100%"
       minH="48px"
       mt="36px"
       bg="blue.primary"
       color="white"
+      borderRadius={0}
       transition="all .3s"
       _hover={{ bg: "blue.active" }}
       onClick={() => write?.()}

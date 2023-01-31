@@ -10,6 +10,8 @@ import {
   Input,
   FormControl,
   FormLabel,
+  FormErrorMessage,
+  Text,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useAccount, useContractRead, usePrepareContractWrite, useContractWrite } from "wagmi";
@@ -138,8 +140,10 @@ const NewPoduct = () => {
   const [myCollateral, setMyCollateral] = useState("1");
   const [stopDate, setStopDate] = useState(getTodaysDate());
   const [cid, setCid] = useState("");
-  const [access, setAcces] = useState(false);
+  const [access, setAcces] = useState(true);
   const [ isStore, setIsStore] = useState(false)
+  const [fileName, setFileName] = useState("");
+  const [thubnailName, setThubnailName] = useState("");
 
   const { data: store } = useContractRead({
     address: addresses[0].address as `0x${string}`,
@@ -174,7 +178,7 @@ const NewPoduct = () => {
     console.log(percentageDone.toFixed(2));
   };
 
-  const deployEncrypted = async (e: any) => {
+  const deployEncrypted = async (e: any, isFile: boolean) => {
     const { publicKey, signedMessage }: any = await encryptionSignature();
     const response = await lighthouse?.uploadEncrypted(
       e,
@@ -187,6 +191,11 @@ const NewPoduct = () => {
     const conditionsId = await lighthouse?.getAccessConditions(
       response?.data?.Hash
     );
+    if (response?.data && isFile) {
+      setFileName(response?.data?.Name);
+    } else {
+      setThubnailName(response?.data.Name);
+    }
     setCid(response?.data?.Hash);
     setAcces(true);
 
@@ -221,6 +230,11 @@ const NewPoduct = () => {
     // accesCondition()
   };
   const { isDesktopHeader, isDesktop } = useDevice();
+  const isItemNameError = itemName === '';
+  const isItemDescriptionError = itemDescription === '';
+  const isStartPriceError = startPrice === '0';
+  const isForceStopPriceError = forceStopPrice === '0';
+  const isDateStopError = stopDate === '';
 
   useEffect(() => {
     console.log(store, 'store');
@@ -250,7 +264,7 @@ const NewPoduct = () => {
             Type of Sale
           </Heading>
           <SaleTypeMenu activeItem={activeItem} setActiveItem={setActiveItem} />
-          <FormControl isRequired>
+          <FormControl isRequired isInvalid={isItemNameError}>
             <CustomFormLabel>
               Name
             </CustomFormLabel>
@@ -264,8 +278,9 @@ const NewPoduct = () => {
               w="100%"
               placeholder="Item name (up to 70 characters)"
             />
+            <FormErrorMessage>Name is required</FormErrorMessage>
           </FormControl>
-          <FormControl isRequired>
+          <FormControl isRequired isInvalid={isItemDescriptionError}>
             <CustomFormLabel>
               Description
             </CustomFormLabel>
@@ -279,6 +294,7 @@ const NewPoduct = () => {
               w="100%"
               placeholder="Description (up to 256 characters)"
             />
+            <FormErrorMessage>Description is required</FormErrorMessage>
           </FormControl>
           <Flex
             w="100%"
@@ -287,7 +303,7 @@ const NewPoduct = () => {
             justifyContent="space-between"
           >
             <Box w={(isDesktop[0] || isDesktopHeader[0]) && activeItem.title !== "SIMPLE TRADES OF FILES" ? "48%" : "100%"}>
-              <FormControl isRequired>
+              <FormControl isRequired isInvalid={isStartPriceError}>
                 <CustomFormLabel>
                   Price Start
                 </CustomFormLabel>
@@ -295,11 +311,12 @@ const NewPoduct = () => {
                   value={startPrice}
                   setValue={setStartPrice}
                   isNeededMarginTop
+                  errorMessage="Price Start is required"
                 />
               </FormControl>
             </Box>
             {activeItem.title !== "SIMPLE TRADES OF FILES" ? (<Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
-              <FormControl isRequired>
+              <FormControl isRequired isInvalid={isForceStopPriceError}>
                 <CustomFormLabel>
                   Price Force Stop
                 </CustomFormLabel>
@@ -307,6 +324,7 @@ const NewPoduct = () => {
                   value={forceStopPrice}
                   setValue={setForceStopPrice}
                   isNeededMarginTop
+                  errorMessage="Price Force Stop is required"
                 />
               </FormControl>
             </Box>) : null}
@@ -317,7 +335,7 @@ const NewPoduct = () => {
             gap={isDesktop[0] ? 0 : "16px"}
           >
             <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
-              <FormControl isRequired>
+              <FormControl isRequired isInvalid={isDateStopError}>
                 <CustomFormLabel>
                   Date Stop Auction
                 </CustomFormLabel>
@@ -326,12 +344,14 @@ const NewPoduct = () => {
                   min={getTodaysDate()}
                   value={stopDate}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                    console.log('date time', typeof event, event)
                     // const start = Date.now() - event.target.value
                     setStopDate(event.target.value);
                   }}
                   px="16px"
                   minW="100%"
                 />
+                <FormErrorMessage>Date Stop Auction is required</FormErrorMessage>
               </FormControl>
             </Box>
             <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
@@ -379,9 +399,20 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
-                    deployEncrypted(e);
+                    console.log('NOW HERE', e)
+                    deployEncrypted(e, true);
                   }}
                 />
+                {fileName ? (
+                  <Text
+                    color="green.primary"
+                    textStyle="mediumText"
+                    textAlign="center"
+                    mt="16px"
+                  >
+                    {fileName}
+                  </Text>
+                ) : null}
               </Box>
               <Box
                 cursor="not-allowed"
@@ -411,9 +442,19 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
-                    // deployEncrypted(e)
+                    // deployEncrypted(e, false)
                   }}
                 />
+                {thubnailName ? (
+                  <Text
+                    color="green.primary"
+                    textStyle="mediumText"
+                    textAlign="center"
+                    mt="16px"
+                  >
+                    {thubnailName}
+                  </Text>
+                ) : null}
               </Box>
             </Flex>
           ) : null}
@@ -427,11 +468,16 @@ const NewPoduct = () => {
                 {
                   name: itemName,
                   description: itemDescription,
+                  collateral: myCollateral,
                   priceStart: startPrice,
                   priceForceStop: forceStopPrice,
                   dateExpire: stopDate,
                   cid,
                 }
+              }
+              isDisabled={
+                (itemName && itemDescription && startPrice && forceStopPrice && stopDate && myCollateral && fileName && thubnailName)
+                 ? false : true
               }
             />
           ) : !isConnected ? (

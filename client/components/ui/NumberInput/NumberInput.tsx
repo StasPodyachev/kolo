@@ -4,6 +4,7 @@ import {
   InputRightElement,
   NumberInputField,
   NumberInput as ChakraNumberInput,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 import { numberWithCommas } from "@/helpers";
 
@@ -14,6 +15,7 @@ interface IProps {
   isNotFullWidth?: boolean;
   minValue?: number;
   isCollateralInput?: boolean;
+  errorMessage?: string;
 }
 
 const NumberInput = ({
@@ -23,9 +25,11 @@ const NumberInput = ({
   isNotFullWidth,
   minValue,
   isCollateralInput,
+  errorMessage,
 }: IProps) => {
   return (
-    <InputGroup
+    <>
+      <InputGroup
       minW={isNotFullWidth ? "278px" : "100%"}
       minH="48px"
       mt={isNeededMarginTop ? "16px" : 0}
@@ -78,6 +82,8 @@ const NumberInput = ({
         </InputRightElement>
       </ChakraNumberInput>
     </InputGroup>
+    <FormErrorMessage>{errorMessage}</FormErrorMessage>
+    </>
   );
 };
 
