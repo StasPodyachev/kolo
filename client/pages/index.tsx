@@ -85,7 +85,7 @@ const Home: NextPage = () => {
         }
       >
         <Grid
-          gap="26px"
+          gap="32px"
           justifyContent="space-around"
           templateColumns="repeat(auto-fill, 304px)"
           templateRows="auto"

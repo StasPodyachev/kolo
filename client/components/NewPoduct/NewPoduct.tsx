@@ -7,8 +7,9 @@ import {
   chakra,
   Flex,
   Heading,
-  useMediaQuery,
   Input,
+  FormControl,
+  FormLabel,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useAccount, useContractRead, usePrepareContractWrite, useContractWrite } from "wagmi";
@@ -43,6 +44,16 @@ const CustomInput = chakra(Input, {
   },
 });
 
+const CustomFormLabel = chakra(FormLabel, {
+  baseStyle: {
+    color: 'gray.200',
+    m: 0,
+    mt: '32px',
+    fontSize: '20px',
+    lineHeight: '28px',
+  }
+});
+
 const CreateStore = ({address} : {address: string}) => {
   const { config } = usePrepareContractWrite({
     address: addresses[0].address as `0x${string}`,
@@ -53,17 +64,18 @@ const CreateStore = ({address} : {address: string}) => {
   return (
     <Button
       mt={10}
-      w="50%"
+      minH="48px"
+      w="100%"
       bg="blue.primary"
       color="white"
       textStyle="button"
-      borderRadius="md"
+      borderRadius={0}
       transition="all .3s"
       _hover={{ bg: "blue.hover" }}
       onClick={() => create?.()}
     >
       Create Store
-    </Button> 
+    </Button>
   )
 }
 
@@ -231,98 +243,110 @@ const NewPoduct = () => {
           setValue={setMyCollateral}
           myCollateral={myCollateral}
         />
-        <Box mt="10px" minW="100%">
-          <Heading variant="h6" color="gray.200" mt="16px">
-            Name
-          </Heading>
-          <CustomInput
-            minW="100%"
-            maxLength={70}
-            value={itemName}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              setItemName(event?.target?.value)
-            }
-            w="100%"
-            placeholder="Item name (up to 70 characters)"
-          />
-          <Heading variant="h6" color="gray.200" mt="16px">
-            Description
-          </Heading>
-          <CustomInput
-            minW="100%"
-            maxLength={256}
-            value={itemDescription}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              setItemDescription(event.target.value)
-            }
-            w="100%"
-            placeholder="Description (up to 256 characters)"
-          />
-          <Heading variant="h6" color="gray.200" mt="16px">
+        {!isStore && address
+          ? <CreateStore address={address as `0x${string}`} /> : null}
+        <Box minW="100%">
+          <Heading variant="h6" color="gray.200" mt="32px">
             Type of Sale
           </Heading>
           <SaleTypeMenu activeItem={activeItem} setActiveItem={setActiveItem} />
+          <FormControl isRequired>
+            <CustomFormLabel>
+              Name
+            </CustomFormLabel>
+            <CustomInput
+              minW="100%"
+              maxLength={70}
+              value={itemName}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setItemName(event?.target?.value)
+              }
+              w="100%"
+              placeholder="Item name (up to 70 characters)"
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <CustomFormLabel>
+              Description
+            </CustomFormLabel>
+            <CustomInput
+              minW="100%"
+              maxLength={256}
+              value={itemDescription}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setItemDescription(event.target.value)
+              }
+              w="100%"
+              placeholder="Description (up to 256 characters)"
+            />
+          </FormControl>
           <Flex
             w="100%"
             flexDir={isDesktop[0] ? "row" : "column"}
             gap={isDesktop[0] ? 0 : "16px"}
             justifyContent="space-between"
-            mt="32px"
           >
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
-              <Heading variant="h6" color="gray.200">
-                Price Start
-              </Heading>
-              <NumberInput
-                value={startPrice}
-                setValue={setStartPrice}
-                isNeededMarginTop
-              />
+            <Box w={(isDesktop[0] || isDesktopHeader[0]) && activeItem.title !== "SIMPLE TRADES OF FILES" ? "48%" : "100%"}>
+              <FormControl isRequired>
+                <CustomFormLabel>
+                  Price Start
+                </CustomFormLabel>
+                <NumberInput
+                  value={startPrice}
+                  setValue={setStartPrice}
+                  isNeededMarginTop
+                />
+              </FormControl>
             </Box>
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
-              <Heading variant="h6" color="gray.200">
-                Price Force Stop
-              </Heading>
-              <NumberInput
-                value={forceStopPrice}
-                setValue={setForceStopPrice}
-                isNeededMarginTop
-              />
-            </Box>
+            {activeItem.title !== "SIMPLE TRADES OF FILES" ? (<Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+              <FormControl isRequired>
+                <CustomFormLabel>
+                  Price Force Stop
+                </CustomFormLabel>
+                <NumberInput
+                  value={forceStopPrice}
+                  setValue={setForceStopPrice}
+                  isNeededMarginTop
+                />
+              </FormControl>
+            </Box>) : null}
           </Flex>
           <Flex
             justifyContent="space-between"
-            mt="16px"
             flexDir={isDesktop[0] ? "row" : "column"}
             gap={isDesktop[0] ? 0 : "16px"}
           >
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
-              <Heading variant="h6" color="gray.200">
-                Date Stop Auction
-              </Heading>
-              <CustomInput
-                type="datetime-local"
-                min={getTodaysDate()}
-                value={stopDate}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  // const start = Date.now() - event.target.value
-                  setStopDate(event.target.value);
-                }}
-                px="16px"
-                minW="100%"
-              />
+            <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+              <FormControl isRequired>
+                <CustomFormLabel>
+                  Date Stop Auction
+                </CustomFormLabel>
+                <CustomInput
+                  type="datetime-local"
+                  min={getTodaysDate()}
+                  value={stopDate}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                    // const start = Date.now() - event.target.value
+                    setStopDate(event.target.value);
+                  }}
+                  px="16px"
+                  minW="100%"
+                />
+              </FormControl>
             </Box>
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
-              <Heading variant="h6" color="gray.200">
-                My Collateral
-              </Heading>
-              <NumberInput
-                value={myCollateral}
-                setValue={setMyCollateral}
-                isNeededMarginTop
-                minValue={+startPrice.split(",").join("") * 0.1}
-                isCollateralInput
-              />
+            <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+              <FormControl isRequired>
+                <CustomFormLabel>
+                  My Collateral
+                </CustomFormLabel>
+                <NumberInput
+                  value={myCollateral}
+                  setValue={setMyCollateral}
+                  isNeededMarginTop
+                  minValue={+startPrice.split(",").join("") * 0.1}
+                  isCollateralInput
+                />
+              </FormControl>
             </Box>
           </Flex>
           {isConnected ? (
@@ -330,7 +354,7 @@ const NewPoduct = () => {
               justify="space-between"
               flexDir={isDesktop[0] ? "row" : "column"}
             >
-              <Box w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}>
+              <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
                 <label
                   style={{
                     display: "flex",
@@ -361,7 +385,7 @@ const NewPoduct = () => {
               </Box>
               <Box
                 cursor="not-allowed"
-                w={isDesktop[0] || isDesktopHeader[0] ? "45%" : "100%"}
+                w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}
               >
                 <label
                   style={{
@@ -412,8 +436,7 @@ const NewPoduct = () => {
             />
           ) : !isConnected ? (
             <ConnectBtn isCentered isNeedMarginTop />
-          ) : !isStore && address
-          ? <CreateStore address={address as `0x${string}`} /> : null}
+          ) : null}
         </Box>
       </Box>
     </Flex>
