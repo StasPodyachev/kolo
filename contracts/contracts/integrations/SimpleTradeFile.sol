@@ -143,7 +143,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     }
 
     function buy(uint256 dealId) external payable {
-        SimpleTradeFileParams memory deal = deals[dealId];
+        SimpleTradeFileParams storage deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
 
         require(
@@ -179,7 +179,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     }
 
     function cancel(uint256 dealId) external {
-        SimpleTradeFileParams memory deal = deals[dealId];
+        SimpleTradeFileParams storage deal = deals[dealId];
 
         require(deal.price != 0, "SimpleTradeFile: Id not found");
         require(
@@ -199,7 +199,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     }
 
     function dispute(uint256 dealId) external payable {
-        SimpleTradeFileParams memory deal = deals[dealId];
+        SimpleTradeFileParams storage deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
 
         require(
@@ -234,7 +234,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
     {
-        SimpleTradeFileParams memory deal = deals[dealId];
+        SimpleTradeFileParams storage deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
 
         require(
@@ -273,7 +273,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     }
 
     function finalize(uint256 dealId) external {
-        SimpleTradeFileParams memory deal = deals[dealId];
+        SimpleTradeFileParams storage deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
 
         require(

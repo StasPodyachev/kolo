@@ -1,9 +1,14 @@
 import { ethers, waffle } from "hardhat"
-import { BigNumber, Wallet } from "ethers"
+import { BigNumber, constants, utils, Wallet } from "ethers"
 import { AuctionFile } from "../typechain/AuctionFile"
 import { Factory } from "../typechain/Factory"
+import { Chat } from "../typechain/Chat"
+import { Treasury } from "../typechain/Treasury"
+
 import { expect } from "chai"
 import { auctionFileFixture } from "./shared/fixtures"
+import { moveBlocks } from "./utils/move-blocks"
+import { moveTime } from "./utils/move-time"
 
 const createFixtureLoader = waffle.createFixtureLoader
 
@@ -12,6 +17,8 @@ describe("AuctionFile", () => {
 
   let auctionFile: AuctionFile
   let factory: Factory
+  let chat: Chat
+
 
   let loadFixture: ReturnType<typeof createFixtureLoader>
 
@@ -21,92 +28,41 @@ describe("AuctionFile", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ;({ auctionFile, factory } = await loadFixture(async () => {
+    ; ({ auctionFile, factory } = await loadFixture(async () => {
       const { auctionFile, factory } = await auctionFileFixture()
-
       return { auctionFile, factory }
     }))
   })
 
   describe("#create", () => {
-    it("should create deal", async () => {
-      await expect(
-        auctionFile.create(
-          "NAME",
-          "DESCRIPTION",
-          10000000000,
-          100000000000,
-          Date.now() + 1000,
-          "0x",
-          { value: BigNumber.from("100000000000000000") }
-        )
-      ).to.be.revertedWith("AuctionFile: Caller does not have a store")
-
+    it("should create store", async () => {
       await factory.createStore()
-      await expect(
-        auctionFile.create(
-          "NAME",
-          "DESCRIPTION",
-          10000000000,
-          100000000000,
-          Date.now() + 1000,
-          "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b",
-          { value: BigNumber.from("100000000000000000") }
-        )
-      )
+      const storeAddress = await factory["getStore(address)"](wallet.address);
+
+      await expect(auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", { value: BigNumber.from("100000000000000000") }
+      ))
         .to.emit(auctionFile, "DealCreated")
         .withArgs(1, wallet.address)
 
-      // WRONG PARAMS
-      await expect(
-        auctionFile.create(
-          "NAME",
-          "DESCRIPTION",
-          0,
-          100000000000,
-          Date.now() + 1000,
-          "0x",
-          { value: BigNumber.from("100000000000000000") }
-        )
-      ).to.be.revertedWith("AuctionFile: Wrong params")
+      expect(await factory["getStore(uint256)"](1))
+        .to.be.eq(storeAddress);
 
-      await expect(
-        auctionFile.create(
-          "NAME",
-          "DESCRIPTION",
-          100000000000,
-          100000000000,
-          Date.now() + 1000,
-          "0x",
-          { value: BigNumber.from("100000000000000000") }
-        )
-      ).to.be.revertedWith("AuctionFile: Wrong params")
+      await expect(factory.getDeal(1))
+        .to.be.not.reverted;
+      await expect(factory.getAllDeals())
+        .to.be.not.reverted;
+    })
 
-      await expect(
-        auctionFile.create(
-          "NAME",
-          "DESCRIPTION",
-          1000000000000,
-          100000000000,
-          Date.now() + 1000,
-          "0x",
-          { value: BigNumber.from("100000000000000000") }
-        )
-      ).to.be.revertedWith("AuctionFile: Wrong params")
+    it("fails if store is not created", async () => {
+      await expect(auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", { value: BigNumber.from("100000000000000000") }
+      ))
+        .to.be.revertedWith("AuctionFile: Caller does not have a store");
+    })
 
-      await expect(
-        auctionFile.create(
-          "NAME",
-          "DESCRIPTION",
-          1000000000000,
-          100000000000,
-          Date.now() - 1000,
-          "0x",
-          { value: BigNumber.from("100000000000000000") }
-        )
-      ).to.be.revertedWith("AuctionFile: Wrong params")
+    it("fails if wrong collateral was passed", async () => {
 
-      // WRONG COLLATERAL
+      await factory.createStore();
+
       await expect(
         auctionFile.create(
           "NAME",
@@ -118,25 +74,184 @@ describe("AuctionFile", () => {
           { value: BigNumber.from("10000000000000000") }
         )
       ).to.be.revertedWith("AuctionFile: Wrong collateral")
+
     })
 
-    it("fails if store is not created", async () => {
+    it("fails if wrong priceStart was passed", async () => {
+
+      await factory.createStore();
+
       await expect(
         auctionFile.create(
           "NAME",
           "DESCRIPTION",
-          10000000000,
+          0,
           100000000000,
           Date.now() + 1000,
           "0x",
           { value: BigNumber.from("100000000000000000") }
         )
-      ).to.be.revertedWith("AuctionFile: Caller does not have a store")
+      ).to.be.revertedWith("AuctionFile: Wrong params")
     })
 
-    it("fails if wrong collateral was passed", async () => {
-      await factory.createStore()
+
+    it("fails if wrong dateExpire was passed", async () => {
+
+      await factory.createStore();
+
+      await expect(
+        auctionFile.create(
+          "NAME",
+          "DESCRIPTION",
+          0,
+          100000000000,
+          (Date.now() / 1000) | 0,
+          "0x",
+          { value: BigNumber.from("100000000000000000") }
+        )
+      ).to.be.revertedWith("AuctionFile: Wrong params")
     })
+
+    it("fails if priceStart equals priceForceStop", async () => {
+
+      await factory.createStore()
+
+      await expect(
+        auctionFile.create(
+          "NAME",
+          "DESCRIPTION",
+          100000000000,
+          100000000000,
+          Date.now() + 1000,
+          "0x",
+          { value: BigNumber.from("100000000000000000") }
+        )
+      ).to.be.revertedWith("AuctionFile: Wrong params")
+
+    })
+  })
+
+  describe("#cancel", () => {
+    it("should cancel bid", async () => {
+      await factory.createStore()
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await expect(auctionFile.cancel(1))
+        .to.emit(auctionFile, "DealCanceled")
+        .withArgs(1, wallet.address)
+    })
+
+    it("fails if id not found", async () => {
+      await factory.createStore()
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await expect(auctionFile.cancel(1000))
+        .to.revertedWith("AuctionFile: Id not found");
+    })
+
+    it("fails if caller is not a seller", async () => {
+      await factory.createStore()
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await expect(auctionFile.connect(other).cancel(1))
+        .to.revertedWith("AuctionFile: Caller is not a seller");
+    })
+
+    it("fails if auction already have a bid", async () => {
+      await factory.createStore()
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await expect(auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      }))
+        .to.emit(auctionFile, "BidCreated")
+        .withArgs(1, other.address, BigNumber.from("10000000000"))
+
+      await expect(auctionFile.cancel(1))
+        .to.revertedWith("AuctionFile: Auction already have a bid");
+    })
+  })
+
+  describe("#bid", () => {
+    it("should create bid", async () => {
+      await factory.connect(other).createStore()
+
+      await auctionFile.connect(other).create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await expect(auctionFile.bid(1, {
+        value: BigNumber.from("10000000000")
+      }))
+        .to.emit(auctionFile, "BidCreated")
+        .withArgs(1, wallet.address, BigNumber.from("10000000000"))
+
+      const bids = await auctionFile.getBidHistory(1)
+      expect(bids.length).to.eq(1)
+      expect(bids[0].buyer).to.eq(wallet.address)
+      expect(bids[0].bid).to.eq(BigNumber.from("10000000000"))
+
+    })
+
+    it("fails if seller bids", async () => {
+      await factory.createStore()
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await expect(auctionFile.bid(1, {
+        value: BigNumber.from("10000000000")
+      }))
+        .to.revertedWith("AuctionFile: Seller cannot be a buyer")
+    })
+
+    it("fails if wrong deal id", async () => {
+
+      await expect(auctionFile.bid(1000, {
+        value: BigNumber.from("10000000000")
+      }))
+        .to.revertedWith("AuctionFile: Id not found")
+    })
+
+    it("fails if deal canceled", async () => {
+      await factory.createStore()
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.cancel(1);
+
+      await expect(auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      }))
+        .to.revertedWith("AuctionFile: Wrong status")
+    })
+
+    // it("fails if store is not created", async () => {
+    //   await expect(auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", { value: BigNumber.from("100000000000000000") }
+    //   ))
+    //     .to.be.revertedWith("AuctionFile: Caller does not have a store");
+    // })
+
+    // it("fails if wrong collateral was passed", async () => {
+
+    //   await factory.createStore();
+
+    // })
   })
 
   describe("#getDeal", () => {

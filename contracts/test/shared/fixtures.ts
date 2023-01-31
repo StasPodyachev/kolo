@@ -71,6 +71,7 @@ export async function treasuryFixture(): Promise<TreasuryFixture> {
 }
 
 export async function chatFixture(): Promise<ChatFixture> {
+
   const factory = await ethers.getContractFactory("Chat")
   const chat = (await factory.deploy()) as Chat
 
