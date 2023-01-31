@@ -9,10 +9,10 @@ import { IAuctionItem } from "@/types";
 import { useContractRead } from "wagmi";
 import ABI_FACTORY from "../contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 const Home: NextPage = () => {
-  const [ products, setProducts ] = useState();
+  const [ products, setProducts ] = useState<IAuctionItem[]>();
   const [ startCount, setStartCount ] = useState(0);
   const [ endCount, setEndCount ] = useState(5);
   const [ items, setItems ] = useState<IAuctionItem[]>([]);
@@ -40,15 +40,33 @@ const Home: NextPage = () => {
         const coder = ethers.utils.defaultAbiCoder;
         const result = coder.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
-        ], data[index].data);
-        console.log(result, 'result');
+        ], item.data);
+        const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
+        const title = result[0][1]
+        const ownedBy = result[0][7]
+        const saleEndDateNew = result[0][9]
+        const price = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         
+
+        // Create a new JavaScript Date object based on the timestamp
+        // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+        let dateYear = new Date(saleEndDateNew * 1);
+        let date = new Date(saleEndDateNew * 1000);
+        const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        // Hours part from the timestamp
+        let month = monthList[date.getMonth()];
+        // Minutes part from the timestamp
+        let days = date.getDay();
+        let year =  dateYear.getFullYear();
+        // Will display time in 10:30:23 format
+        let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
+
         return {
-          id: 1,
-          title: "Tree planting plan",
-          price: 32,
-          ownedBy: "0x9D21...7a88",
-          saleEndDate: "28 Feb 2023",
+          id,
+          title,
+          price,
+          ownedBy,
+          saleEndDate,
           currentPrice: 300,
           priceEnd: 1000,
           description:
@@ -58,7 +76,7 @@ const Home: NextPage = () => {
         };
       });
       console.log(decryptedData, 'decryptedData');
-      // setProducts(decryptedData);
+      setItems(decryptedData);
     }
   }, [data]);
 
