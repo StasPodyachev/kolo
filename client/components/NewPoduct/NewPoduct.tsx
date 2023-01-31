@@ -140,7 +140,7 @@ const NewPoduct = () => {
   const [myCollateral, setMyCollateral] = useState("1");
   const [stopDate, setStopDate] = useState(getTodaysDate());
   const [cid, setCid] = useState("");
-  const [access, setAcces] = useState(true);
+  const [access, setAcces] = useState(false);
   const [ isStore, setIsStore] = useState(false)
   const [fileName, setFileName] = useState("");
   const [thubnailName, setThubnailName] = useState("");
@@ -264,7 +264,7 @@ const NewPoduct = () => {
             Type of Sale
           </Heading>
           <SaleTypeMenu activeItem={activeItem} setActiveItem={setActiveItem} />
-          <FormControl isRequired isInvalid={isItemNameError}>
+          <FormControl isRequired isInvalid={(isItemNameError && access)}>
             <CustomFormLabel>
               Name
             </CustomFormLabel>
@@ -280,7 +280,7 @@ const NewPoduct = () => {
             />
             <FormErrorMessage>Name is required</FormErrorMessage>
           </FormControl>
-          <FormControl isRequired isInvalid={isItemDescriptionError}>
+          <FormControl isRequired isInvalid={(isItemDescriptionError && access)}>
             <CustomFormLabel>
               Description
             </CustomFormLabel>
@@ -303,7 +303,7 @@ const NewPoduct = () => {
             justifyContent="space-between"
           >
             <Box w={(isDesktop[0] || isDesktopHeader[0]) && activeItem.title !== "SIMPLE TRADES OF FILES" ? "48%" : "100%"}>
-              <FormControl isRequired isInvalid={isStartPriceError}>
+              <FormControl isRequired isInvalid={(isStartPriceError && access)}>
                 <CustomFormLabel>
                   Price Start
                 </CustomFormLabel>
@@ -316,7 +316,7 @@ const NewPoduct = () => {
               </FormControl>
             </Box>
             {activeItem.title !== "SIMPLE TRADES OF FILES" ? (<Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
-              <FormControl isRequired isInvalid={isForceStopPriceError}>
+              <FormControl isRequired isInvalid={(isForceStopPriceError && access)}>
                 <CustomFormLabel>
                   Price Force Stop
                 </CustomFormLabel>
@@ -335,7 +335,7 @@ const NewPoduct = () => {
             gap={isDesktop[0] ? 0 : "16px"}
           >
             <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
-              <FormControl isRequired isInvalid={isDateStopError}>
+              <FormControl isRequired isInvalid={(isDateStopError && access)}>
                 <CustomFormLabel>
                   Date Stop Auction
                 </CustomFormLabel>
@@ -468,7 +468,6 @@ const NewPoduct = () => {
                 {
                   name: itemName,
                   description: itemDescription,
-                  collateral: myCollateral,
                   priceStart: startPrice,
                   priceForceStop: forceStopPrice,
                   dateExpire: stopDate,
@@ -476,10 +475,9 @@ const NewPoduct = () => {
                   cid,
                 }
               }
-              isDisabled={
-                (itemName && itemDescription && startPrice && forceStopPrice && stopDate && myCollateral && fileName && thubnailName)
-                 ? false : true
-              }
+              isDisabled={!access &&
+                (itemName && itemDescription && startPrice && forceStopPrice && stopDate && myCollateral && fileName
+                  ? false : true)}
             />
           ) : !isConnected ? (
             <ConnectBtn isCentered isNeedMarginTop />
