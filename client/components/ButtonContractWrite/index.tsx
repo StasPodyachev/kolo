@@ -39,7 +39,6 @@ const ButtonContractWrite = ({ title, address, abi, method, parrams, isDisabled 
 
   useEffect(() => {
     console.log(data, 'data');
-
   }, [data])
 
   return isSuccess ? null : isLoading ? (

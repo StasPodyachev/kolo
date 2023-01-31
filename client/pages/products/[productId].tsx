@@ -21,9 +21,10 @@ import Tooltip from "@/components/ui/Tooltip";
 import useDevice from "@/hooks/useDevice";
 
 import ABI_FACTORY from "@/contracts/abi/Factory.json";
+import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import addresses from "@/contracts/addresses";
 import { useEffect } from "react";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 const Product: NextPage = () => {
   const { isConnected } = useAccount();
@@ -40,18 +41,57 @@ const Product: NextPage = () => {
     functionName: `getDeal`,
     args: [router?.query?.productId],
   });
+
+  const totalBids = useContractRead({
+    address: addresses[1].address as `0x${string}`,
+    abi: ABI_AUCTION_FILE,
+    functionName: `getBidHistory`,
+    args: [router?.query?.productId],
+  });
+
+  console.log('total', totalBids?.data)
   useEffect(() => {
-    console.log('data here', data, typeof data);
-    // console.log('data there', data.data)
-    // console.log('data 1231231', data[0].data)
-    // console.log('data is Array', Array.isArray(data));
-    if (typeof data === 'object') {
-      const coder = ethers.utils.defaultAbiCoder;
-      const result = coder.decode([
-        "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
-      ], data?.data);
-      console.log(result[0], 'result');
-    }
+    const decryptedData = () => {
+      if (typeof data === 'object') {
+        const coder = ethers.utils.defaultAbiCoder;
+        const result = coder.decode([
+          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
+        ], data?.data);
+        console.log(result[0], 'result');
+        const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
+        const title = result[0][1]
+        const description = result[0][2]
+        const ownedBy = result[0][7]
+        const saleEndDateNew = result[0][9]
+        const price = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+
+        // Create a new JavaScript Date object based on the timestamp
+        // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+        let dateYear = new Date(saleEndDateNew * 1);
+        let date = new Date(saleEndDateNew * 1000);
+        const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        // Hours part from the timestamp
+        let month = monthList[date.getMonth()];
+        // Minutes part from the timestamp
+        let days = date.getDay();
+        let year =  dateYear.getFullYear();
+        // Will display time in 10:30:23 format
+        let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
+
+        return {
+          id,
+          title,
+          description,
+          ownedBy,
+          saleEndDate,
+          currentPrice: 300,
+          priceEnd: 1000,
+          status: "active",
+          totalBids: totalBids.data,
+        }
+      }
+    };
+    console.log('decrypted', decryptedData())
   }, [data]);
   return (
     <Layout pageTitle="Item">
