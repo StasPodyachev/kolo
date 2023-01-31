@@ -16,83 +16,103 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import BidsTable from "@/components/Products/BidsTable";
 import AddressCopy from "@/components/ui/AddressCopy";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount } from "wagmi";
+import { readContract } from '@wagmi/core'
 import Tooltip from "@/components/ui/Tooltip";
 import useDevice from "@/hooks/useDevice";
 
-import ABI_FACTORY from "@/contracts/abi/Factory.json";
+import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import addresses from "@/contracts/addresses";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BigNumber, ethers } from "ethers";
+import { IAuctionItem } from "@/types";
+import { BIG_1E18 } from "@/helpers/misc";
 
 const Product: NextPage = () => {
+  const [item, setItem] = useState<IAuctionItem>({} as IAuctionItem);
+  const [formattedId, setFormattedId] = useState("");
+  const [fetchedData, setFetchedData] = useState<unknown>();
+  const [bidsAmount, setBidsAmount] = useState<unknown>();
   const { isConnected } = useAccount();
   const router = useRouter();
-  const productItem = auctionItems.find(
-    (item) => item.id.toString() === router.query.productId
-  );
   const { isDesktopHeader } = useDevice();
   const isItemsInColumn = useMediaQuery("(max-width: 899px)");
 
-  const { data } = useContractRead({
-    address: addresses[0].address as `0x${string}`,
-    abi: ABI_FACTORY,
-    functionName: `getDeal`,
-    args: [router?.query?.productId],
-  });
-
-  const totalBids = useContractRead({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: `getBidHistory`,
-    args: [router?.query?.productId],
-  });
-
-  console.log('total', totalBids?.data)
   useEffect(() => {
-    const decryptedData = () => {
-      if (typeof data === 'object') {
-        const coder = ethers.utils.defaultAbiCoder;
-        const result = coder.decode([
-          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
-        ], data?.data);
-        console.log(result[0], 'result');
-        const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
-        const title = result[0][1]
-        const description = result[0][2]
-        const ownedBy = result[0][7]
-        const saleEndDateNew = result[0][9]
-        const price = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+    if (router.isReady) {
+      const productId = Number(router?.query?.productId);
+      const numberId = productId.toFixed(18);
+      const bigIntId = BigInt(new BigDecimal(numberId).mul(BIG_1E18 + "").toFixed(0)) + "";
+      setFormattedId(bigIntId);
 
-        // Create a new JavaScript Date object based on the timestamp
-        // multiplied by 1000 so that the argument is in milliseconds, not seconds.
-        let dateYear = new Date(saleEndDateNew * 1);
-        let date = new Date(saleEndDateNew * 1000);
-        const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        // Hours part from the timestamp
-        let month = monthList[date.getMonth()];
-        // Minutes part from the timestamp
-        let days = date.getDay();
-        let year =  dateYear.getFullYear();
-        // Will display time in 10:30:23 format
-        let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
-
-        return {
-          id,
-          title,
-          description,
-          ownedBy,
-          saleEndDate,
-          currentPrice: 300,
-          priceEnd: 1000,
-          status: "active",
-          totalBids: totalBids.data,
+      const fetchData = async () => {
+        if (formattedId) {
+          const data = await readContract({
+            address: addresses[1].address as `0x${string}`,
+            abi: ABI_AUCTION_FILE,
+            functionName: `getDeal`,
+            args: [ formattedId ],
+          })
+          setFetchedData(data);
+          const totalBids = await readContract({
+            address: addresses[1].address as `0x${string}`,
+            abi: ABI_AUCTION_FILE,
+            functionName: `getBidHistory`,
+            args: [ formattedId ],
+          })
+          setBidsAmount(totalBids);
         }
       }
-    };
-    console.log('decrypted', decryptedData())
-  }, [data]);
+      fetchData();
+    }
+  }, [router.isReady, router?.query?.productId, formattedId])
+
+  useEffect(() => {
+    if (fetchedData && typeof fetchedData === 'object') {
+      const coder = ethers.utils.defaultAbiCoder;
+      const result = coder.decode([
+        "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
+        // @ts-ignore
+      ], fetchedData?.data);
+      const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
+      const title = result[0][1];
+      const description = result[0][2]
+      const ownedBy = result[0][7]
+      const saleEndDateNew = result[0][9]
+      const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
+      const startPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+      const endPrice = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
+      const status = ethers.utils.formatEther(BigNumber?.from(result[0][11]));
+
+      // Create a new JavaScript Date object based on the timestamp
+      // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+      let dateYear = new Date(saleEndDateNew * 1);
+      let date = new Date(saleEndDateNew * 1000);
+      const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      // Hours part from the timestamp
+      let month = monthList[date.getMonth()];
+      // Minutes part from the timestamp
+      let days = date.getDay();
+      let year =  dateYear.getFullYear();
+      // Will display time in 10:30:23 format
+      let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
+
+      const decryptedData = {
+        id,
+        title,
+        currentPrice: price < startPrice ? startPrice : price,
+        ownedBy,
+        saleEndDate,
+        price: startPrice,
+        priceEnd: endPrice,
+        description,
+        status,
+        totalBids: 20,
+      }
+      setItem(decryptedData)
+    }
+  }, [fetchedData]);
   return (
     <Layout pageTitle="Item">
       <Flex flexDir="column">
@@ -104,9 +124,9 @@ const Product: NextPage = () => {
             flexDir="column"
             alignItems={isDesktopHeader[0] ? "normal" : "center"}
           >
-            {productItem?.image ? (
+            {item?.image ? (
               <Image
-                src={productItem.image}
+                src={item?.image}
                 alt="card image"
                 width={336}
                 height={240}
@@ -133,7 +153,7 @@ const Product: NextPage = () => {
                   Sale ends
                 </Text>
                 <Text textStyle="smallText" color="gray.300">
-                  {productItem?.saleEndDate}
+                  {item?.saleEndDate}
                 </Text>
               </Flex>
             </Flex>
@@ -153,20 +173,20 @@ const Product: NextPage = () => {
           >
             <Flex flexDir="column" gap="6px" minW="278px">
               <Heading variant="h4" color="white">
-                {productItem?.title}
+                {item?.title}
               </Heading>
               <HStack spacing="16px">
                 <Text textStyle="mediumText" color="gray.500">
                   Owned by:
                 </Text>
-                <AddressCopy address={productItem?.ownedBy!} color="gray.500" />
+                <AddressCopy address={item?.ownedBy!} color="gray.500" />
               </HStack>
               <Flex justifyContent="space-between" mt="6px">
                 <Heading variant="h6" color="gray.200">
                   Current price
                 </Heading>
                 <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
-                  {productItem?.currentPrice}&nbsp;FIL
+                  {item?.currentPrice}&nbsp;FIL
                 </Heading>
               </Flex>
               <Flex justifyContent="space-between" mt="6px">
@@ -174,7 +194,7 @@ const Product: NextPage = () => {
                   Price end
                 </Heading>
                 <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
-                  {productItem?.priceEnd}&nbsp;FIL
+                  {item?.priceEnd}&nbsp;FIL
                 </Heading>
               </Flex>
               <Tooltip
@@ -213,7 +233,7 @@ const Product: NextPage = () => {
                   boxSize="10px"
                   borderRadius="50%"
                   bg={
-                    productItem?.status === "active"
+                    item?.status === "active"
                       ? "green.active"
                       : "red.active"
                   }
@@ -223,11 +243,11 @@ const Product: NextPage = () => {
                   color="white"
                   textTransform="capitalize"
                 >
-                  {productItem?.status}
+                  {item?.status}
                 </Text>
               </Flex>
               <Text textStyle="smallText" color="gray.300">
-                {productItem?.description}
+                {item?.description}
               </Text>
               <Tooltip
                 label="Connect wallet to buy"
@@ -262,7 +282,7 @@ const Product: NextPage = () => {
               <Flex alignItems="center">
                 <UserIcon width="21px" height="20px" />
                 <Heading variant="h6" color="white">
-                  {productItem?.totalBids}
+                  {item?.totalBids}
                 </Heading>
               </Flex>
             </Flex>
@@ -276,7 +296,7 @@ const Product: NextPage = () => {
             bg="gray.800"
             p="32px 24px"
           >
-            <AddressCopy address={productItem?.ownedBy!} color="gray.50" />
+            <AddressCopy address={item?.ownedBy!} color="gray.50" />
             <Text textStyle="smallText" color="gray.400">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras
               pulvinar commodo lacus eu dapibus. Aliquam vestibulum, lectus at

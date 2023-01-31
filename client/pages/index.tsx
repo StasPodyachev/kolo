@@ -14,7 +14,7 @@ import { BigNumber, ethers } from "ethers";
 const Home: NextPage = () => {
   const [ startCount, setStartCount ] = useState(0);
   const [ endCount, setEndCount ] = useState(5);
-  const [ items, setItems ] = useState<IAuctionItem[]>([]);
+  const [ items, setItems ] = useState<IAuctionItem[] | []>([]);
   const [ hasMore, setHasMore ] = useState(true);
 
   useEffect(() => {
@@ -22,7 +22,6 @@ const Home: NextPage = () => {
   }, [items]);
 
   useEffect(() => {
-    setItems(auctionItems.slice(0, 5));
     setStartCount(5);
     setEndCount(10);
   }, []);
@@ -43,13 +42,13 @@ const Home: NextPage = () => {
         const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
         const title = result[0][1]
         const description = result[0][2]
-        const price = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+        const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
         const ownedBy = result[0][7]
         const saleEndDateNew = result[0][9]
-        const currentPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+        const startPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+        const endPrice = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const status = ethers.utils.formatEther(BigNumber?.from(result[0][11]));
-        console.log(status, 'status');
-        
+
         let dateYear = new Date(saleEndDateNew * 1)
         let date = new Date(saleEndDateNew * 1000)
         const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -61,11 +60,11 @@ const Home: NextPage = () => {
         return {
           id,
           title,
-          price,
+          currentPrice: price,
           ownedBy,
           saleEndDate,
-          currentPrice,
-          priceEnd: 1000,
+          price: startPrice,
+          priceEnd: endPrice,
           description,
           status,
           totalBids: 20
@@ -103,7 +102,7 @@ const Home: NextPage = () => {
               key={auctionItem.id}
               to={auctionItem.id}
               title={auctionItem.title}
-              price={auctionItem.price}
+              price={auctionItem.priceEnd}
               ownedBy={auctionItem.ownedBy}
               saleEndDate={auctionItem.saleEndDate}
             />
