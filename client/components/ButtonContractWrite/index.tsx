@@ -15,12 +15,16 @@ interface IProps {
 
 const ButtonContractWrite = ({ title, address, abi, method, parrams }: IProps) => {
   const { name, description, priceStart, priceForceStop, dateExpire, cid, collateral} = parrams
-  console.log();
+  console.log({
+    name, description, priceStart, priceForceStop, dateExpire, cid, collateral
+  });
   const date = new Date(dateExpire);
   const newDateExpire = date.getTime();
   const newPriceStart = BigInt(new BigDecimal(priceStart).mul(BIG_1E18 + "").toFixed(0)) + ""
   const newForceStop = BigInt(new BigDecimal(priceForceStop).mul(BIG_1E18 + "").toFixed(0)) + ""
   const newCollateral = BigInt(new BigDecimal(collateral).mul(BIG_1E18 + "").toFixed(0)) + ""
+  // console.log();
+  
   let newCid = web3.utils.asciiToHex(cid)  
   const { config } = usePrepareContractWrite({
     address,
