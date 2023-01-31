@@ -16,9 +16,14 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import BidsTable from "@/components/Products/BidsTable";
 import AddressCopy from "@/components/ui/AddressCopy";
-import { useAccount } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import Tooltip from "@/components/ui/Tooltip";
 import useDevice from "@/hooks/useDevice";
+
+import ABI_FACTORY from "@/contracts/abi/Factory.json";
+import addresses from "@/contracts/addresses";
+import { useEffect } from "react";
+import { ethers } from "ethers";
 
 const Product: NextPage = () => {
   const { isConnected } = useAccount();
@@ -28,6 +33,26 @@ const Product: NextPage = () => {
   );
   const { isDesktopHeader } = useDevice();
   const isItemsInColumn = useMediaQuery("(max-width: 899px)");
+
+  const { data } = useContractRead({
+    address: addresses[0].address as `0x${string}`,
+    abi: ABI_FACTORY,
+    functionName: `getDeal`,
+    args: [router?.query?.productId],
+  });
+  useEffect(() => {
+    console.log('data here', data, typeof data);
+    // console.log('data there', data.data)
+    // console.log('data 1231231', data[0].data)
+    // console.log('data is Array', Array.isArray(data));
+    if (typeof data === 'object') {
+      const coder = ethers.utils.defaultAbiCoder;
+      const result = coder.decode([
+        "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
+      ], data?.data);
+      console.log(result[0], 'result');
+    }
+  }, [data]);
   return (
     <Layout pageTitle="Item">
       <Flex flexDir="column">
