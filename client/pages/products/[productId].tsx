@@ -1,36 +1,19 @@
 import { NextPage } from "next";
-import Image from "next/image";
 import Layout from "@/components/Layout";
-import {
-  Flex,
-  Text,
-  Box,
-  Heading,
-  HStack,
-  Button,
-  useMediaQuery,
-} from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { auctionItems } from "@/constants/shared";
-import CardImage from "@/icons/cardImage.svg";
-import { FileIcon, UserIcon } from "@/icons";
-import BidsTable from "@/components/Products/BidsTable";
-import AddressCopy from "@/components/ui/AddressCopy";
-import { useAccount } from "wagmi";
 import { readContract } from '@wagmi/core'
-import Tooltip from "@/components/ui/Tooltip";
-import useDevice from "@/hooks/useDevice";
+import dynamic from 'next/dynamic'
+const Product = dynamic(() => import("@/components/Product/Product"), {
+  ssr: false,
+})
 
-import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
+import ABI_FACTORY from "@/contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
 import { useEffect, useState } from "react";
 import { BigNumber, ethers } from "ethers";
 import { IAuctionItem } from "@/types";
-import { BIG_1E18 } from "@/helpers/misc";
 import { convertExpNumberToNormal, convertStatus } from "@/helpers";
-import NumberInput from "@/components/ui/NumberInput/NumberInput";
-import Product from "@/components/Product/Product";
 
 const ProductPage: NextPage = () => {
   const [item, setItem] = useState<IAuctionItem>({} as IAuctionItem);
@@ -39,10 +22,7 @@ const ProductPage: NextPage = () => {
   const [bidsData, setBidsData] = useState<unknown>();
   const [bidsAmount, setBidsAmount] = useState();
   const [bid, setBid] = useState("");
-  const { isConnected } = useAccount();
   const router = useRouter();
-  const { isDesktopHeader } = useDevice();
-  const isItemsInColumn = useMediaQuery("(max-width: 899px)");
 
   useEffect(() => {
     if (router.isReady) {
@@ -52,24 +32,24 @@ const ProductPage: NextPage = () => {
       const fetchData = async () => {
         if (formattedId) {
           const data = await readContract({
-            address: addresses[1].address as `0x${string}`,
-            abi: ABI_AUCTION_FILE,
+            address: addresses[0]?.address as `0x${string}`,
+            abi: ABI_FACTORY,
             functionName: `getDeal`,
-            args: [ formattedId ],
+            args: [ BigNumber.from(router?.query?.productId) ],
           })
           setFetchedData(data);
           const totalBids = await readContract({
             address: addresses[1].address as `0x${string}`,
             abi: ABI_AUCTION_FILE,
             functionName: `getBidHistory`,
-            args: [ formattedId ],
+            args: [ BigNumber.from(router?.query?.productId) ],
           })
           setBidsData(totalBids);
         }
       }
       fetchData();
     }
-  }, [router.isReady, router?.query?.productId, formattedId])
+  }, [router?.query?.productId, item?.id, router?.isReady, formattedId])
 
   useEffect(() => {
     if (fetchedData && typeof fetchedData === 'object') {
@@ -78,7 +58,7 @@ const ProductPage: NextPage = () => {
         "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
         // @ts-ignore
       ], fetchedData?.data);
-      const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
+      const id = +result[0][0].toString();
       const title = result[0][1];
       const description = result[0][2]
       const ownedBy = result[0][7]
@@ -93,12 +73,9 @@ const ProductPage: NextPage = () => {
       let dateYear = new Date(saleEndDateNew * 1);
       let date = new Date(saleEndDateNew * 1000);
       const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      // Hours part from the timestamp
       let month = monthList[date.getMonth()];
-      // Minutes part from the timestamp
       let days = date.getDay();
-      let year =  dateYear.getFullYear();
-      // Will display time in 10:30:23 format
+      let year =  dateYear.getFullYear()
       let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
 
       const decryptedData = {
@@ -123,9 +100,10 @@ const ProductPage: NextPage = () => {
     }
   }, [fetchedData, bidsData]);
   return (
+    item.id ?
     <Layout pageTitle="Item">
       <Product item={item} bid={bid} setBid={setBid} />
-    </Layout>
+    </Layout> : null
   );
 };
 export default ProductPage;

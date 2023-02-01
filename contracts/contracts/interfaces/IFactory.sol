@@ -29,4 +29,6 @@ interface IFactory {
         returns (IIntegration.DealParams[] memory result);
 
     function registerIntegration(uint256 type_, address addr) external;
+
+    function integrationExist(address addr) external view returns (bool);
 }

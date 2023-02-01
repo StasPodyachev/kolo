@@ -17,6 +17,7 @@
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",
+    "cross-env": "^7.0.3",
     "chai": "^4.3.7",
     "cids": "^1.1.9",
     "ethereum-waffle": "^3.4.0",

@@ -44,6 +44,9 @@ const contracts: ContractDeploy[] = [
   {
     contractName: deployNames.CHAT,
   },
+  {
+    contractName: deployNames.MOCK_EXCHANGE,
+  },
 
   // dao
   {

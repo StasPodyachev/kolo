@@ -1,10 +1,9 @@
 import { Button } from "@chakra-ui/react";
 import { useEffect } from "react";
 import BigDecimal from "decimal.js-light";
-import { useContractWrite, usePrepareContractWrite, usePrepareSendTransaction } from "wagmi";
 import { BIG_1E18 } from "@/helpers/misc";
+import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import web3 from "web3"
-import { BigNumber } from "ethers";
 interface IProps {
   title: string;
   address: any;

@@ -39,7 +39,7 @@ const Home: NextPage = () => {
         const result = coder.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
         ], item.data);
-        const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
+        const id = +result[0][0].toString();
         const title = result[0][1]
         const description = result[0][2]
         const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
@@ -47,8 +47,8 @@ const Home: NextPage = () => {
         const saleEndDateNew = result[0][9]
         const startPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const endPrice = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
-        const status = ethers.utils.formatEther(BigNumber?.from(result[0][11]));
-
+        const status = result[0][11].toString()
+        
         let dateYear = new Date(saleEndDateNew * 1)
         let date = new Date(saleEndDateNew * 1000)
         const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"]
