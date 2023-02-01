@@ -10,9 +10,6 @@ import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
 import "../interfaces/IChat.sol";
 
-import {SizeOf} from "../libs/seriality/SizeOf.sol";
-import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
-
 import "hardhat/console.sol";
 
 contract AuctionFile is IAuctionFile, IIntegration, Ownable {
@@ -314,6 +311,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
     {
+        require(msg.sender == address(_notary), "AuctionFile: Only notary");
+
         AuctionFileParams storage deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
 
@@ -383,7 +382,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function addAccsess(uint256 dealId, address wallet) external {
-        // TODO: Security
+        require(msg.sender == address(_notary), "AuctionFile: Only notary");
+
         bytes memory cid = deals[dealId].cid;
         _accsess[wallet][cid] = true;
     }
