@@ -191,7 +191,7 @@ contract Notary is INotary, Ownable {
             if (notaries[dealId][notariesArr[rnd]]) continue;
 
             notaries[dealId][notariesArr[rnd]] = true;
-            IIntegration(integration).addAccsess(dealId, notariesArr[rnd]);
+            IIntegration(integration).addAccess(dealId, notariesArr[rnd]);
             count++;
         }
     }

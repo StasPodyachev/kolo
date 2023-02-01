@@ -165,7 +165,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
         deal.buyer = msg.sender;
 
-        this.addAccsess(dealId, deal.buyer);
+        _addAccess(dealId, deal.buyer);
         deal.status = SimpleTradeFileStatus.FINALIZE;
         deal.dateExpire = block.timestamp;
         emit DealFinalized(dealId);
@@ -303,14 +303,18 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         _chat.sendSystemMessage(dealId, "Deal closed.");
     }
 
-    function addAccsess(uint256 dealId, address wallet) external {
-        require(msg.sender == address(_notary), "AuctionFile: Only notary");
+    function addAccess(uint256 dealId, address wallet) external {
+        require(msg.sender == address(_notary), "SimpleTradeFile: Only notary");
 
+        _addAccess(dealId, wallet);
+    }
+
+    function _addAccess(uint256 dealId, address wallet) internal {
         bytes memory cid = deals[dealId].cid;
         _accsess[wallet][cid] = true;
     }
 
-    function checkAccsess(bytes calldata cid, address wallet)
+    function checkAccess(bytes calldata cid, address wallet)
         external
         view
         returns (uint8)
@@ -318,11 +322,23 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         return _accsess[wallet][cid] ? 1 : 0;
     }
 
-    function checkAccsess(
+    function checkAccess(
         bytes32[] calldata cid,
         uint8 size,
         address wallet
     ) external view returns (uint8) {
-        return this.checkAccsess(bytes.concat(cid[0]), wallet);
+        size -= 32;
+        bytes memory tmp = new bytes(size);
+
+        // TODO: change to assembly
+
+        for (uint256 i = 0; i < size; i++) {
+            tmp[i] = cid[1][i];
+        }
+
+        return this.checkAccess(bytes.concat(cid[0], tmp), wallet);
+
+        //QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
+        //QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
     }
 }

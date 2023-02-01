@@ -9,7 +9,7 @@ import { expect } from "chai"
 import { simpleTradeFileFixture } from "./shared/fixtures"
 import { moveBlocks } from "./utils/move-blocks"
 import { moveTime } from "./utils/move-time"
-import { time } from "@nomicfoundation/hardhat-network-helpers";
+import { time } from "@nomicfoundation/hardhat-network-helpers"
 
 const createFixtureLoader = waffle.createFixtureLoader
 
@@ -28,7 +28,7 @@ describe("SimpleTradeFile", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ; ({ simpleTradeFile, factory } = await loadFixture(async () => {
+    ;({ simpleTradeFile, factory } = await loadFixture(async () => {
       const { simpleTradeFile, factory } = await simpleTradeFileFixture()
 
       return { simpleTradeFile, factory }
@@ -40,31 +40,42 @@ describe("SimpleTradeFile", () => {
       console.log("simpleTradeFile", simpleTradeFile.address)
 
       await factory.createStore()
-      const storeAddress = await factory["getStore(address)"](wallet.address);
+      const storeAddress = await factory["getStore(address)"](wallet.address)
 
-      await expect(simpleTradeFile.create("NAME", "DESCRIPTION", 10000000000, Date.now() + 1000, "0x", { value: BigNumber.from("100000000000000000") }
-      ))
+      await expect(
+        simpleTradeFile.create(
+          "NAME",
+          "DESCRIPTION",
+          10000000000,
+          Date.now() + 1000,
+          "0x",
+          { value: BigNumber.from("100000000000000000") }
+        )
+      )
         .to.emit(simpleTradeFile, "DealCreated")
         .withArgs(1, wallet.address)
 
-      expect(await factory["getStore(uint256)"](1))
-        .to.be.eq(storeAddress);
+      expect(await factory["getStore(uint256)"](1)).to.be.eq(storeAddress)
 
-      await expect(factory.getDeal(1))
-        .to.be.not.reverted;
-      await expect(factory.getAllDeals())
-        .to.be.not.reverted;
+      await expect(factory.getDeal(1)).to.be.not.reverted
+      await expect(factory.getAllDeals()).to.be.not.reverted
     })
 
     it("fails if store is not created", async () => {
-      await expect(simpleTradeFile.create("NAME", "DESCRIPTION", 10000000000, Date.now() + 1000, "0x", { value: BigNumber.from("100000000000000000") }
-      ))
-        .to.be.revertedWith("SimpleTradeFile: Caller does not have a store");
+      await expect(
+        simpleTradeFile.create(
+          "NAME",
+          "DESCRIPTION",
+          10000000000,
+          Date.now() + 1000,
+          "0x",
+          { value: BigNumber.from("100000000000000000") }
+        )
+      ).to.be.revertedWith("SimpleTradeFile: Caller does not have a store")
     })
 
     it("fails if wrong collateral was passed", async () => {
-
-      await factory.createStore();
+      await factory.createStore()
 
       await expect(
         simpleTradeFile.create(
@@ -76,12 +87,10 @@ describe("SimpleTradeFile", () => {
           { value: BigNumber.from("10000000000000000") }
         )
       ).to.be.revertedWith("SimpleTradeFile: Wrong collateral")
-
     })
 
     it("fails if wrong price was passed", async () => {
-
-      await factory.createStore();
+      await factory.createStore()
 
       await expect(
         simpleTradeFile.create(
@@ -95,10 +104,8 @@ describe("SimpleTradeFile", () => {
       ).to.be.revertedWith("SimpleTradeFile: Wrong params")
     })
 
-
     it("fails if wrong dateExpire was passed", async () => {
-
-      await factory.createStore();
+      await factory.createStore()
 
       await expect(
         simpleTradeFile.create(
@@ -117,9 +124,16 @@ describe("SimpleTradeFile", () => {
     it("should cancel bid", async () => {
       await factory.createStore()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, Date.now() + 1000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        Date.now() + 1000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await expect(simpleTradeFile.cancel(1))
         .to.emit(simpleTradeFile, "DealCanceled")
@@ -129,38 +143,57 @@ describe("SimpleTradeFile", () => {
     it("fails if id not found", async () => {
       await factory.createStore()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, Date.now() + 1000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        Date.now() + 1000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await expect(simpleTradeFile.cancel(1000))
-        .to.revertedWith("SimpleTradeFile: Id not found");
+      await expect(simpleTradeFile.cancel(1000)).to.revertedWith(
+        "SimpleTradeFile: Id not found"
+      )
     })
 
     it("fails if caller is not a seller", async () => {
       await factory.createStore()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, Date.now() + 1000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        Date.now() + 1000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await expect(simpleTradeFile.connect(other).cancel(1))
-        .to.revertedWith("SimpleTradeFile: Caller is not a seller");
+      await expect(simpleTradeFile.connect(other).cancel(1)).to.revertedWith(
+        "SimpleTradeFile: Caller is not a seller"
+      )
     })
-
   })
 
   describe("#buy", () => {
     it("should buy", async () => {
       await factory.connect(other).createStore()
 
-      await simpleTradeFile.connect(other).create("NAME", "DESCRIPTION", 10000000000, Date.now() + 1000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile
+        .connect(other)
+        .create("NAME", "DESCRIPTION", 10000000000, Date.now() + 1000, "0x", {
+          value: BigNumber.from("100000000000000000"),
+        })
 
-      await expect(simpleTradeFile.buy(1, {
-        value: BigNumber.from("10000000000")
-      }))
+      await expect(
+        simpleTradeFile.buy(1, {
+          value: BigNumber.from("10000000000"),
+        })
+      )
         .to.emit(simpleTradeFile, "DealFinalized")
         .withArgs(1)
     })
@@ -168,312 +201,422 @@ describe("SimpleTradeFile", () => {
     it("fails if seller buys", async () => {
       await factory.createStore()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, Date.now() + 1000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        Date.now() + 1000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await expect(simpleTradeFile.buy(1, {
-        value: BigNumber.from("10000000000")
-      }))
-        .to.revertedWith("SimpleTradeFile: Seller cannot be a buyer")
+      await expect(
+        simpleTradeFile.buy(1, {
+          value: BigNumber.from("10000000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Seller cannot be a buyer")
     })
 
-
     it("fails if wrong deal id", async () => {
-
-      await expect(simpleTradeFile.buy(1000, {
-        value: BigNumber.from("10000000000")
-      }))
-        .to.revertedWith("SimpleTradeFile: Id not found")
+      await expect(
+        simpleTradeFile.buy(1000, {
+          value: BigNumber.from("10000000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Id not found")
     })
 
     it("fails if deal canceled", async () => {
       await factory.createStore()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, Date.now() + 1000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        Date.now() + 1000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await simpleTradeFile.cancel(1);
+      await simpleTradeFile.cancel(1)
 
-      await expect(simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("10000000000")
-      }))
-        .to.revertedWith("SimpleTradeFile: Wrong status")
+      await expect(
+        simpleTradeFile.connect(other).buy(1, {
+          value: BigNumber.from("10000000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Wrong status")
     })
 
     it("fails if time is up", async () => {
       await factory.createStore()
 
-      const ts = await time.latest();
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await time.increase(time.duration.hours(1));
+      await time.increase(time.duration.hours(1))
 
-      await expect(simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("10000000000")
-      }))
-        .to.revertedWith("SimpleTradeFile: Time is up")
+      await expect(
+        simpleTradeFile.connect(other).buy(1, {
+          value: BigNumber.from("10000000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Time is up")
     })
-
 
     it("fails if amount is wrong", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1));
-      const ts = await time.latest();
+      console.log("DATE JS: ", time.duration.hours(1))
+      const ts = await time.latest()
 
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
-
-      await expect(simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("100000000")
-      })).to.revertedWith("SimpleTradeFile: Wrong amount");
+      await expect(
+        simpleTradeFile.connect(other).buy(1, {
+          value: BigNumber.from("100000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Wrong amount")
     })
-
 
     it("fails if Current bid is less then previous bid", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1));
-      const ts = await time.latest();
+      console.log("DATE JS: ", time.duration.hours(1))
+      const ts = await time.latest()
 
-
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("80000000000")
+        value: BigNumber.from("80000000000"),
       })
 
-      await expect(simpleTradeFile.connect(buyer).buy(1, {
-        value: BigNumber.from("60000000000")
-      })).to.revertedWith("SimpleTradeFile: Current bid cannot be less then previous bid");
-
-
+      await expect(
+        simpleTradeFile.connect(buyer).buy(1, {
+          value: BigNumber.from("60000000000"),
+        })
+      ).to.revertedWith(
+        "SimpleTradeFile: Current bid cannot be less then previous bid"
+      )
     })
   })
-
 
   describe("#finalize", () => {
     it("should finalize with no bids", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1));
-      const ts = await time.latest();
+      console.log("DATE JS: ", time.duration.hours(1))
+      const ts = await time.latest()
 
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
-
-      await time.increase(time.duration.hours(1));
+      await time.increase(time.duration.hours(1))
 
       await expect(simpleTradeFile.finalize(1))
         .to.emit(simpleTradeFile, "DealClosed")
-        .withArgs(1);
+        .withArgs(1)
     })
 
     it("should finalize with bids", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1));
-      const ts = await time.latest();
+      console.log("DATE JS: ", time.duration.hours(1))
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await simpleTradeFile.connect(buyer).buy(1, {
-        value: BigNumber.from("10000000000")
+        value: BigNumber.from("10000000000"),
       })
 
-      await time.increase(time.duration.hours(1));
+      await time.increase(time.duration.hours(1))
 
       await expect(simpleTradeFile.finalize(1))
         .to.emit(simpleTradeFile, "DealFinalized")
-        .withArgs(1);
+        .withArgs(1)
 
-      expect(await simpleTradeFile["checkAccsess(bytes,address)"]("0x", other.address))
-        .to.eq(1);
+      expect(
+        await simpleTradeFile["checkAccess(bytes,address)"]("0x", other.address)
+      ).to.eq(1)
     })
 
     it("fails if auction is not open", async () => {
       await factory.createStore()
-      const ts = await time.latest();
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await simpleTradeFile.cancel(1);
-      await time.increase(time.duration.hours(1));
+      await simpleTradeFile.cancel(1)
+      await time.increase(time.duration.hours(1))
 
-
-      await expect(simpleTradeFile.finalize(1))
-        .to.revertedWith("SimpleTradeFile: Auction is not open");
+      await expect(simpleTradeFile.finalize(1)).to.revertedWith(
+        "SimpleTradeFile: Auction is not open"
+      )
     })
-
 
     it("fails if id not found", async () => {
       await factory.createStore()
-      const ts = await time.latest();
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
-      await expect(simpleTradeFile.finalize(100))
-        .to.revertedWith("SimpleTradeFile: Id not found");
+      await expect(simpleTradeFile.finalize(100)).to.revertedWith(
+        "SimpleTradeFile: Id not found"
+      )
     })
-
 
     it("fails if date expire", async () => {
       await factory.createStore()
-      const ts = await time.latest();
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       //await time.increase(time.duration.days(10));
 
-      await expect(simpleTradeFile.finalize(1))
-        .to.revertedWith("SimpleTradeFile: Date is not expire");
+      await expect(simpleTradeFile.finalize(1)).to.revertedWith(
+        "SimpleTradeFile: Date is not expire"
+      )
     })
   })
-
 
   describe("#dispute", () => {
     it("should make dispute", async () => {
       await factory.createStore()
 
-      const ts = await time.latest();
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("10000000000")
+        value: BigNumber.from("10000000000"),
       })
 
-      await time.increase(time.duration.hours(1));
+      await time.increase(time.duration.hours(1))
 
-      await simpleTradeFile.finalize(1);
+      await simpleTradeFile.finalize(1)
 
-      await expect(simpleTradeFile.connect(other).dispute(1, {
-        value: BigNumber.from("100000000000000000")
-      }))
+      await expect(
+        simpleTradeFile.connect(other).dispute(1, {
+          value: BigNumber.from("100000000000000000"),
+        })
+      )
         .to.emit(simpleTradeFile, "DisputeCreated")
-        .withArgs(1);
+        .withArgs(1)
     })
 
     it("fails without finalize", async () => {
       await factory.createStore()
 
-      const ts = await time.latest();
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("10000000000")
+        value: BigNumber.from("10000000000"),
       })
 
-      await time.increase(time.duration.hours(1));
+      await time.increase(time.duration.hours(1))
 
-      await expect(simpleTradeFile.connect(other).dispute(1, {
-        value: BigNumber.from("100000000000000000")
-      }))
-        .to.revertedWith("SimpleTradeFile: Wrong status");
+      await expect(
+        simpleTradeFile.connect(other).dispute(1, {
+          value: BigNumber.from("100000000000000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Wrong status")
     })
 
     it("fails if id not found", async () => {
-      await expect(simpleTradeFile.dispute(1000, {
-        value: BigNumber.from("100000000000000000")
-      }))
-        .to.revertedWith("SimpleTradeFile: Id not found");
+      await expect(
+        simpleTradeFile.dispute(1000, {
+          value: BigNumber.from("100000000000000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Id not found")
     })
 
     it("fails if caller is not a buyer", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1));
-      const ts = await time.latest();
+      console.log("DATE JS: ", time.duration.hours(1))
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("10000000000")
+        value: BigNumber.from("10000000000"),
       })
 
-      await time.increase(time.duration.hours(1));
+      await time.increase(time.duration.hours(1))
 
-      await simpleTradeFile.finalize(1);
+      await simpleTradeFile.finalize(1)
 
-      await expect(simpleTradeFile.dispute(1, {
-        value: BigNumber.from("100000000000000000")
-      }))
-        .to.revertedWith("SimpleTradeFile: Caller is not a buyer");
+      await expect(
+        simpleTradeFile.dispute(1, {
+          value: BigNumber.from("100000000000000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Caller is not a buyer")
     })
 
     it("fails if time for dispute is up", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1));
-      const ts = await time.latest();
+      console.log("DATE JS: ", time.duration.hours(1))
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("10000000000")
+        value: BigNumber.from("10000000000"),
       })
 
-      await time.increase(time.duration.hours(1));
+      await time.increase(time.duration.hours(1))
 
-      await simpleTradeFile.finalize(1);
-      await time.increase(time.duration.days(10));
+      await simpleTradeFile.finalize(1)
+      await time.increase(time.duration.days(10))
 
-      await expect(simpleTradeFile.connect(other).dispute(1, {
-        value: BigNumber.from("100000000000000000")
-      }))
-        .to.revertedWith("SimpleTradeFile: Time for dispute is up");
+      await expect(
+        simpleTradeFile.connect(other).dispute(1, {
+          value: BigNumber.from("100000000000000000"),
+        })
+      ).to.revertedWith("SimpleTradeFile: Time for dispute is up")
     })
-
 
     it("fails if collateral is wrong", async () => {
       await factory.createStore()
 
-      const ts = await time.latest();
+      const ts = await time.latest()
 
-      await simpleTradeFile.create("NAME", "DESCRIPTION", 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await simpleTradeFile.connect(other).buy(1, {
-        value: BigNumber.from("10000000000")
+        value: BigNumber.from("10000000000"),
       })
 
-      await time.increase(time.duration.hours(1));
+      await time.increase(time.duration.hours(1))
 
-      await simpleTradeFile.finalize(1);
-      await expect(simpleTradeFile.connect(other).dispute(1))
-        .to.revertedWith("SimpleTradeFile: Wrong collateral");
+      await simpleTradeFile.finalize(1)
+      await expect(simpleTradeFile.connect(other).dispute(1)).to.revertedWith(
+        "SimpleTradeFile: Wrong collateral"
+      )
     })
   })
-
 
   describe("#getDeal", () => {
     let storeAddress: any
@@ -492,14 +635,9 @@ describe("SimpleTradeFile", () => {
         "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
       const collateral = "100000000000000000"
 
-      await simpleTradeFile.create(
-        name,
-        description,
-        price,
-        dateExpire,
-        cid,
-        { value: BigNumber.from(collateral) }
-      )
+      await simpleTradeFile.create(name, description, price, dateExpire, cid, {
+        value: BigNumber.from(collateral),
+      })
 
       const deal = await simpleTradeFile.getDeal(1)
 

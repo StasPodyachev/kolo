@@ -14,7 +14,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useAccount, useContractRead, usePrepareContractWrite, useContractWrite } from "wagmi";
+import {
+  useAccount,
+  useContractRead,
+  usePrepareContractWrite,
+  useContractWrite,
+} from "wagmi";
 import ButtonContractWrite from "../ButtonContractWrite";
 import ConnectBtn from "../ui/ConnectBtn";
 import NumberInput from "../ui/NumberInput/NumberInput";
@@ -48,21 +53,21 @@ const CustomInput = chakra(Input, {
 
 const CustomFormLabel = chakra(FormLabel, {
   baseStyle: {
-    color: 'gray.200',
+    color: "gray.200",
     m: 0,
-    mt: '32px',
-    fontSize: '20px',
-    lineHeight: '28px',
-  }
+    mt: "32px",
+    fontSize: "20px",
+    lineHeight: "28px",
+  },
 });
 
-const CreateStore = ({address} : {address: string}) => {
+const CreateStore = ({ address }: { address: string }) => {
   const { config } = usePrepareContractWrite({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
-    functionName: 'createStore',
-  })
-  const { write: create } = useContractWrite(config)
+    functionName: "createStore",
+  });
+  const { write: create } = useContractWrite(config);
   return (
     <Button
       mt={10}
@@ -78,8 +83,8 @@ const CreateStore = ({address} : {address: string}) => {
     >
       Create Store
     </Button>
-  )
-}
+  );
+};
 
 const GetIntegrationInfo = ({
   activeItem,
@@ -109,7 +114,7 @@ const GetIntegrationInfo = ({
         collateralPercentValue
       );
       const minimalCollateral =
-      priceOfStart * minCollateralPercent > minCollateralAmount
+        priceOfStart * minCollateralPercent > minCollateralAmount
           ? priceOfStart * minCollateralPercent
           : minCollateralAmount;
       const myCollateral =
@@ -138,16 +143,16 @@ const NewPoduct = () => {
   const [stopDate, setStopDate] = useState(getTodaysDate());
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
-  const [ isStore, setIsStore] = useState(false)
+  const [isStore, setIsStore] = useState(false);
   const [fileName, setFileName] = useState("");
   const [thubnailName, setThubnailName] = useState("");
 
   const { data: store } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
-    functionName: 'getStore',
-    args: [address]
-  })
+    functionName: "getStore",
+    args: [address],
+  });
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
@@ -194,53 +199,58 @@ const NewPoduct = () => {
     setCid(response?.data?.Hash);
     setAcces(true);
 
-    // const accesCondition = async () => {
-    //   const { publicKey, signedMessage } : any = await encryptionSignature();
-    //   const conditions = [
-    //     {
-    //       id: 1,
-    //       chain: "Hyperspace",
-    //       method: "checkAccess",
-    //       standardContractType: "Custom",
-    //       contractAddress: "0x49bD7e073c52cb831cBFebfc894A751a09c3521D",
-    //       returnValueTest: {
-    //       comparator: "==",
-    //       value: "1"
-    //       },
-    //       parameters: [':userAddress', ':userAddress',':userAddress'],
-    //       inputArrayType: ['bytes32[]', 'uint8', 'address'],
-    //       outputType: "uint8"
-    //   }
-    //   ]
-    //   const aggregator = "([1])";
-    //   const res = await lighthouse.accessCondition(
-    //     publicKey,
-    //     response?.data?.Hash,
-    //     signedMessage,
-    //     conditions,
-    //     aggregator
-    //   )
-    //   console.log(res, 'res')
-    // }
-    // accesCondition()
+    const accesCondition = async () => {
+      const { publicKey, signedMessage }: any = await encryptionSignature();
+      const conditions = [
+        {
+          id: 1,
+          chain: "Hyperspace",
+          method: "checkAccess",
+          standardContractType: "Custom",
+          contractAddress: "0x95a26314fA5A7B50734724639ff81B4435e8A4BE",
+          returnValueTest: {
+            comparator: "==",
+            value: "1",
+          },
+          parameters: [
+            [
+              "0xd78af4f09668f4c3e8f2de44c0488804e03345acff0c0caffa03b9cfc8285033",
+            ],
+            90,
+            ":userAddress",
+          ],
+          inputArrayType: ["bytes32[]", "uint8", "address"],
+          outputType: "uint8",
+        },
+      ];
+      const aggregator = "([1])";
+      const res = await lighthouse.accessCondition(
+        publicKey,
+        response?.data?.Hash,
+        signedMessage,
+        conditions,
+        aggregator
+      );
+      console.log(res, "res");
+    };
+    accesCondition();
   };
   const { isDesktopHeader, isDesktop } = useDevice();
-  const isItemNameError = itemName === '';
-  const isItemDescriptionError = itemDescription === '';
-  const isStartPriceError = startPrice === '0';
-  const isForceStopPriceError = forceStopPrice === '0';
-  const isDateStopError = stopDate === '';
+  const isItemNameError = itemName === "";
+  const isItemDescriptionError = itemDescription === "";
+  const isStartPriceError = startPrice === "0";
+  const isForceStopPriceError = forceStopPrice === "0";
+  const isDateStopError = stopDate === "";
 
   useEffect(() => {
-    if (store === '0x0000000000000000000000000000000000000000') {
+    if (store === "0x0000000000000000000000000000000000000000") {
       setIsStore(false);
-
-    } if (store !== '0x0000000000000000000000000000000000000000') {
-      setIsStore(true)
-    } else {
-
     }
-  }, [store])
+    if (store !== "0x0000000000000000000000000000000000000000") {
+      setIsStore(true);
+    } else {
+    }
+  }, [store]);
 
   return (
     <Flex justifyContent="center">
@@ -251,234 +261,246 @@ const NewPoduct = () => {
           setValue={setMyCollateral}
           myCollateral={myCollateral}
         />
-        {!address ? (
-            <ConnectBtn isCentered isNeedMarginTop />
+        {!address ? <ConnectBtn isCentered isNeedMarginTop /> : null}
+        {!isStore && address ? (
+          <CreateStore address={address as `0x${string}`} />
         ) : null}
-        {!isStore && address
-          ? <CreateStore address={address as `0x${string}`} />
-          : null
-        }
         {isStore && address ? (
           <Box minW="100%">
-          <Heading variant="h6" color="gray.200" mt="32px">
-            Type of Sale
-          </Heading>
-          <SaleTypeMenu activeItem={activeItem} setActiveItem={setActiveItem} />
-          <FormControl isRequired isInvalid={(isItemNameError && access)}>
-            <CustomFormLabel>
-              Name
-            </CustomFormLabel>
-            <CustomInput
-              minW="100%"
-              maxLength={70}
-              value={itemName}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setItemName(event?.target?.value)
-              }
-              w="100%"
-              placeholder="Item name (up to 70 characters)"
+            <Heading variant="h6" color="gray.200" mt="32px">
+              Type of Sale
+            </Heading>
+            <SaleTypeMenu
+              activeItem={activeItem}
+              setActiveItem={setActiveItem}
             />
-            <FormErrorMessage>Name is required</FormErrorMessage>
-          </FormControl>
-          <FormControl isRequired isInvalid={(isItemDescriptionError && access)}>
-            <CustomFormLabel>
-              Description
-            </CustomFormLabel>
-            <CustomInput
-              minW="100%"
-              maxLength={256}
-              value={itemDescription}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setItemDescription(event.target.value)
-              }
-              w="100%"
-              placeholder="Description (up to 256 characters)"
-            />
-            <FormErrorMessage>Description is required</FormErrorMessage>
-          </FormControl>
-          <Flex
-            w="100%"
-            flexDir={isDesktop[0] ? "row" : "column"}
-            gap={isDesktop[0] ? 0 : "16px"}
-            justifyContent="space-between"
-          >
-            <Box w={(isDesktop[0] || isDesktopHeader[0]) && activeItem.title !== "SIMPLE TRADES OF FILES" ? "48%" : "100%"}>
-              <FormControl isRequired isInvalid={(isStartPriceError && access)}>
-                <CustomFormLabel>
-                  Price Start
-                </CustomFormLabel>
-                <NumberInput
-                  value={startPrice}
-                  setValue={setStartPrice}
-                  isNeededMarginTop
-                  errorMessage="Price Start is required"
-                />
-              </FormControl>
-            </Box>
-            {activeItem.title !== "SIMPLE TRADES OF FILES" ? (<Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
-              <FormControl isRequired isInvalid={(isForceStopPriceError && access)}>
-                <CustomFormLabel>
-                  Price Force Stop
-                </CustomFormLabel>
-                <NumberInput
-                  value={forceStopPrice}
-                  setValue={setForceStopPrice}
-                  isNeededMarginTop
-                  errorMessage="Price Force Stop is required"
-                />
-              </FormControl>
-            </Box>) : null}
-          </Flex>
-          <Flex
-            justifyContent="space-between"
-            flexDir={isDesktop[0] ? "row" : "column"}
-            gap={isDesktop[0] ? 0 : "16px"}
-          >
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
-              <FormControl isRequired isInvalid={(isDateStopError && access)}>
-                <CustomFormLabel>
-                  Date Stop Auction
-                </CustomFormLabel>
-                <CustomInput
-                  type="datetime-local"
-                  min={getTodaysDate()}
-                  value={stopDate}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    // const start = Date.now() - event.target.value
-                    setStopDate(event.target.value);
-                  }}
-                  px="16px"
-                  minW="100%"
-                />
-                <FormErrorMessage>Date Stop Auction is required</FormErrorMessage>
-              </FormControl>
-            </Box>
-            <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
-              <FormControl isRequired>
-                <CustomFormLabel>
-                  My Collateral
-                </CustomFormLabel>
-                <NumberInput
-                  value={myCollateral}
-                  setValue={setMyCollateral}
-                  isNeededMarginTop
-                  minValue={+startPrice * 0.1}
-                  isCollateralInput
-                />
-              </FormControl>
-            </Box>
-          </Flex>
-          {isConnected ? (
+            <FormControl isRequired isInvalid={isItemNameError && access}>
+              <CustomFormLabel>Name</CustomFormLabel>
+              <CustomInput
+                minW="100%"
+                maxLength={70}
+                value={itemName}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setItemName(event?.target?.value)
+                }
+                w="100%"
+                placeholder="Item name (up to 70 characters)"
+              />
+              <FormErrorMessage>Name is required</FormErrorMessage>
+            </FormControl>
+            <FormControl
+              isRequired
+              isInvalid={isItemDescriptionError && access}
+            >
+              <CustomFormLabel>Description</CustomFormLabel>
+              <CustomInput
+                minW="100%"
+                maxLength={256}
+                value={itemDescription}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setItemDescription(event.target.value)
+                }
+                w="100%"
+                placeholder="Description (up to 256 characters)"
+              />
+              <FormErrorMessage>Description is required</FormErrorMessage>
+            </FormControl>
             <Flex
-              justify="space-between"
+              w="100%"
               flexDir={isDesktop[0] ? "row" : "column"}
+              gap={isDesktop[0] ? 0 : "16px"}
+              justifyContent="space-between"
+            >
+              <Box
+                w={
+                  (isDesktop[0] || isDesktopHeader[0]) &&
+                  activeItem.title !== "SIMPLE TRADES OF FILES"
+                    ? "48%"
+                    : "100%"
+                }
+              >
+                <FormControl isRequired isInvalid={isStartPriceError && access}>
+                  <CustomFormLabel>Price Start</CustomFormLabel>
+                  <NumberInput
+                    value={startPrice}
+                    setValue={setStartPrice}
+                    isNeededMarginTop
+                    errorMessage="Price Start is required"
+                  />
+                </FormControl>
+              </Box>
+              {activeItem.title !== "SIMPLE TRADES OF FILES" ? (
+                <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+                  <FormControl
+                    isRequired
+                    isInvalid={isForceStopPriceError && access}
+                  >
+                    <CustomFormLabel>Price Force Stop</CustomFormLabel>
+                    <NumberInput
+                      value={forceStopPrice}
+                      setValue={setForceStopPrice}
+                      isNeededMarginTop
+                      errorMessage="Price Force Stop is required"
+                    />
+                  </FormControl>
+                </Box>
+              ) : null}
+            </Flex>
+            <Flex
+              justifyContent="space-between"
+              flexDir={isDesktop[0] ? "row" : "column"}
+              gap={isDesktop[0] ? 0 : "16px"}
             >
               <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
-                <label
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "48px",
-                    minWidth: "100%",
-                    cursor: "pointer",
-                    background: "#004DE5",
-                    color: "white",
-                    fontSize: "16px",
-                    lineHeight: "24px",
-                    textTransform: "uppercase",
-                    marginTop: "36px",
-                  }}
-                  htmlFor="fileDownload"
-                >
-                  download file
-                </label>
-                <Input
-                  id="fileDownload"
-                  type="file"
-                  display="none"
-                  onChange={(e) => {
-                    deployEncrypted(e, true);
-                  }}
-                />
-                {fileName ? (
-                  <Text
-                    color="green.primary"
-                    textStyle="mediumText"
-                    textAlign="center"
-                    mt="16px"
-                  >
-                    {fileName}
-                  </Text>
-                ) : null}
+                <FormControl isRequired isInvalid={isDateStopError && access}>
+                  <CustomFormLabel>Date Stop Auction</CustomFormLabel>
+                  <CustomInput
+                    type="datetime-local"
+                    min={getTodaysDate()}
+                    value={stopDate}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      // const start = Date.now() - event.target.value
+                      setStopDate(event.target.value);
+                    }}
+                    px="16px"
+                    minW="100%"
+                  />
+                  <FormErrorMessage>
+                    Date Stop Auction is required
+                  </FormErrorMessage>
+                </FormControl>
               </Box>
-              <Box
-                cursor="not-allowed"
-                w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}
-              >
-                <label
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "48px",
-                    minWidth: "100%",
-                    background: "#696C80",
-                    color: "white",
-                    fontSize: "16px",
-                    lineHeight: "24px",
-                    textTransform: "uppercase",
-                    marginTop: "36px",
-                    pointerEvents: "none",
-                  }}
-                  htmlFor="thubnailDownload"
-                >
-                  download thubnail
-                </label>
-                <Input
-                  id="fileDownload"
-                  type="file"
-                  display="none"
-                  onChange={(e) => {
-                    // deployEncrypted(e, false)
-                  }}
-                />
-                {thubnailName ? (
-                  <Text
-                    color="green.primary"
-                    textStyle="mediumText"
-                    textAlign="center"
-                    mt="16px"
-                  >
-                    {thubnailName}
-                  </Text>
-                ) : null}
+              <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+                <FormControl isRequired>
+                  <CustomFormLabel>My Collateral</CustomFormLabel>
+                  <NumberInput
+                    value={myCollateral}
+                    setValue={setMyCollateral}
+                    isNeededMarginTop
+                    minValue={+startPrice * 0.1}
+                    isCollateralInput
+                  />
+                </FormControl>
               </Box>
             </Flex>
-          ) : null}
-          {isConnected && access ? (
-            <ButtonContractWrite
-              address={activeItem.address}
-              abi={activeItem.abi}
-              method="create"
-              title="start sell"
-              parrams={
-                {
+            {isConnected ? (
+              <Flex
+                justify="space-between"
+                flexDir={isDesktop[0] ? "row" : "column"}
+              >
+                <Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+                  <label
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "48px",
+                      minWidth: "100%",
+                      cursor: "pointer",
+                      background: "#004DE5",
+                      color: "white",
+                      fontSize: "16px",
+                      lineHeight: "24px",
+                      textTransform: "uppercase",
+                      marginTop: "36px",
+                    }}
+                    htmlFor="fileDownload"
+                  >
+                    download file
+                  </label>
+                  <Input
+                    id="fileDownload"
+                    type="file"
+                    display="none"
+                    onChange={(e) => {
+                      deployEncrypted(e, true);
+                    }}
+                  />
+                  {fileName ? (
+                    <Text
+                      color="green.primary"
+                      textStyle="mediumText"
+                      textAlign="center"
+                      mt="16px"
+                    >
+                      {fileName}
+                    </Text>
+                  ) : null}
+                </Box>
+                <Box
+                  cursor="not-allowed"
+                  w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}
+                >
+                  <label
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "48px",
+                      minWidth: "100%",
+                      background: "#696C80",
+                      color: "white",
+                      fontSize: "16px",
+                      lineHeight: "24px",
+                      textTransform: "uppercase",
+                      marginTop: "36px",
+                      pointerEvents: "none",
+                    }}
+                    htmlFor="thubnailDownload"
+                  >
+                    download thubnail
+                  </label>
+                  <Input
+                    id="fileDownload"
+                    type="file"
+                    display="none"
+                    onChange={(e) => {
+                      // deployEncrypted(e, false)
+                    }}
+                  />
+                  {thubnailName ? (
+                    <Text
+                      color="green.primary"
+                      textStyle="mediumText"
+                      textAlign="center"
+                      mt="16px"
+                    >
+                      {thubnailName}
+                    </Text>
+                  ) : null}
+                </Box>
+              </Flex>
+            ) : null}
+            {isConnected && access ? (
+              <ButtonContractWrite
+                address={activeItem.address}
+                abi={activeItem.abi}
+                method="create"
+                title="start sell"
+                parrams={{
                   name: itemName,
                   description: itemDescription,
                   priceStart: startPrice,
                   priceForceStop: forceStopPrice,
                   dateExpire: stopDate,
                   cid,
-                  collateral: myCollateral
+                  collateral: myCollateral,
+                }}
+                isDisabled={
+                  !access &&
+                  (itemName &&
+                  itemDescription &&
+                  startPrice &&
+                  forceStopPrice &&
+                  stopDate &&
+                  myCollateral &&
+                  fileName
+                    ? false
+                    : true)
                 }
-              }
-              isDisabled={!access &&
-                (itemName && itemDescription && startPrice && forceStopPrice && stopDate && myCollateral && fileName
-                  ? false : true)}
-            />
-          ) : null}
-        </Box>
+              />
+            ) : null}
+          </Box>
         ) : null}
       </Box>
     </Flex>

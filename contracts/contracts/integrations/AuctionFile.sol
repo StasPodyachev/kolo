@@ -296,7 +296,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
     function _finalize(AuctionFileParams storage deal) internal {
         // _withdrawBids(deal.id, deal.buyer, store);
-        this.addAccsess(deal.id, deal.buyer);
+        _addAccess(deal.id, deal.buyer);
 
         deal.status = AuctionStatus.FINALIZE;
         deal.dateExpire = block.timestamp;
@@ -396,14 +396,18 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         return bidHistory[dealId];
     }
 
-    function addAccsess(uint256 dealId, address wallet) external {
+    function addAccess(uint256 dealId, address wallet) external {
         require(msg.sender == address(_notary), "AuctionFile: Only notary");
 
+        _addAccess(dealId, wallet);
+    }
+
+    function _addAccess(uint256 dealId, address wallet) internal {
         bytes memory cid = deals[dealId].cid;
         _accsess[wallet][cid] = true;
     }
 
-    function checkAccsess(bytes calldata cid, address wallet)
+    function checkAccess(bytes calldata cid, address wallet)
         external
         view
         returns (uint8)
@@ -411,11 +415,23 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         return _accsess[wallet][cid] ? 1 : 0;
     }
 
-    function checkAccsess(
+    function checkAccess(
         bytes32[] calldata cid,
         uint8 size,
         address wallet
     ) external view returns (uint8) {
-        return this.checkAccsess(bytes.concat(cid[0]), wallet);
+        size -= 32;
+        bytes memory tmp = new bytes(size);
+
+        // TODO: change to assembly
+
+        for (uint256 i = 0; i < size; i++) {
+            tmp[i] = cid[1][i];
+        }
+
+        return this.checkAccess(bytes.concat(cid[0], tmp), wallet);
+
+        //QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
+        //QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
     }
 }
