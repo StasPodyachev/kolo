@@ -90,7 +90,7 @@ const Product = ({item, bid, setBid} : {item: IAuctionItem, bid: string, setBid:
                   Current price
                 </Heading>
                 <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
-                  {item?.currentPrice}&nbsp;FIL
+                  {item?.price}&nbsp;FIL
                 </Heading>
               </Flex>
               <Flex justifyContent="space-between" mt="6px">

@@ -64,8 +64,8 @@ const ProductPage: NextPage = () => {
       const ownedBy = result[0][7]
       const saleEndDateNew = result[0][9]
       const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
-      const startPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
-      const endPrice = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
+      const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+      const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
       const status = result[0][11] && convertStatus(Number(result[0][11]));
 
       // Create a new JavaScript Date object based on the timestamp
@@ -81,11 +81,11 @@ const ProductPage: NextPage = () => {
       const decryptedData = {
         id,
         title,
-        currentPrice: price < startPrice ? startPrice : price,
+        price: price < priceStart ? priceStart : price,
         ownedBy,
         saleEndDate,
-        price: startPrice,
-        priceEnd: endPrice,
+        priceStart,
+        priceEnd,
         description,
         status,
         totalBids: 20,
@@ -96,6 +96,8 @@ const ProductPage: NextPage = () => {
       const decryptedData = bidsData?.map((item: any) => {
         const currentBid = +ethers.utils.formatEther(BigNumber?.from(item.bid._hex));
         setBid(currentBid.toString());
+        console.log(currentBid, 'currentBid');
+        
       })
     }
   }, [fetchedData, bidsData]);

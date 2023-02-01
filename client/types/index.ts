@@ -17,7 +17,7 @@ export interface IAuctionItem {
   ownedBy: string;
   buyerAddress?: string;
   saleEndDate: string;
-  currentPrice: number;
+  priceStart: number;
   priceEnd: number;
   image?: string;
   description: string;
