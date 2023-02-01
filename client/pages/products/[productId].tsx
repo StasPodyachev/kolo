@@ -23,6 +23,7 @@ import useDevice from "@/hooks/useDevice";
 
 import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
+import ABI_FACTORY from "@/contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
 import { useEffect, useState } from "react";
 import { BigNumber, ethers } from "ethers";
@@ -30,10 +31,10 @@ import { IAuctionItem } from "@/types";
 import { BIG_1E18 } from "@/helpers/misc";
 
 const Product: NextPage = () => {
-  const [item, setItem] = useState<IAuctionItem>({} as IAuctionItem);
-  const [formattedId, setFormattedId] = useState("");
-  const [fetchedData, setFetchedData] = useState<unknown>();
-  const [bidsAmount, setBidsAmount] = useState<unknown>();
+  const [ item, setItem ] = useState<IAuctionItem>({} as IAuctionItem);
+  const [ formattedId, setFormattedId ] = useState("");
+  const [ fetchedData, setFetchedData ] = useState<unknown>();
+  const [ bidsAmount, setBidsAmount ] = useState<unknown>();
   const { isConnected } = useAccount();
   const router = useRouter();
   const { isDesktopHeader } = useDevice();
@@ -49,8 +50,8 @@ const Product: NextPage = () => {
       const fetchData = async () => {
         if (formattedId) {
           const data = await readContract({
-            address: addresses[1].address as `0x${string}`,
-            abi: ABI_AUCTION_FILE,
+            address: addresses[0].address as `0x${string}`,
+            abi: ABI_FACTORY,
             functionName: `getDeal`,
             args: [ formattedId ],
           })
@@ -220,7 +221,7 @@ const Product: NextPage = () => {
               flexDir="column"
               minW="278px"
               maxW={isItemsInColumn[0] ? "100%" : "278px"}
-              gap="34px"
+              justifyContent="space-between"
               maxH="240px"
             >
               <Flex
