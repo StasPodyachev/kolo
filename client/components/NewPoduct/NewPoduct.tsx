@@ -99,7 +99,6 @@ const GetIntegrationInfo = ({
   });
   useEffect(() => {
     let priceOfStart = +startPrice.split(",").join("");
-    console.log("price", priceOfStart);
     if (data) {
       // console.log(data, "data");
       const collateralAmountValue = BigNumber?.from(data.collateralAmount);
@@ -111,7 +110,7 @@ const GetIntegrationInfo = ({
         collateralPercentValue
       );
       const minimalCollateral =
-        priceOfStart * minCollateralPercent > minCollateralAmount
+      priceOfStart * minCollateralPercent > minCollateralAmount
           ? priceOfStart * minCollateralPercent
           : minCollateralAmount;
       // console.log(minimalCollateral.toFixed(2), "value");
@@ -369,7 +368,7 @@ const NewPoduct = () => {
                   value={myCollateral}
                   setValue={setMyCollateral}
                   isNeededMarginTop
-                  minValue={+startPrice.split(",").join("") * 0.1}
+                  minValue={+startPrice * 0.1}
                   isCollateralInput
                 />
               </FormControl>
