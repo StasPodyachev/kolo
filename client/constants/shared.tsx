@@ -1,3 +1,4 @@
+import addresses from "@/contracts/addresses";
 import {
   DashboardIcon,
   DocsIcon,
@@ -414,7 +415,7 @@ export const SaleTypeMenuItems: ISaleTypeMenuItem[] = [
   {
     id: 1,
     title: "AUCTION OF FILES",
-    address: "0x49bD7e073c52cb831cBFebfc894A751a09c3521D",
+    address: addresses[1].address,
     abi: ABI_FILE,
   },
   {
@@ -432,7 +433,7 @@ export const SaleTypeMenuItems: ISaleTypeMenuItem[] = [
   {
     id: 4,
     title: "SIMPLE TRADES OF FILES",
-    address: "0xFA365357a5b9204E9f7EF749f1153DfC6310A9f2",
+    address: addresses[3].address,
     abi: ABI_FILE,
   },
 ];

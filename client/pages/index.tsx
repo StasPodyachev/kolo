@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { Grid, Heading, Text } from "@chakra-ui/react";
+import { Grid, Heading } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
 import { auctionItems } from "@/constants/shared";
@@ -9,27 +9,24 @@ import { IAuctionItem } from "@/types";
 import { useContractRead } from "wagmi";
 import ABI_FACTORY from "../contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
-import web3 from "web3";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 const Home: NextPage = () => {
-  const [products, setProducts] = useState<ethers.utils.Result[]>();
-  const [startCount, setStartCount] = useState(0);
-  const [endCount, setEndCount] = useState(5);
-  const [items, setItems] = useState<IAuctionItem[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+  const [ startCount, setStartCount ] = useState(0);
+  const [ endCount, setEndCount ] = useState(5);
+  const [ items, setItems ] = useState<IAuctionItem[] | []>([]);
+  const [ hasMore, setHasMore ] = useState(true);
 
   useEffect(() => {
     setHasMore(auctionItems.length > items.length ? true : false);
   }, [items]);
 
   useEffect(() => {
-    setItems(auctionItems.slice(0, 5));
     setStartCount(5);
     setEndCount(10);
   }, []);
 
-  const { data, isError, isLoading } = useContractRead({
+  const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
     functionName: "getAllDeals",
@@ -41,29 +38,39 @@ const Home: NextPage = () => {
         const coder = ethers.utils.defaultAbiCoder;
         const result = coder.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
-        ], data[index].data);
-        return result;
-        // console.log("item data", item.data);
-        // let itemData = web3?.utils?.hexToBytes(item.data as string);
-        // console.log("item data", itemData);
-        // let dataDecode = web3?.utils?.bytesToHex(itemData);
-        // console.log(dataDecode, "itemData");
-        // function bin2String(array: any) {
-        //   var result = "";
-        //   for (var i = 0; i < array.length; i++) {
-        //     result += String.fromCharCode(parseInt(array[i], 2));
-        //   }
-        //   return result;
-        // }
+        ], item.data);
+        const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
+        const title = result[0][1]
+        const description = result[0][2]
+        const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
+        const ownedBy = result[0][7]
+        const saleEndDateNew = result[0][9]
+        const startPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+        const endPrice = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
+        const status = ethers.utils.formatEther(BigNumber?.from(result[0][11]));
 
-        // bin2String(["01100110", "01101111", "01101111"]);
-        // console.log(bin2String(item), "binToString");
+        let dateYear = new Date(saleEndDateNew * 1)
+        let date = new Date(saleEndDateNew * 1000)
+        const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+        let month = monthList[date.getMonth()]
+        let days = date.getDay()
+        let year =  dateYear.getFullYear()
+        let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
 
-        // return item;
+        return {
+          id,
+          title,
+          currentPrice: price,
+          ownedBy,
+          saleEndDate,
+          price: startPrice,
+          priceEnd: endPrice,
+          description,
+          status,
+          totalBids: 20
+        };
       });
-      setProducts(decryptedData);
-      // let newCid = web3?.utils?.hexToBytes((data));
-      // console.log(newCid, "data");
+      setItems(decryptedData);
     }
   }, [data]);
 
@@ -80,12 +87,12 @@ const Home: NextPage = () => {
         hasMore={hasMore}
         loader={
           <Heading textAlign="center" mt="36px" color="white" variant="h5">
-            Loading...
+            {/* Loading... */}
           </Heading>
         }
       >
         <Grid
-          gap="26px"
+          gap="32px"
           justifyContent="space-around"
           templateColumns="repeat(auto-fill, 304px)"
           templateRows="auto"
@@ -95,7 +102,7 @@ const Home: NextPage = () => {
               key={auctionItem.id}
               to={auctionItem.id}
               title={auctionItem.title}
-              price={auctionItem.price}
+              price={auctionItem.priceEnd}
               ownedBy={auctionItem.ownedBy}
               saleEndDate={auctionItem.saleEndDate}
             />

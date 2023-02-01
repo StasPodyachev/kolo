@@ -54,7 +54,7 @@ const SideBar: NextPage = () => {
       <Box
         position="fixed"
         left={isHiddenSidebar ? "160px" : !isDesktop[0] ? "220px" : "336px"}
-        mt="65px"
+        mt="60px"
         minW="max-content"
         minH="max-content"
         p="4px"

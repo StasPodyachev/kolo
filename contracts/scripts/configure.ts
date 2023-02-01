@@ -2,6 +2,7 @@ import { deployNames } from "./constants"
 import deployment from "../deployment/deployments.json"
 import {
   AuctionFile,
+  Chat,
   Factory,
   KoloToken,
   Notary,
@@ -30,6 +31,10 @@ const contracts: any = [
   {
     contractName: deployNames.NOTARY,
     f: notary,
+  },
+  {
+    contractName: deployNames.NOTARY,
+    f: chat,
   },
   {
     contractName: deployNames.TREASURY,
@@ -107,6 +112,31 @@ async function notary() {
   await notary.setFactory(factoryDeployed.address)
 }
 
+async function treasury() {
+  const koloDeployed = deployments[CHAIN_ID][deployNames.KOLO_TOKEN]
+  const exchangeDeployed = deployments[CHAIN_ID][deployNames.MOCK_EXCHANGE]
+  const treasury = (await getKnowContractAt(deployNames.TREASURY)) as Treasury
+
+  await treasury.setKoloToken(koloDeployed.address)
+  await treasury.setExchange(exchangeDeployed.address)
+}
+
+async function koloToken() {
+  const treasuryDeployed = deployments[CHAIN_ID][deployNames.TREASURY]
+  const kolo = (await getKnowContractAt(deployNames.KOLO_TOKEN)) as KoloToken
+
+  const BURNABLE_ROLE = await kolo.BURNABLE_ROLE()
+  await kolo.grantRole(BURNABLE_ROLE, treasuryDeployed.address)
+}
+
+async function chat() {
+  const factoryDeployed = deployments[CHAIN_ID].Factory
+
+  const chat = (await getKnowContractAt(deployNames.CHAT)) as Chat
+
+  await chat.setFactory(factoryDeployed.address)
+}
+
 async function getContractAt(name: string, address: string) {
   const contractFactory = await ethers.getContractFactory(name, WALLET)
 
@@ -118,20 +148,6 @@ async function getKnowContractAt(name: string) {
   const contractDeployed = deployments[CHAIN_ID][name]
 
   return contractFactory.attach(contractDeployed.address)
-}
-
-async function treasury() {
-  const koloDeployed = deployments[CHAIN_ID][deployNames.KOLO_TOKEN]
-  const treasury = (await getKnowContractAt(deployNames.TREASURY)) as Treasury
-
-  await treasury.setKoloToken(koloDeployed.address)
-}
-
-async function koloToken() {
-  const treasuryDeployed = deployments[CHAIN_ID][deployNames.TREASURY]
-  const kolo = (await getKnowContractAt(deployNames.KOLO_TOKEN)) as KoloToken
-
-  await kolo.setBurnAccess(treasuryDeployed.address, true)
 }
 
 // main()
