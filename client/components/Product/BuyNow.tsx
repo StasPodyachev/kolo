@@ -6,17 +6,15 @@ import addresses from "@/contracts/addresses";
 import BigDecimal from "decimal.js-light";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { BIG_1E18 } from "@/helpers/misc";
-import { useRouter } from "next/router";
 import { BigNumber } from "ethers";
 
-const PlaceBid = ({isConnected,bid, id}:{isConnected: boolean, bid: number, id: number}) => {
-  const bidValue = BigInt(new BigDecimal(bid).mul(BIG_1E18 + "").toFixed(0)) + ""
-  
+const BuyNow = ({isConnected, price, id}:{isConnected: boolean, price: number, id: number}) => {
+  const praceValue = BigInt(new BigDecimal(price).mul(BIG_1E18 + "").toFixed(0)) + ""
   const { config } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: 'bid',
-    args: [BigNumber.from(id), {value: bidValue}]
+    args: [BigNumber.from(id), {value: praceValue}]
   })
   const { write } = useContractWrite(config)
  
@@ -37,4 +35,4 @@ const PlaceBid = ({isConnected,bid, id}:{isConnected: boolean, bid: number, id: 
   )
 }
 
-export default PlaceBid
+export default BuyNow
