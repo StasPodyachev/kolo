@@ -259,7 +259,6 @@ describe("AuctionFile", () => {
     })
 
 
-
     it("fails if wrong deal id", async () => {
 
       await expect(auctionFile.bid(1000, {

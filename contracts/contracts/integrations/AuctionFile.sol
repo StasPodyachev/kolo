@@ -117,8 +117,6 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             "AuctionFile: Wrong collateral"
         );
 
-        console.log(block.timestamp);
-
         require(
             priceStart != 0 &&
                 priceStart < priceForceStop &&
@@ -257,8 +255,6 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function finalize(uint256 dealId) external {
-        console.log("finalize: ", block.timestamp);
-
         AuctionFileParams storage deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
 
@@ -283,7 +279,6 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             );
 
             deal.status = AuctionStatus.CLOSE;
-            console.log("CLOSED");
             _chat.sendSystemMessage(dealId, "Deal closed.");
 
             emit DealClosed(dealId);
