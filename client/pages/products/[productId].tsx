@@ -67,6 +67,7 @@ const ProductPage: NextPage = () => {
       const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
       const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
       const status = result[0][11] && convertStatus(Number(result[0][11]));
+      const minStep = 0.01
 
       // Create a new JavaScript Date object based on the timestamp
       // multiplied by 1000 so that the argument is in milliseconds, not seconds.
@@ -77,7 +78,6 @@ const ProductPage: NextPage = () => {
       let days = date.getDay();
       let year =  dateYear.getFullYear()
       let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
-
       const decryptedData = {
         id,
         title,
@@ -90,21 +90,24 @@ const ProductPage: NextPage = () => {
         status,
         totalBids: 20,
       }
+
+      setBid(price < priceStart ? priceStart + '' : price + minStep + '')
       setItem(decryptedData)
     }
     if (bidsData && Array.isArray(bidsData)) {
       const decryptedData = bidsData?.map((item: any) => {
         const currentBid = +ethers.utils.formatEther(BigNumber?.from(item.bid._hex));
-        setBid(currentBid.toString());
+        // setBid(currentBid.toString())
         console.log(currentBid, 'currentBid');
-
+        
       })
+      console.log(decryptedData, 'decryptedData')
     }
   }, [fetchedData, bidsData]);
   return (
     item.id ?
     <Layout pageTitle="Item">
-      <Product item={item} bid={bid} setBid={setBid} currentBid={item.price.toString()} />
+      <Product item={item} bid={bid} setBid={setBid} currentBid={item?.price?.toString()} />
     </Layout> : null
   );
 };

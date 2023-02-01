@@ -9,9 +9,10 @@ import { BIG_1E18 } from "@/helpers/misc";
 import { useRouter } from "next/router";
 import { BigNumber } from "ethers";
 
-const PlaceBid = ({isConnected,bid, id}:{isConnected: boolean, bid: number, id: number}) => {
-  const bidValue = BigInt(new BigDecimal(bid).mul(BIG_1E18 + "").toFixed(0)) + ""
+const PlaceBid = ({isDisabled,bid,id}:{isDisabled: boolean, bid: string, id: number}) => {
+  console.log(bid, 'bid');
   
+  const bidValue = BigInt(new BigDecimal(bid).mul(BIG_1E18 + "").toFixed(0)) + ""  
   const { config } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -22,12 +23,13 @@ const PlaceBid = ({isConnected,bid, id}:{isConnected: boolean, bid: number, id: 
  
   return (
     <Button
+      w="100%"
+      minH="48px"
       onClick={() => write?.()}
-      isDisabled={!isConnected}
+      isDisabled={isDisabled}
       textStyle="button"
       bg="blue.primary"
       color="white"
-      mt="39px"
       borderRadius={0}
       transition="all .3s"
       _hover={{ bg: "blue.hover" }}

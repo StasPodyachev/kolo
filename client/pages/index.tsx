@@ -48,7 +48,6 @@ const Home: NextPage = () => {
         const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const status = result[0][11].toString()
-        console.log(id, 'id');
         
         let dateYear = new Date(saleEndDateNew * 1)
         let date = new Date(saleEndDateNew * 1000)
