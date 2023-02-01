@@ -83,12 +83,12 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
     function sendMessage(uint256 dealId, string calldata message) external {
         SimpleTradeFileParams memory deal = deals[dealId];
-        require(deal.price != 0, "SimpleTradeFileFile: Id not found");
+        require(deal.price != 0, "SimpleTradeFile: Id not found");
 
         require(
             deal.status != SimpleTradeFileStatus.CLOSE &&
                 deal.status != SimpleTradeFileStatus.CANCEL,
-            "SimpleTradeFileFile: Wrong status"
+            "SimpleTradeFile: Wrong status"
         );
 
         _chat.sendMessage(dealId, message, msg.sender);
@@ -105,18 +105,18 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
         require(
             storeAddress != address(0),
-            "SimpleTradeFileFile: Caller does not have a store"
+            "SimpleTradeFile: Caller does not have a store"
         );
 
         require(
             msg.value >= (price * _collateralPercent) / 1e18 &&
                 msg.value >= _collateralAmount,
-            "SimpleTradeFileFile: Wrong collateral"
+            "SimpleTradeFile: Wrong collateral"
         );
 
         require(
             price != 0 && dateExpire > block.timestamp,
-            "SimpleTradeFileFile: Wrong params"
+            "SimpleTradeFile: Wrong params"
         );
 
         uint256 id = _factory.addDeal(storeAddress);
@@ -171,6 +171,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         this.addAccsess(dealId, deal.buyer);
         deal.status = SimpleTradeFileStatus.FINALIZE;
         deal.dateExpire = block.timestamp;
+        emit DealFinalized(dealId);
 
         _chat.sendSystemMessage(
             dealId,

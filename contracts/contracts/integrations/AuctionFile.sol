@@ -155,8 +155,6 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function bid(uint256 dealId) external payable {
-        console.log("bid: ", block.timestamp);
-
         AuctionFileParams storage deal = deals[dealId];
 
         require(deal.priceStart != 0, "AuctionFile: Id not found");
@@ -169,32 +167,30 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         );
 
         require(block.timestamp < deal.dateExpire, "AuctionFile: Time is up");
-
-        uint256 currentBid = bids[dealId][msg.sender] + msg.value;
-
-        require(currentBid >= deal.priceStart, "AuctionFile: Wrong amount");
-
-        console.log("BID: ", currentBid);
-        console.log("PRICE: ", deal.price);
+        require(msg.value >= deal.priceStart, "AuctionFile: Wrong amount");
 
         require(
-            currentBid > deal.price,
+            msg.value > deal.price,
             "AuctionFile: Current bid cannot be less then previous bid"
         );
 
         address storeAddress = _factory.getStore(deal.seller);
         IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
-        deal.price = currentBid;
+        if (deal.price != 0) {
+            IStore(storeAddress).withdrawBuyer(dealId, deal.buyer);
+        }
+
+        deal.price = msg.value;
         deal.buyer = msg.sender;
 
-        bids[dealId][msg.sender] = currentBid;
+        bids[dealId][msg.sender] = msg.value;
 
         bidHistory[dealId].push(
             BidParams({
                 timestamp: block.timestamp,
                 buyer: msg.sender,
-                bid: currentBid
+                bid: msg.value
             })
         );
 
@@ -207,8 +203,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         emit BidCreated(dealId, deal.buyer, deal.price);
 
-        if (currentBid >= deal.priceForceStop) {
-            _finalize(deal, IStore(storeAddress));
+        if (msg.value >= deal.priceForceStop) {
+            _finalize(deal);
         }
     }
 
@@ -298,35 +294,33 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             return;
         }
 
-        _finalize(deal, IStore(storeAddress));
+        _finalize(deal);
     }
 
-    function _finalize(AuctionFileParams storage deal, IStore store) internal {
-        _withdrawBids(deal.id, deal.buyer, store);
+    function _finalize(AuctionFileParams storage deal) internal {
+        // _withdrawBids(deal.id, deal.buyer, store);
         this.addAccsess(deal.id, deal.buyer);
 
         deal.status = AuctionStatus.FINALIZE;
         deal.dateExpire = block.timestamp;
 
-        console.log("FINALIZED");
-
         _chat.sendSystemMessage(deal.id, "Deal finalized.");
         emit DealFinalized(deal.id);
     }
 
-    function _withdrawBids(
-        uint256 dealId,
-        address buyer,
-        IStore store
-    ) internal {
-        address[] memory buyers = bidBuyers[dealId];
+    // function _withdrawBids(
+    //     uint256 dealId,
+    //     address buyer,
+    //     IStore store
+    // ) internal {
+    //     address[] memory buyers = bidBuyers[dealId];
 
-        for (uint256 i = 0; i < buyers.length; i++) {
-            if (buyers[i] == buyer) continue;
+    //     for (uint256 i = 0; i < buyers.length; i++) {
+    //         if (buyers[i] == buyer) continue;
 
-            store.withdrawBuyer(dealId, buyers[i]);
-        }
-    }
+    //         store.withdrawBuyer(dealId, buyers[i]);
+    //     }
+    // }
 
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
