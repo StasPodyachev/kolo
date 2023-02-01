@@ -6,7 +6,6 @@ import {
   NumberInput as ChakraNumberInput,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { numberWithCommas } from "@/helpers";
 
 interface IProps {
   value: string;
@@ -38,13 +37,12 @@ const NumberInput = ({
       mt={isNeededMarginTop ? "16px" : 0}
     >
       <ChakraNumberInput
-        step={0.01}
+        min={minValue}
         value={value}
         onKeyPress={(event) => {
-          console.log("e key", event.key);
           if (event.key === "e" || event.key === "E" || event.key === "-") {
             setTimeout(() => {
-              setValue("");
+              setValue("0");
             }, 100);
           }
         }}
@@ -52,7 +50,7 @@ const NumberInput = ({
           if (isCollateralInput && minValue && minValue > +event) {
             setTimeout(() => setValue(minValue.toString()), 2000);
           } else {
-            setValue(numberWithCommas(+event));
+            setValue(event);
           }
         }}
         w="100%"

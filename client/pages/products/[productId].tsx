@@ -21,7 +21,7 @@ const ProductPage: NextPage = () => {
   const [fetchedData, setFetchedData] = useState<unknown>();
   const [bidsData, setBidsData] = useState<unknown>();
   const [bidsAmount, setBidsAmount] = useState();
-  const [bid, setBid] = useState("");
+  const [bid, setBid] = useState("0");
   const router = useRouter();
 
   useEffect(() => {
@@ -94,15 +94,15 @@ const ProductPage: NextPage = () => {
     }
     if (bidsData && Array.isArray(bidsData)) {
       const decryptedData = bidsData?.map((item: any) => {
-        const currentBid = +ethers.utils.formatEther(BigNumber?.from(item.bid._hex));
-        setBid(currentBid.toString());
+        const currentBid = ethers.utils.formatEther(BigNumber?.from(item.bid._hex));
+        setBid(currentBid);
       })
     }
   }, [fetchedData, bidsData]);
   return (
     item.id ?
     <Layout pageTitle="Item">
-      <Product item={item} bid={bid} setBid={setBid} />
+      <Product item={item} bid={bid} setBid={setBid} currentBid={item.currentPrice.toString()} />
     </Layout> : null
   );
 };

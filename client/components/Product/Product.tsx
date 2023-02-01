@@ -1,20 +1,21 @@
 import useDevice from "@/hooks/useDevice";
 import { IAuctionItem } from "@/types";
-import { Box, Button, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
+import { Box, Button, Flex, FormControl, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useAccount, useSigner } from "wagmi";
+import { useSigner } from "wagmi";
 import Tooltip from "../ui/Tooltip";
 import BidsTable from "../Products/BidsTable";
 
-const Product = ({item, bid, setBid} : {item: IAuctionItem, bid: string, setBid: (value: string) => void}) => {
+const Product = ({item, bid, setBid, currentBid} : {item: IAuctionItem, bid: string, setBid: (value: string) => void, currentBid: string}) => {
   const { isDesktopHeader } = useDevice();
   const isItemsInColumn = useMediaQuery("(max-width: 899px)");
-  const { isConnected } = useAccount();
   const signer = useSigner();
+  const isBidError = +bid <= +currentBid;
+
   return (
     <Flex flexDir="column">
         <Flex
@@ -115,7 +116,7 @@ const Product = ({item, bid, setBid} : {item: IAuctionItem, bid: string, setBid:
                   <Button
                     w="100%"
                     minH="48px"
-                    isDisabled={!signer}
+                    isDisabled={!signer || isBidError}
                     textStyle="button"
                     bg="blue.primary"
                     color="white"
