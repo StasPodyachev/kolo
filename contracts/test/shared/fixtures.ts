@@ -5,6 +5,7 @@ import { Notary } from "../../typechain/Notary"
 import { Chat } from "../../typechain/Chat"
 import { Treasury } from "../../typechain/Treasury"
 import { AuctionFile } from "../../typechain/AuctionFile"
+import { SimpleTradeFile } from "../../typechain/SimpleTradeFile"
 
 import { ethers } from "hardhat"
 
@@ -31,6 +32,13 @@ interface TreasuryFixture {
 interface AuctionFileFixture {
   auctionFile: AuctionFile
   factory: Factory
+  notary: Notary
+}
+
+interface SimpleTradeFileFixture {
+  simpleTradeFile: SimpleTradeFile
+  factory: Factory
+  notary: Notary
 }
 
 export async function factoryFixture(): Promise<FactoryFixture> {
@@ -42,6 +50,7 @@ export async function factoryFixture(): Promise<FactoryFixture> {
 
   factory.setTreasury(treasury.address)
   factory.setChat(chat.address)
+  chat.setFactory(factory.address)
 
   return { factory }
 }
@@ -85,5 +94,29 @@ export async function auctionFileFixture(): Promise<AuctionFileFixture> {
   const { factory } = await factoryFixture()
   auctionFile.setFactory(factory.address)
 
-  return { auctionFile, factory }
+  const notaryFactory = await ethers.getContractFactory("Notary")
+  const notary = (await notaryFactory.deploy()) as Notary
+  notary.setFactory(factory.address)
+  auctionFile.setNotary(notary.address)
+
+  factory.registerIntegration(0, auctionFile.address);
+
+  return { auctionFile, factory, notary }
+}
+
+export async function simpleTradeFileFixture(): Promise<SimpleTradeFileFixture> {
+  const stFactory = await ethers.getContractFactory("SimpleTradeFile")
+  const st = (await stFactory.deploy()) as SimpleTradeFile
+
+  const { factory } = await factoryFixture()
+  st.setFactory(factory.address)
+
+  const notaryFactory = await ethers.getContractFactory("Notary")
+  const notary = (await notaryFactory.deploy()) as Notary
+  notary.setFactory(factory.address)
+  st.setNotary(notary.address)
+
+  factory.registerIntegration(0, st.address);
+
+  return { simpleTradeFile: st, factory, notary }
 }

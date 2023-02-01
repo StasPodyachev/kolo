@@ -99,9 +99,7 @@ const GetIntegrationInfo = ({
   });
   useEffect(() => {
     let priceOfStart = +startPrice.split(",").join("");
-    console.log("price", priceOfStart);
     if (data) {
-      // console.log(data, "data");
       const collateralAmountValue = BigNumber?.from(data.collateralAmount);
       const minCollateralAmount = +ethers.utils.formatEther(
         collateralAmountValue
@@ -111,10 +109,9 @@ const GetIntegrationInfo = ({
         collateralPercentValue
       );
       const minimalCollateral =
-        priceOfStart * minCollateralPercent > minCollateralAmount
+      priceOfStart * minCollateralPercent > minCollateralAmount
           ? priceOfStart * minCollateralPercent
           : minCollateralAmount;
-      // console.log(minimalCollateral.toFixed(2), "value");
       const myCollateral =
         minimalCollateral >= (priceOfStart * minCollateralPercent) / 1e18
           ? minimalCollateral
@@ -175,7 +172,6 @@ const NewPoduct = () => {
     uploaded: number;
   }) => {
     let percentageDone = 100 - total / uploaded;
-    console.log(percentageDone.toFixed(2));
   };
 
   const deployEncrypted = async (e: any, isFile: boolean) => {
@@ -187,7 +183,6 @@ const NewPoduct = () => {
       signedMessage,
       progressCallback
     );
-    console.log(response);
     const conditionsId = await lighthouse?.getAccessConditions(
       response?.data?.Hash
     );
@@ -237,7 +232,6 @@ const NewPoduct = () => {
   const isDateStopError = stopDate === '';
 
   useEffect(() => {
-    console.log(store, 'store');
     if (store === '0x0000000000000000000000000000000000000000') {
       setIsStore(false);
 
@@ -257,9 +251,15 @@ const NewPoduct = () => {
           setValue={setMyCollateral}
           myCollateral={myCollateral}
         />
+        {!address ? (
+            <ConnectBtn isCentered isNeedMarginTop />
+        ) : null}
         {!isStore && address
-          ? <CreateStore address={address as `0x${string}`} /> : null}
-        <Box minW="100%">
+          ? <CreateStore address={address as `0x${string}`} />
+          : null
+        }
+        {isStore && address ? (
+          <Box minW="100%">
           <Heading variant="h6" color="gray.200" mt="32px">
             Type of Sale
           </Heading>
@@ -344,7 +344,6 @@ const NewPoduct = () => {
                   min={getTodaysDate()}
                   value={stopDate}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    console.log('date time', typeof event, event)
                     // const start = Date.now() - event.target.value
                     setStopDate(event.target.value);
                   }}
@@ -363,7 +362,7 @@ const NewPoduct = () => {
                   value={myCollateral}
                   setValue={setMyCollateral}
                   isNeededMarginTop
-                  minValue={+startPrice.split(",").join("") * 0.1}
+                  minValue={+startPrice * 0.1}
                   isCollateralInput
                 />
               </FormControl>
@@ -399,7 +398,6 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
-                    console.log('NOW HERE', e)
                     deployEncrypted(e, true);
                   }}
                 />
@@ -479,10 +477,9 @@ const NewPoduct = () => {
                 (itemName && itemDescription && startPrice && forceStopPrice && stopDate && myCollateral && fileName
                   ? false : true)}
             />
-          ) : !isConnected ? (
-            <ConnectBtn isCentered isNeedMarginTop />
           ) : null}
         </Box>
+        ) : null}
       </Box>
     </Flex>
   );

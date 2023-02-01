@@ -6,7 +6,6 @@ import {
   NumberInput as ChakraNumberInput,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { numberWithCommas } from "@/helpers";
 
 interface IProps {
   value: string;
@@ -16,6 +15,7 @@ interface IProps {
   minValue?: number;
   isCollateralInput?: boolean;
   errorMessage?: string;
+  width?: string;
 }
 
 const NumberInput = ({
@@ -26,22 +26,23 @@ const NumberInput = ({
   minValue,
   isCollateralInput,
   errorMessage,
+  width,
 }: IProps) => {
   return (
     <>
       <InputGroup
-      minW={isNotFullWidth ? "278px" : "100%"}
+      minW={isNotFullWidth ? "278px" : width ? width : "100%"}
+      width={width}
       minH="48px"
       mt={isNeededMarginTop ? "16px" : 0}
     >
       <ChakraNumberInput
-        step={0.01}
+        min={minValue}
         value={value}
         onKeyPress={(event) => {
-          console.log("e key", event.key);
           if (event.key === "e" || event.key === "E" || event.key === "-") {
             setTimeout(() => {
-              setValue("");
+              setValue("0");
             }, 100);
           }
         }}
@@ -49,7 +50,7 @@ const NumberInput = ({
           if (isCollateralInput && minValue && minValue > +event) {
             setTimeout(() => setValue(minValue.toString()), 2000);
           } else {
-            setValue(numberWithCommas(+event));
+            setValue(event);
           }
         }}
         w="100%"

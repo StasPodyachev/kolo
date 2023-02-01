@@ -1,4 +1,4 @@
-import { ethers, waffle } from "hardhat"
+import { ethers, waffle, network } from "hardhat"
 import { BigNumber, constants, utils, Wallet } from "ethers"
 import { AuctionFile } from "../typechain/AuctionFile"
 import { Factory } from "../typechain/Factory"
@@ -9,27 +9,28 @@ import { expect } from "chai"
 import { auctionFileFixture } from "./shared/fixtures"
 import { moveBlocks } from "./utils/move-blocks"
 import { moveTime } from "./utils/move-time"
+import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 const createFixtureLoader = waffle.createFixtureLoader
 
 describe("AuctionFile", () => {
-  let wallet: Wallet, other: Wallet
+  let wallet: Wallet, other: Wallet, buyer: Wallet
 
   let auctionFile: AuctionFile
   let factory: Factory
   let chat: Chat
 
-
   let loadFixture: ReturnType<typeof createFixtureLoader>
 
   before("create fixture loader", async () => {
-    ;[wallet, other] = await (ethers as any).getSigners()
-    loadFixture = createFixtureLoader([wallet, other])
+    ;[wallet, other, buyer] = await (ethers as any).getSigners()
+    loadFixture = createFixtureLoader([wallet, other, buyer])
   })
 
   beforeEach("deploy fixture", async () => {
     ; ({ auctionFile, factory } = await loadFixture(async () => {
       const { auctionFile, factory } = await auctionFileFixture()
+
       return { auctionFile, factory }
     }))
   })
@@ -39,10 +40,21 @@ describe("AuctionFile", () => {
       await factory.createStore()
       const storeAddress = await factory["getStore(address)"](wallet.address);
 
-      await expect(auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", { value: BigNumber.from("100000000000000000") }
-      ))
+      const oldBalance = (await wallet.getBalance()).toString()
+      const collateral = BigNumber.from("100000000000000000")
+
+      const tx = await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", { value: collateral }
+      )
+
+      await expect(tx)
         .to.emit(auctionFile, "DealCreated")
         .withArgs(1, wallet.address)
+
+      const txRec = await tx.wait()
+      const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
+      const newBalance = (await wallet.getBalance()).toString()
+
+      expect(collateral.add(newBalance).add(gas)).to.eq(oldBalance);
 
       expect(await factory["getStore(uint256)"](1))
         .to.be.eq(storeAddress);
@@ -60,9 +72,7 @@ describe("AuctionFile", () => {
     })
 
     it("fails if wrong collateral was passed", async () => {
-
       await factory.createStore();
-
       await expect(
         auctionFile.create(
           "NAME",
@@ -74,11 +84,9 @@ describe("AuctionFile", () => {
           { value: BigNumber.from("10000000000000000") }
         )
       ).to.be.revertedWith("AuctionFile: Wrong collateral")
-
     })
 
     it("fails if wrong priceStart was passed", async () => {
-
       await factory.createStore();
 
       await expect(
@@ -96,7 +104,6 @@ describe("AuctionFile", () => {
 
 
     it("fails if wrong dateExpire was passed", async () => {
-
       await factory.createStore();
 
       await expect(
@@ -110,10 +117,10 @@ describe("AuctionFile", () => {
           { value: BigNumber.from("100000000000000000") }
         )
       ).to.be.revertedWith("AuctionFile: Wrong params")
+
     })
 
     it("fails if priceStart equals priceForceStop", async () => {
-
       await factory.createStore()
 
       await expect(
@@ -133,7 +140,9 @@ describe("AuctionFile", () => {
 
   describe("#cancel", () => {
     it("should cancel bid", async () => {
+
       await factory.createStore()
+      const oldBalance = (await wallet.getBalance()).toString()
 
       await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
         value: BigNumber.from("100000000000000000")
@@ -188,20 +197,51 @@ describe("AuctionFile", () => {
     it("should create bid", async () => {
       await factory.connect(other).createStore()
 
+
       await auctionFile.connect(other).create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
         value: BigNumber.from("100000000000000000")
       })
 
-      await expect(auctionFile.bid(1, {
-        value: BigNumber.from("10000000000")
-      }))
+      const oldBalanceWallet = (await wallet.getBalance()).toString()
+      const bid = BigNumber.from("10000000000")
+
+      let tx = await auctionFile.bid(1, {
+        value: bid
+      })
+
+      await expect(tx)
         .to.emit(auctionFile, "BidCreated")
         .withArgs(1, wallet.address, BigNumber.from("10000000000"))
 
+      let txRec = await tx.wait()
+      let gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
+      const newBalanceWallet = (await wallet.getBalance()).toString()
+
+      expect(bid.add(newBalanceWallet).add(gas)).to.eq(oldBalanceWallet);
+
+      const oldBalanceBuyer = (await buyer.getBalance()).toString()
+
+      tx = await auctionFile.connect(buyer).bid(1, {
+        value: bid.add(1)
+      })
+
+      await expect(tx)
+        .to.emit(auctionFile, "BidCreated")
+        .withArgs(1, buyer.address, bid.add(1))
+
+      txRec = await tx.wait()
+      gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
+      const newBalanceBuyer = (await buyer.getBalance()).toString()
+
+      expect(bid.add(1).add(newBalanceBuyer).add(gas)).to.eq(oldBalanceBuyer);
+
+      const newestBalanceWallet = (await wallet.getBalance()).toString()
+      expect(bid.add(newBalanceWallet)).to.eq(newestBalanceWallet);
+
       const bids = await auctionFile.getBidHistory(1)
-      expect(bids.length).to.eq(1)
-      expect(bids[0].buyer).to.eq(wallet.address)
-      expect(bids[0].bid).to.eq(BigNumber.from("10000000000"))
+      expect(bids.length).to.eq(2)
+      expect(bids[1].bid).to.eq(BigNumber.from(bid.add(1)))
+      expect(bids[1].buyer).to.eq(buyer.address)
 
     })
 
@@ -217,6 +257,8 @@ describe("AuctionFile", () => {
       }))
         .to.revertedWith("AuctionFile: Seller cannot be a buyer")
     })
+
+
 
     it("fails if wrong deal id", async () => {
 
@@ -241,17 +283,386 @@ describe("AuctionFile", () => {
         .to.revertedWith("AuctionFile: Wrong status")
     })
 
-    // it("fails if store is not created", async () => {
-    //   await expect(auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", { value: BigNumber.from("100000000000000000") }
-    //   ))
-    //     .to.be.revertedWith("AuctionFile: Caller does not have a store");
-    // })
+    it("should create bid eq priceForceStop", async () => {
+      await factory.connect(other).createStore()
 
-    // it("fails if wrong collateral was passed", async () => {
+      await auctionFile.connect(other).create("NAME", "DESCRIPTION", 10000000000, 100000000000, Date.now() + 1000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
 
-    //   await factory.createStore();
+      await expect(auctionFile.bid(1, {
+        value: BigNumber.from("100000000000000000")
+      }))
+        .to.emit(auctionFile, "DealFinalized")
+        .withArgs(1)
 
-    // })
+      const bids = await auctionFile.getBidHistory(1)
+      expect(bids.length).to.eq(1)
+      expect(bids[0].buyer).to.eq(wallet.address)
+      expect(bids[0].bid).to.eq(BigNumber.from("100000000000000000"))
+    })
+
+    it("fails if time is up", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+
+      await expect(auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      }))
+        .to.revertedWith("AuctionFile: Time is up")
+    })
+
+
+    it("fails if amount is wrong", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await expect(auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("100000000")
+      })).to.revertedWith("AuctionFile: Wrong amount");
+    })
+
+
+    it("fails if current bid is less then previous bid", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("80000000000")
+      })
+
+      await expect(auctionFile.connect(buyer).bid(1, {
+        value: BigNumber.from("60000000000")
+      })).to.revertedWith("AuctionFile: Current bid cannot be less then previous bid");
+
+
+    })
+  })
+
+
+  describe("#finalize", () => {
+    it("should finalize with no bids", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+
+      await expect(auctionFile.finalize(1))
+        .to.emit(auctionFile, "DealClosed")
+        .withArgs(1);
+    })
+
+    it("should finalize with bids", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(buyer).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("60000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+
+      await expect(auctionFile.finalize(1))
+        .to.emit(auctionFile, "DealFinalized")
+        .withArgs(1);
+
+      expect(await auctionFile["checkAccsess(bytes,address)"]("0x", other.address))
+        .to.eq(1);
+    })
+
+    it("fails if auction is not open", async () => {
+      await factory.createStore()
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.cancel(1);
+      await time.increase(time.duration.hours(1));
+
+
+      await expect(auctionFile.finalize(1))
+        .to.revertedWith("AuctionFile: Auction is not open");
+    })
+
+
+    it("fails if id not found", async () => {
+      await factory.createStore()
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await expect(auctionFile.finalize(100))
+        .to.revertedWith("AuctionFile: Id not found");
+    })
+
+
+    it("fails if date expire", async () => {
+      await factory.createStore()
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      //await time.increase(time.duration.days(10));
+
+      await expect(auctionFile.finalize(1))
+        .to.revertedWith("AuctionFile: Date is not expire");
+    })
+  })
+
+
+  describe("#dispute", () => {
+    it("should make dispute", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+
+      await auctionFile.finalize(1);
+
+      await expect(auctionFile.connect(other).dispute(1, {
+        value: BigNumber.from("100000000000000000")
+      }))
+        .to.emit(auctionFile, "DisputeCreated")
+        .withArgs(1);
+    })
+
+    it("fails without finalize", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+
+      await expect(auctionFile.connect(other).dispute(1, {
+        value: BigNumber.from("100000000000000000")
+      }))
+        .to.revertedWith("AuctionFile: Wrong status");
+    })
+
+    it("fails if id not found", async () => {
+      await expect(auctionFile.dispute(1000, {
+        value: BigNumber.from("100000000000000000")
+      }))
+        .to.revertedWith("AuctionFile: Id not found");
+    })
+
+    it("fails if caller is not a buyer", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+
+      await auctionFile.finalize(1);
+
+      await expect(auctionFile.dispute(1, {
+        value: BigNumber.from("100000000000000000")
+      }))
+        .to.revertedWith("AuctionFile: Caller is not a buyer");
+    })
+
+    it("fails if time for dispute is up", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+
+      await auctionFile.finalize(1);
+      await time.increase(time.duration.days(10));
+
+      await expect(auctionFile.connect(other).dispute(1, {
+        value: BigNumber.from("100000000000000000")
+      }))
+        .to.revertedWith("AuctionFile: Time for dispute is up");
+    })
+
+
+    it("fails if collateral is wrong", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+
+      await auctionFile.finalize(1);
+      await expect(auctionFile.connect(other).dispute(1))
+        .to.revertedWith("AuctionFile: Wrong collateral");
+    })
+  })
+
+  describe("#receiveReward", () => {
+    it("should receiveReward", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+      await auctionFile.finalize(1);
+      await time.increase(time.duration.days(6));
+
+      await expect(auctionFile.receiveReward(1))
+        .to.emit(auctionFile, "DealClosed")
+        .withArgs(1);
+    })
+
+    it("fails if its time for dispute", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest();
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await time.increase(time.duration.hours(1));
+      await auctionFile.finalize(1);
+      //await time.increase(time.duration.days(6));
+
+      await expect(auctionFile.receiveReward(1))
+        .to.revertedWith("AuctionFile: Time for dispute");
+    })
+
+    it("fails if wrong status", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await expect(auctionFile.receiveReward(1))
+        .to.revertedWith("AuctionFile: Wrong status");
+    })
+
+    it("fails if id not found", async () => {
+      await factory.createStore()
+
+      console.log("DATE JS: ", time.duration.hours(1));
+      const ts = await time.latest();
+
+
+      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
+        value: BigNumber.from("100000000000000000")
+      })
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000")
+      })
+
+      await expect(auctionFile.receiveReward(1000))
+        .to.revertedWith("AuctionFile: Id not found");
+    })
+
+
   })
 
   describe("#getDeal", () => {

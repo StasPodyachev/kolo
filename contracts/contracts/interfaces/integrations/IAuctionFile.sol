@@ -42,6 +42,8 @@ interface IAuctionFile {
     event BidCreated(uint256 id, address sender, uint256 amount);
     event DealCreated(uint256 dealId, address sender);
     event DealCanceled(uint256 dealId, address sender);
+    event DealFinalized(uint256 dealId);
+    event DealClosed(uint256 dealId);
 
     function getIntegrationInfo()
         external

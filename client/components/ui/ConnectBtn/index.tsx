@@ -24,7 +24,7 @@ const ConnectBtn = ({
       justifyContent={isCentered ? "center" : "normal"}
       alignItems={isCentered ? "center" : "normal"}
       alignSelf={isCentered ? "center" : "baseline"}
-      w="max-content"
+      w="100%"
       sx={{
         div: {
           height: "100%",

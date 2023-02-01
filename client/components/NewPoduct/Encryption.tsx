@@ -20,7 +20,6 @@ const Encryption = () => {
 
   const progressCallback = ({total, uploaded}:{total: number, uploaded: number}) => {
     let percentageDone = 100 - (total / uploaded);
-    console.log(percentageDone.toFixed(2));
   };
 
   const deployEncrypted = async(e: any) =>{
@@ -32,7 +31,6 @@ const Encryption = () => {
       signedMessage,
       progressCallback
     );
-    console.log(response);
   }
 
   return (

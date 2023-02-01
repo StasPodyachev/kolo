@@ -34,6 +34,8 @@ interface ISimpleTradeFile {
     event DisputeCreated(uint256 id);
     event DealCreated(uint256 dealId, address sender);
     event DealCanceled(uint256 dealId, address sender);
+    event DealFinalized(uint256 dealId);
+    event DealClosed(uint256 dealId);
 
     function getIntegrationInfo()
         external
