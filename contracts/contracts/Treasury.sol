@@ -14,6 +14,8 @@ contract Treasury is ITreasury, Ownable {
     uint256 private _dateTx;
     address private _token;
 
+    receive() external payable {}
+
     function setKoloToken(address token) external onlyOwner {
         _token = token;
         // KoloToken(_token).setBurnAccess(address(this), true);

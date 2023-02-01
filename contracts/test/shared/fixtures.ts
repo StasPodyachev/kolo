@@ -85,5 +85,10 @@ export async function auctionFileFixture(): Promise<AuctionFileFixture> {
   const { factory } = await factoryFixture()
   auctionFile.setFactory(factory.address)
 
+  const notaryFactory = await ethers.getContractFactory("Notary")
+  const notary = (await notaryFactory.deploy()) as Notary
+  notary.setFactory(factory.address)
+  auctionFile.setNotary(notary.address)
+
   return { auctionFile, factory }
 }

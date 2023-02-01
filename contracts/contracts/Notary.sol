@@ -150,7 +150,7 @@ contract Notary is INotary, Ownable {
         IStore store = IStore(storeAddress);
         IIntegration integration = IIntegration(store.getIntegration(dealId));
 
-        for (uint256 i = 0; i < _countInvaitedNotary; i++) {
+        for (uint256 i = 0; i < arr.length; i++) {
             notaries[dealId][arr[i]] = true;
             IIntegration(integration).addAccsess(dealId, arr[i]);
         }
