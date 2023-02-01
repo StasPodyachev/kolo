@@ -2,7 +2,12 @@ import { Flex, Heading } from "@chakra-ui/react";
 import { NextPage } from "next";
 import ConnectBtn from "../ConnectBtn";
 
-const PlugNotConnectedUser: NextPage = () => {
+interface IProps {
+  title: string;
+  isNeedConnectBtn?: boolean;
+}
+
+const Plug = ({ title, isNeedConnectBtn }: IProps) => {
   return (
     <Flex
       bg="black"
@@ -14,11 +19,13 @@ const PlugNotConnectedUser: NextPage = () => {
       alignItems="center"
     >
       <Heading variant="h6" color="gray.400" textStyle="button">
-        to see your info
+        {title}
       </Heading>
-      <ConnectBtn isCentered isNeedSmallMarginTop />
+      {isNeedConnectBtn ? (
+        <ConnectBtn isCentered isNeedSmallMarginTop />
+      ) : null}
     </Flex>
   );
 };
 
-export default PlugNotConnectedUser;
+export default Plug;

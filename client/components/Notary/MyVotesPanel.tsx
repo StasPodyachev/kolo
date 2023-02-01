@@ -11,7 +11,7 @@ const MyVotesPanel: NextPage = () => {
       <Heading mt="28px" variant="h3">
         My Votes
       </Heading>
-      <AuctionItemsAccordion />
+      <AuctionItemsAccordion deals={[]} />
     </TabPanel>
   );
 };

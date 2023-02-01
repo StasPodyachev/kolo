@@ -8,7 +8,7 @@ import Tabs from "@/components/ui/Tabs";
 import { useAccount } from "wagmi";
 import ConnectBtn from "@/components/ui/ConnectBtn";
 import { Flex, Text } from "@chakra-ui/react";
-import PlugNotConnectedUser from "@/components/ui/PlugNotConnectedUser";
+import Plug from "@/components/ui/Plug";
 
 const Notary: NextPage = () => {
   const { isConnected } = useAccount();
@@ -21,7 +21,7 @@ const Notary: NextPage = () => {
           <DepositOrWithdrawPanel />
         </Tabs>
       ) : (
-        <PlugNotConnectedUser />
+        <Plug title="to see your info" isNeedConnectBtn />
       )}
     </Layout>
   );

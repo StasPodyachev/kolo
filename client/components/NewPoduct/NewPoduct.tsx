@@ -257,9 +257,15 @@ const NewPoduct = () => {
           setValue={setMyCollateral}
           myCollateral={myCollateral}
         />
+        {!address ? (
+            <ConnectBtn isCentered isNeedMarginTop />
+        ) : null}
         {!isStore && address
-          ? <CreateStore address={address as `0x${string}`} /> : null}
-        <Box minW="100%">
+          ? <CreateStore address={address as `0x${string}`} />
+          : null
+        }
+        {isStore && address ? (
+          <Box minW="100%">
           <Heading variant="h6" color="gray.200" mt="32px">
             Type of Sale
           </Heading>
@@ -479,10 +485,9 @@ const NewPoduct = () => {
                 (itemName && itemDescription && startPrice && forceStopPrice && stopDate && myCollateral && fileName
                   ? false : true)}
             />
-          ) : !isConnected ? (
-            <ConnectBtn isCentered isNeedMarginTop />
           ) : null}
         </Box>
+        ) : null}
       </Box>
     </Flex>
   );

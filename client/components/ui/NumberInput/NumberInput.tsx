@@ -16,6 +16,7 @@ interface IProps {
   minValue?: number;
   isCollateralInput?: boolean;
   errorMessage?: string;
+  width?: string;
 }
 
 const NumberInput = ({
@@ -26,11 +27,13 @@ const NumberInput = ({
   minValue,
   isCollateralInput,
   errorMessage,
+  width,
 }: IProps) => {
   return (
     <>
       <InputGroup
-      minW={isNotFullWidth ? "278px" : "100%"}
+      minW={isNotFullWidth ? "278px" : width ? width : "100%"}
+      width={width}
       minH="48px"
       mt={isNeededMarginTop ? "16px" : 0}
     >

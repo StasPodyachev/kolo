@@ -34,7 +34,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (Array.isArray(data)) {
-      const decryptedData = data?.map((item: any, index) => {
+      const decryptedData = data?.map((item: any) => {
         const coder = ethers.utils.defaultAbiCoder;
         const result = coder.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
@@ -77,7 +77,7 @@ const Home: NextPage = () => {
   const getMoreItems = () => {
     setStartCount(startCount + 5);
     setEndCount(endCount * 2);
-    setItems([...items, ...auctionItems.slice(startCount, endCount)]);
+    setItems([...items, ...items.slice(startCount, endCount)]);
   };
   return (
     <Layout pageTitle="Market">
