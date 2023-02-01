@@ -13,4 +13,5 @@ export const deployNames: any = {
   GOVERNOR: "GovernorContract",
   TIME_LOCK: "TimeLock",
   KOLO_TOKEN: "KoloToken",
+  MOCK_EXCHANGE: "MockExchange",
 }

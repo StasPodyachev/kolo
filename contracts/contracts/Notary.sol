@@ -142,6 +142,11 @@ contract Notary is INotary, Ownable {
     }
 
     function chooseNotaries(uint256 dealId) external {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Notary: Only integration"
+        );
+
         penaltyByDeal[dealId] = _penalty;
 
         address[] memory arr = _getRandomNotaries();
