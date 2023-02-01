@@ -45,8 +45,8 @@ const Dashboard: NextPage = () => {
         const buyerAddress = result[0][8];
         const saleEndDateNew = result[0][9]
         const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
-        const startPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
-        const endPrice = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
+        const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+        const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
 
         const status = result[0][11] && convertStatus(Number(result[0][11]));
 
@@ -66,12 +66,12 @@ const Dashboard: NextPage = () => {
         return {
           id,
           title,
-          currentPrice: price < startPrice ? startPrice : price,
+          price: price < priceStart ? priceStart : price,
           ownedBy,
           buyerAddress,
           saleEndDate,
-          price: startPrice,
-          priceEnd: endPrice,
+          priceStart,
+          priceEnd,
           description,
           status,
           totalBids: 20

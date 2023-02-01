@@ -14,7 +14,7 @@ import { NextPage } from "next";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import {
-  auctionItems,
+  // auctionItems,
   VotesBlockchain,
   VotesParameters,
 } from "@/constants/shared";

@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import { Grid, Heading } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
-import { auctionItems } from "@/constants/shared";
+// import { auctionItems } from "@/constants/shared";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useState } from "react";
 import { IAuctionItem } from "@/types";
@@ -17,9 +17,9 @@ const Home: NextPage = () => {
   const [ items, setItems ] = useState<IAuctionItem[] | []>([]);
   const [ hasMore, setHasMore ] = useState(true);
 
-  useEffect(() => {
-    setHasMore(auctionItems.length > items.length ? true : false);
-  }, [items]);
+  // useEffect(() => {
+  //   setHasMore(auctionItems.length > items.length ? true : false);
+  // }, [items]);
 
   useEffect(() => {
     setStartCount(5);
