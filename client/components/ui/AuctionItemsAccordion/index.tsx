@@ -117,7 +117,7 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                           }
                           color="white"
                         >
-                          {item.currentPrice}&nbsp;FIL
+                          {item.price}&nbsp;FIL
                         </Text>
                       </HStack>
                       <HStack spacing={isAccordionTextInColumn[0] ? 0 : "24px"}>
