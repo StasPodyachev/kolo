@@ -8,6 +8,7 @@ import "./interfaces/IStore.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/IStoreDeployer.sol";
 import "./interfaces/integrations/IIntegration.sol";
+import "hardhat/console.sol";
 
 contract Store is IStore, Ownable {
     mapping(uint256 => address) private deals;
@@ -99,6 +100,7 @@ contract Store is IStore, Ownable {
         if (buyers[dealId][buyer] != 0) {
             uint256 fee = (buyers[dealId][buyer] * serviceFee) / 1e18;
 
+            console.log("TREASURY: ", _factory.treasury());
             payable(_factory.treasury()).transfer(fee);
 
             amount += buyers[dealId][buyer] - fee;

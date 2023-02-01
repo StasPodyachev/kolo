@@ -120,6 +120,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             "AuctionFile: Wrong collateral"
         );
 
+        console.log(block.timestamp);
+
         require(
             priceStart != 0 &&
                 priceStart < priceForceStop &&
@@ -153,6 +155,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function bid(uint256 dealId) external payable {
+        console.log("bid: ", block.timestamp);
+
         AuctionFileParams storage deal = deals[dealId];
 
         require(deal.priceStart != 0, "AuctionFile: Id not found");
@@ -169,6 +173,9 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         uint256 currentBid = bids[dealId][msg.sender] + msg.value;
 
         require(currentBid >= deal.priceStart, "AuctionFile: Wrong amount");
+
+        console.log("BID: ", currentBid);
+        console.log("PRICE: ", deal.price);
 
         require(
             currentBid > deal.price,
@@ -252,9 +259,13 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         _notary.chooseNotaries(dealId);
         _chat.sendSystemMessage(dealId, "Dispute started.");
+
+        emit DisputeCreated(dealId);
     }
 
     function finalize(uint256 dealId) external {
+        console.log("finalize: ", block.timestamp);
+
         AuctionFileParams storage deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
 
@@ -279,7 +290,10 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             );
 
             deal.status = AuctionStatus.CLOSE;
+            console.log("CLOSED");
             _chat.sendSystemMessage(dealId, "Deal closed.");
+
+            emit DealClosed(dealId);
 
             return;
         }
@@ -294,7 +308,10 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         deal.status = AuctionStatus.FINALIZE;
         deal.dateExpire = block.timestamp;
 
+        console.log("FINALIZED");
+
         _chat.sendSystemMessage(deal.id, "Deal finalized.");
+        emit DealFinalized(deal.id);
     }
 
     function _withdrawBids(
@@ -338,6 +355,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         deal.status = AuctionStatus.CLOSE;
 
+        emit DealClosed(dealId);
+
         _chat.sendSystemMessage(
             dealId,
             string(
@@ -370,6 +389,8 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         store.transferWinToSeller(dealId, deal.buyer, deal.seller, _serviceFee);
 
         deal.status = AuctionStatus.CLOSE;
+
+        emit DealClosed(dealId);
 
         _chat.sendSystemMessage(dealId, "Dispute closed.");
     }

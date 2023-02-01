@@ -142,6 +142,11 @@ contract Notary is INotary, Ownable {
     }
 
     function chooseNotaries(uint256 dealId) external {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Notary: Only integration"
+        );
+
         penaltyByDeal[dealId] = _penalty;
 
         address[] memory arr = _getRandomNotaries();
@@ -150,7 +155,7 @@ contract Notary is INotary, Ownable {
         IStore store = IStore(storeAddress);
         IIntegration integration = IIntegration(store.getIntegration(dealId));
 
-        for (uint256 i = 0; i < _countInvaitedNotary; i++) {
+        for (uint256 i = 0; i < arr.length; i++) {
             notaries[dealId][arr[i]] = true;
             IIntegration(integration).addAccsess(dealId, arr[i]);
         }

@@ -9,8 +9,14 @@ import "./interfaces/IStore.sol";
 import "./StoreDeployer.sol";
 import "./Store.sol";
 
-contract Chat is IChat {
+contract Chat is IChat, Ownable {
+    IFactory public _factory;
+
     mapping(uint256 => ChatParams[]) private chats;
+
+    function setFactory(address factory) external onlyOwner {
+        _factory = IFactory(factory);
+    }
 
     function getChat(uint256 dealId)
         external
@@ -20,13 +26,11 @@ contract Chat is IChat {
         return chats[dealId];
     }
 
-    function sendMessage(
+    function _sendMessage(
         uint256 dealId,
         string memory message,
         address sender
-    ) external {
-        // TODO: Security only Integration
-
+    ) internal {
         chats[dealId].push(
             ChatParams({
                 timestamp: block.timestamp,
@@ -36,8 +40,24 @@ contract Chat is IChat {
         );
     }
 
+    function sendMessage(
+        uint256 dealId,
+        string memory message,
+        address sender
+    ) external {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Chat: Only integration"
+        );
+
+        _sendMessage(dealId, message, sender);
+    }
+
     function sendSystemMessage(uint256 dealId, string memory message) external {
-        // TODO: Security
-        this.sendMessage(dealId, message, address(0));
+        require(
+            _factory.integrationExist(msg.sender),
+            "Chat: Only integration"
+        );
+        _sendMessage(dealId, message, address(0));
     }
 }

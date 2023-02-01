@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/integrations/IIntegration.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/IStore.sol";
@@ -9,10 +10,11 @@ import "./interfaces/IStore.sol";
 import "./StoreDeployer.sol";
 import "./Store.sol";
 
-contract Factory is IFactory, StoreDeployer, Ownable {
+contract Factory is IFactory, StoreDeployer, AccessControl, Ownable {
     mapping(address => address) private stores;
     mapping(uint256 => address) private _dealStore;
     mapping(uint256 => address) private _integrations;
+    mapping(address => uint256) private _integrationType;
     uint256[] private deals;
     uint256 id;
 
@@ -40,6 +42,8 @@ contract Factory is IFactory, StoreDeployer, Ownable {
     }
 
     function addDeal(address storeAddress) external returns (uint256) {
+        require(this.integrationExist(msg.sender), "Factory: Only integration");
+
         _dealStore[++id] = storeAddress;
         deals.push(id);
 
@@ -85,5 +89,10 @@ contract Factory is IFactory, StoreDeployer, Ownable {
         );
 
         _integrations[type_] = addr;
+        _integrationType[addr] = type_ + 1;
+    }
+
+    function integrationExist(address addr) external view returns (bool) {
+        return _integrationType[addr] > 0;
     }
 }
