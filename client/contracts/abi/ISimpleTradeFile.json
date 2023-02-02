@@ -26,6 +26,19 @@
         "internalType": "uint256",
         "name": "dealId",
         "type": "uint256"
+      }
+    ],
+    "name": "DealClosed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "dealId",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -35,6 +48,19 @@
       }
     ],
     "name": "DealCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "dealId",
+        "type": "uint256"
+      }
+    ],
+    "name": "DealFinalized",
     "type": "event"
   },
   {

@@ -12,7 +12,7 @@
         "type": "address"
       }
     ],
-    "name": "addAccsess",
+    "name": "addAccess",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -30,7 +30,7 @@
         "type": "address"
       }
     ],
-    "name": "checkAccsess",
+    "name": "checkAccess",
     "outputs": [
       {
         "internalType": "uint8",
@@ -59,7 +59,7 @@
         "type": "address"
       }
     ],
-    "name": "checkAccsess",
+    "name": "checkAccess",
     "outputs": [
       {
         "internalType": "uint8",
