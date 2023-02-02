@@ -10,6 +10,7 @@ import { useSigner } from "wagmi";
 import Tooltip from "../ui/Tooltip";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
+import BuyNow from "./BuyNow";
 
 interface IProps {
   item: IAuctionItem,
@@ -174,19 +175,8 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               label="Connect wallet to buy"
               isHidden={signer ? true : false}
             >
-              <Button
-                mt="auto"
-                isDisabled={!signer}
-                minH="48px"
-                bg="green.primary"
-                color="white"
-                textStyle="button"
-                transition="all .3s"
-                _hover={{ bg: "green.hover" }}
-                borderRadius={0}
-              >
-                buy now
-              </Button>
+              {/* BuyNow = ({isDisabled, price, id} */}
+              <BuyNow isDisabled={!signer} price={item?.priceEnd} id={item?.id} />
             </Tooltip>
           </Flex>
         </Flex>

@@ -33,7 +33,7 @@ const PlaceBid = ({isDisabled,bid,id}:{isDisabled: boolean, bid: string, id: num
       transition="all .3s"
       _hover={{ bg: "blue.hover" }}
     >
-      place bid
+      Buy now
     </Button>
   )
 }
