@@ -9,9 +9,7 @@ import { BIG_1E18 } from "@/helpers/misc";
 import { BigNumber } from "ethers";
 
 const PlaceBid = ({isDisabled,bid,id}:{isDisabled: boolean, bid: string, id: number}) => {
-  console.log(isDisabled,bid,id, 'bid')
-  const bidValue = BigInt(new BigDecimal(bid).mul(BIG_1E18 + "").toFixed(0)) + ""  
-  console.log(bidValue, 'bidValue', BigNumber.from(id))
+  const bidValue = BigInt(new BigDecimal(bid).mul(BIG_1E18 + "").toFixed(2)) + ""
   const { config } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -19,7 +17,6 @@ const PlaceBid = ({isDisabled,bid,id}:{isDisabled: boolean, bid: string, id: num
     args: [BigNumber.from(id), {value: bidValue}]
   })
   const { write } = useContractWrite(config)
- 
   return (
     <Button
       w="100%"

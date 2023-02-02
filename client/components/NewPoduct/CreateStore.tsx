@@ -11,6 +11,7 @@ const CreateStore = () => {
     abi: ABI_FACTORY,
     functionName: 'createStore',
   })
+
   const { write: create } = useContractWrite(config)
   return (
     <Button
