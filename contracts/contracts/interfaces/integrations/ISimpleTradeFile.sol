@@ -21,6 +21,7 @@ interface ISimpleTradeFile {
         address seller;
         address buyer;
         uint256 dateExpire;
+        uint256 dateDispute;
         bytes cid;
         SimpleTradeFileStatus status;
     }
