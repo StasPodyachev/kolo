@@ -28,11 +28,42 @@ describe("SimpleTradeFile", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ; ({ simpleTradeFile, factory } = await loadFixture(async () => {
-      const { simpleTradeFile, factory } = await simpleTradeFileFixture()
+    ; ({ simpleTradeFile, factory, chat } = await loadFixture(async () => {
+      const { simpleTradeFile, factory, chat } = await simpleTradeFileFixture()
 
-      return { simpleTradeFile, factory }
+      return { simpleTradeFile, factory, chat }
     }))
+  })
+
+  describe("#setters", () => {
+    it("setServiceFee", async () => {
+      await expect(simpleTradeFile.setServiceFee(111111111)).to.be.not.reverted;
+      await expect(simpleTradeFile.connect(other).setServiceFee(111111111)).to.be.reverted;
+    })
+
+    it("setPeriodDispute", async () => {
+      await expect(simpleTradeFile.setPeriodDispute(111111111)).to.be.not.reverted;
+      await expect(simpleTradeFile.connect(other).setPeriodDispute(111111111)).to.be.reverted;
+
+      const params = await simpleTradeFile.getIntegrationInfo()
+      expect(params.periodDispute).to.eq(111111111)
+    })
+
+    it("setCollateralAmount", async () => {
+      await expect(simpleTradeFile.setCollateralPercent(111111111)).to.be.not.reverted;
+      await expect(simpleTradeFile.connect(other).setCollateralPercent(111111111)).to.be.reverted;
+
+      const params = await simpleTradeFile.getIntegrationInfo()
+      expect(params.collateralPercent).to.eq(111111111)
+    })
+
+    it("setCollateralAmount", async () => {
+      await expect(simpleTradeFile.setCollateralAmount(111111111)).to.be.not.reverted;
+      await expect(simpleTradeFile.connect(other).setCollateralAmount(111111111)).to.be.reverted;
+
+      const params = await simpleTradeFile.getIntegrationInfo()
+      expect(params.collateralAmount).to.eq(111111111)
+    })
   })
 
   describe("#create", () => {
@@ -221,6 +252,10 @@ describe("SimpleTradeFile", () => {
       const newBalanceWallet = (await wallet.getBalance()).toString()
 
       expect(price.add(newBalanceWallet).add(gas)).to.eq(oldBalanceWallet)
+
+      expect(
+        await simpleTradeFile["checkAccess(bytes,address)"]("0x", wallet.address)
+      ).to.eq(1)
     })
 
     it("fails if seller buys", async () => {
@@ -510,7 +545,7 @@ describe("SimpleTradeFile", () => {
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
       const newBalance = (await other.getBalance()).toString()
 
-      expect(collateral.add(oldBalance).add(gas)).to.eq(newBalance)
+      expect(collateral.add(newBalance).add(gas)).to.eq(oldBalance)
     })
 
     it("fails if id not found", async () => {
@@ -607,6 +642,74 @@ describe("SimpleTradeFile", () => {
     })
   })
 
+  describe("#sendMessage", () => {
+    it("should send message", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest()
+
+      const collateral = BigNumber.from("100000000000000000")
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: collateral,
+        }
+      )
+      await simpleTradeFile.sendMessage(1, "Hello!")
+      const param = await chat.getChat(1)
+      expect(param.length).eq(2)
+      expect(param[1].message).eq("Hello!")
+      expect(param[1].sender).eq(wallet.address)
+    })
+
+    it("fails if status cancel", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest()
+
+      const collateral = BigNumber.from("100000000000000000")
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: collateral,
+        }
+      )
+
+      await simpleTradeFile.cancel(1)
+      await expect(simpleTradeFile.sendMessage(1, "Hello!")).to.be.revertedWith("SimpleTradeFile: Wrong status")
+    })
+
+    it("fails if status close", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest()
+
+      const collateral = BigNumber.from("100000000000000000")
+      await simpleTradeFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: collateral,
+        }
+      )
+
+      await time.increase(time.duration.hours(1))
+      await simpleTradeFile.receiveReward(1)
+      await expect(simpleTradeFile.sendMessage(1, "Hello!")).to.be.revertedWith("SimpleTradeFile: Wrong status")
+    })
+  })
+
   describe("#getDeal", () => {
     let storeAddress: any
     beforeEach("create storage", async () => {
@@ -652,11 +755,24 @@ describe("SimpleTradeFile", () => {
         ]
       )
 
+      const res = await simpleTradeFile["checkAccess(bytes32[],uint8,address)"](
+        [
+          "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a66",
+          "0x4d325a696577414e6b4855574d4b000000000000000000000000000000000000",
+        ],
+        46,
+        wallet.address
+      )
+
+      expect(0).to.be.eq(res)
+
       expect(deal.id).to.be.equal(1)
       expect(deal._type).to.be.equal(1)
       expect(deal.data).to.be.equal(data)
       expect(deal.integration).to.be.equal(simpleTradeFile.address)
       expect(deal.store).to.be.equal(storeAddress)
+
+
 
       // const res = coder.decode(
       //   [

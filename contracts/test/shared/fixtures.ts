@@ -11,6 +11,7 @@ import { ethers } from "hardhat"
 
 interface FactoryFixture {
   factory: Factory
+  chat: Chat
 }
 
 interface StoreFixture {
@@ -33,12 +34,14 @@ interface AuctionFileFixture {
   auctionFile: AuctionFile
   factory: Factory
   notary: Notary
+  chat: Chat
 }
 
 interface SimpleTradeFileFixture {
   simpleTradeFile: SimpleTradeFile
   factory: Factory
   notary: Notary
+  chat: Chat
 }
 
 export async function factoryFixture(): Promise<FactoryFixture> {
@@ -52,7 +55,7 @@ export async function factoryFixture(): Promise<FactoryFixture> {
   factory.setChat(chat.address)
   chat.setFactory(factory.address)
 
-  return { factory }
+  return { factory, chat }
 }
 
 export async function storeFixture(): Promise<StoreFixture> {
@@ -91,7 +94,7 @@ export async function auctionFileFixture(): Promise<AuctionFileFixture> {
   const auctionFactory = await ethers.getContractFactory("AuctionFile")
   const auctionFile = (await auctionFactory.deploy()) as AuctionFile
 
-  const { factory } = await factoryFixture()
+  const { factory, chat } = await factoryFixture()
   auctionFile.setFactory(factory.address)
 
   const notaryFactory = await ethers.getContractFactory("Notary")
@@ -101,14 +104,14 @@ export async function auctionFileFixture(): Promise<AuctionFileFixture> {
 
   factory.registerIntegration(0, auctionFile.address);
 
-  return { auctionFile, factory, notary }
+  return { auctionFile, factory, notary, chat }
 }
 
 export async function simpleTradeFileFixture(): Promise<SimpleTradeFileFixture> {
   const stFactory = await ethers.getContractFactory("SimpleTradeFile")
   const st = (await stFactory.deploy()) as SimpleTradeFile
 
-  const { factory } = await factoryFixture()
+  const { factory, chat } = await factoryFixture()
   st.setFactory(factory.address)
 
   const notaryFactory = await ethers.getContractFactory("Notary")
@@ -118,5 +121,5 @@ export async function simpleTradeFileFixture(): Promise<SimpleTradeFileFixture> 
 
   factory.registerIntegration(0, st.address);
 
-  return { simpleTradeFile: st, factory, notary }
+  return { simpleTradeFile: st, factory, notary, chat }
 }

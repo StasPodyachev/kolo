@@ -36,6 +36,7 @@ contract Notary is INotary, Ownable {
     }
 
     function setPenalty(uint256 value) external onlyOwner {
+        require(_penalty <= _minDeposit, "Notary: Wrong amount");
         _penalty = value;
     }
 
@@ -82,12 +83,6 @@ contract Notary is INotary, Ownable {
      */
     function vote(uint256 dealId, bool mark) external {
         require(notaries[dealId][msg.sender], "Notary: No accsess");
-
-        console.log(
-            "votes",
-            votesForBuyer[dealId].length,
-            votesForSeller[dealId].length
-        );
 
         require(
             votesForBuyer[dealId].length < _consensusCount ||
