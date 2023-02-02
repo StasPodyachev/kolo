@@ -76,9 +76,6 @@ async function factory() {
   await factory.registerIntegration(0, auctionDeployed.address)
   await factory.registerIntegration(1, simpleTradeDeployed.address)
 
-  const timeLockDeployed = deployments[CHAIN_ID][deployNames.TIME_LOCK]
-  await factory.transferOwnership(timeLockDeployed.address)
-
   await daoAccess(factory)
 }
 
@@ -134,6 +131,8 @@ async function koloToken() {
   const kolo = (await getKnowContractAt(deployNames.KOLO_TOKEN)) as KoloToken
 
   const BURNABLE_ROLE = await kolo.BURNABLE_ROLE()
+
+  // TODO: fixed in contract role access
   await kolo.grantRole(BURNABLE_ROLE, treasuryDeployed.address)
 
   await daoAccess(kolo)
