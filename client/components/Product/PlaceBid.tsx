@@ -6,13 +6,12 @@ import addresses from "@/contracts/addresses";
 import BigDecimal from "decimal.js-light";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { BIG_1E18 } from "@/helpers/misc";
-import { useRouter } from "next/router";
 import { BigNumber } from "ethers";
 
 const PlaceBid = ({isDisabled,bid,id}:{isDisabled: boolean, bid: string, id: number}) => {
-  console.log(bid, 'bid');
-  
+  console.log(isDisabled,bid,id, 'bid')
   const bidValue = BigInt(new BigDecimal(bid).mul(BIG_1E18 + "").toFixed(0)) + ""  
+  console.log(bidValue, 'bidValue', BigNumber.from(id))
   const { config } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -34,7 +33,7 @@ const PlaceBid = ({isDisabled,bid,id}:{isDisabled: boolean, bid: string, id: num
       transition="all .3s"
       _hover={{ bg: "blue.hover" }}
     >
-      place bid
+      Buy now
     </Button>
   )
 }

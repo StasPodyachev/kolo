@@ -8,27 +8,28 @@ import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { BIG_1E18 } from "@/helpers/misc";
 import { BigNumber } from "ethers";
 
-const BuyNow = ({isConnected, price, id}:{isConnected: boolean, price: number, id: number}) => {
-  const praceValue = BigInt(new BigDecimal(price).mul(BIG_1E18 + "").toFixed(0)) + ""
+const BuyNow = ({isDisabled, price, id}:{isDisabled: boolean, price: number, id: number}) => {
+  const priceValue = BigInt(new BigDecimal(price).mul(BIG_1E18 + "").toFixed(0)) + ""
   const { config } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: 'bid',
-    args: [BigNumber.from(id), {value: praceValue}]
+    args: [BigNumber.from(id), {value: priceValue}]
   })
   const { write } = useContractWrite(config)
  
   return (
     <Button
+      mt="auto"
       onClick={() => write?.()}
-      isDisabled={!isConnected}
-      textStyle="button"
-      bg="blue.primary"
+      isDisabled={isDisabled}
+      minH="48px"
+      bg="green.primary"
       color="white"
-      mt="39px"
-      borderRadius={0}
+      textStyle="button"
       transition="all .3s"
-      _hover={{ bg: "blue.hover" }}
+      _hover={{ bg: "green.hover" }}
+      borderRadius={0}
     >
       place bid
     </Button>
