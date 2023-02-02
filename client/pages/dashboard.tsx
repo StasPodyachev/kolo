@@ -24,12 +24,12 @@ const Dashboard: NextPage = () => {
   const [buyerWaitForPaymentCount, setBuyerWaitForPaymentCount] = useState(0);
   const [buyerDisputCount, setBuyerDisputCount] = useState(0);
   const { isConnected } = useAccount();
+  const { address } = useAccount();
   const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
     functionName: "getAllDeals",
   });
-  const address = "0x9D21bbaF17d1a71153FBB08E9396E5A293157a88";
   useEffect(() => {
     if (Array.isArray(data)) {
       const decryptedData = data?.map((item: any) => {
