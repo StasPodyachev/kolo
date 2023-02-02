@@ -31,7 +31,7 @@ const BuyNow = ({isDisabled, price, id}:{isDisabled: boolean, price: number, id:
       _hover={{ bg: "green.hover" }}
       borderRadius={0}
     >
-      place bid
+      buy now
     </Button>
   )
 }

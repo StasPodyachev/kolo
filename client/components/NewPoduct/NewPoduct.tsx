@@ -3,7 +3,6 @@ import { getTodaysDate } from "@/helpers";
 import { SaleTypeMenuItems } from "@/constants/shared";
 import {
   Box,
-  Button,
   chakra,
   Flex,
   Heading,
@@ -14,7 +13,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useAccount, useContractRead, usePrepareContractWrite, useContractWrite } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import ButtonContractWrite from "../ButtonContractWrite";
 import ConnectBtn from "../ui/ConnectBtn";
 import NumberInput from "../ui/NumberInput/NumberInput";
@@ -28,6 +27,7 @@ declare var window: any;
 import ABI_FACTORY from "../../contracts/abi/Factory.json";
 import useDevice from "@/hooks/useDevice";
 import { ISaleTypeMenuItem } from "@/types";
+import CreateStore from "./CreateStore";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
 const CustomInput = chakra(Input, {
@@ -55,31 +55,6 @@ const CustomFormLabel = chakra(FormLabel, {
     lineHeight: '28px',
   }
 });
-
-const CreateStore = ({address} : {address: string}) => {
-  const { config } = usePrepareContractWrite({
-    address: addresses[0].address as `0x${string}`,
-    abi: ABI_FACTORY,
-    functionName: 'createStore',
-  })
-  const { write: create } = useContractWrite(config)
-  return (
-    <Button
-      mt={10}
-      minH="48px"
-      w="100%"
-      bg="blue.primary"
-      color="white"
-      textStyle="button"
-      borderRadius={0}
-      transition="all .3s"
-      _hover={{ bg: "blue.hover" }}
-      onClick={() => create?.()}
-    >
-      Create Store
-    </Button>
-  )
-}
 
 const GetIntegrationInfo = ({
   activeItem,
@@ -254,10 +229,7 @@ const NewPoduct = () => {
         {!address ? (
             <ConnectBtn isCentered isNeedMarginTop />
         ) : null}
-        {!isStore && address
-          ? <CreateStore address={address as `0x${string}`} />
-          : null
-        }
+        {!isStore && address ? <CreateStore/>: null}
         {isStore && address ? (
           <Box minW="100%">
           <Heading variant="h6" color="gray.200" mt="32px">
