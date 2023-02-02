@@ -38,7 +38,7 @@ const Dashboard: NextPage = () => {
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
         ], item.data);
 
-        const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
+        const id = +result[0][0].toString();
         const title = result[0][1];
         const description = result[0][2]
         const ownedBy = result[0][7]
@@ -74,7 +74,7 @@ const Dashboard: NextPage = () => {
           priceEnd,
           description,
           status,
-          totalBids: 20
+          totalBids: 20,
         };
       });
       const filteredDealsBySeller = decryptedData.filter((item: any) => item.ownedBy === address);

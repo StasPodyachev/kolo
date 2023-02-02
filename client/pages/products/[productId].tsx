@@ -80,6 +80,13 @@ const ProductPage: NextPage = () => {
       let days = date.getDay();
       let year =  dateYear.getFullYear()
       let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
+      if (bidsData && Array.isArray(bidsData)) {
+        const decryptedBidData = bidsData.map((item) => {
+          const currentBid = ethers.utils.formatEther(BigNumber?.from(item.bid._hex));
+          return currentBid;
+        })
+        setBidsAmount(decryptedBidData.length);
+      }
       const decryptedData = {
         id,
         title,
@@ -90,7 +97,7 @@ const ProductPage: NextPage = () => {
         priceEnd,
         description,
         status,
-        totalBids: 20,
+        totalBids: bidsAmount,
       }
 
       setBid(price < priceStart ? priceStart + '' : price + minStep + '')
