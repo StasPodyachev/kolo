@@ -8,12 +8,16 @@ import "./interfaces/integrations/IIntegration.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+import "hardhat/console.sol";
+
 contract Notary is INotary, Ownable {
     IFactory public _factory;
 
     mapping(address => uint256) private deposits;
     mapping(uint256 => uint256) private penaltyByDeal;
     mapping(uint256 => mapping(address => bool)) private notaries;
+    mapping(address => uint256) private currNotaries;
+
     mapping(uint256 => address[]) private votesForBuyer;
     mapping(uint256 => address[]) private votesForSeller;
 
@@ -54,6 +58,11 @@ contract Notary is INotary, Ownable {
         );
 
         deposits[msg.sender] += msg.value;
+
+        if (currNotaries[msg.sender] == 0) {
+            notariesArr.push(msg.sender);
+            currNotaries[msg.sender] = notariesArr.length;
+        }
     }
 
     function withdraw(uint256 amount) external {
@@ -61,6 +70,11 @@ contract Notary is INotary, Ownable {
 
         payable(msg.sender).transfer(amount);
         deposits[msg.sender] -= amount;
+
+        if (deposits[msg.sender] == 0) {
+            delete notariesArr[currNotaries[msg.sender] - 1];
+            currNotaries[msg.sender] = 0;
+        }
     }
 
     /**
@@ -69,9 +83,15 @@ contract Notary is INotary, Ownable {
     function vote(uint256 dealId, bool mark) external {
         require(notaries[dealId][msg.sender], "Notary: No accsess");
 
+        console.log(
+            "votes",
+            votesForBuyer[dealId].length,
+            votesForSeller[dealId].length
+        );
+
         require(
-            votesForBuyer[dealId].length == _consensusCount ||
-                votesForSeller[dealId].length == _consensusCount,
+            votesForBuyer[dealId].length < _consensusCount ||
+                votesForSeller[dealId].length < _consensusCount,
             "Notary: Enough votes"
         );
 
@@ -149,32 +169,30 @@ contract Notary is INotary, Ownable {
 
         penaltyByDeal[dealId] = _penalty;
 
-        address[] memory arr = _getRandomNotaries();
-
-        address storeAddress = _factory.getStore(dealId);
-        IStore store = IStore(storeAddress);
-        IIntegration integration = IIntegration(store.getIntegration(dealId));
-
-        for (uint256 i = 0; i < arr.length; i++) {
-            notaries[dealId][arr[i]] = true;
-            IIntegration(integration).addAccsess(dealId, arr[i]);
-        }
+        _generateRandomNotaries(dealId);
     }
 
-    function _getRandomNotaries()
-        internal
-        view
-        returns (address[] memory result)
-    {
+    function _generateRandomNotaries(uint256 dealId) internal {
         uint256 min = _countInvaitedNotary < notariesArr.length
             ? _countInvaitedNotary
             : notariesArr.length;
         uint256 max = notariesArr.length;
 
-        result = new address[](min);
+        address storeAddress = _factory.getStore(dealId);
+        IStore store = IStore(storeAddress);
+        IIntegration integration = IIntegration(store.getIntegration(dealId));
 
-        for (uint256 i = 0; i < min; i++) {
-            result[i] = notariesArr[_random(max, i)];
+        uint256 i;
+        uint256 count;
+
+        while (count < min) {
+            uint256 rnd = _random(max, i++);
+
+            if (notaries[dealId][notariesArr[rnd]]) continue;
+
+            notaries[dealId][notariesArr[rnd]] = true;
+            IIntegration(integration).addAccsess(dealId, notariesArr[rnd]);
+            count++;
         }
     }
 

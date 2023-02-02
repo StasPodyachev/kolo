@@ -10,9 +10,6 @@ import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
 import "../interfaces/IChat.sol";
 
-import {SizeOf} from "../libs/seriality/SizeOf.sol";
-import {TypesToBytes} from "../libs/seriality/TypesToBytes.sol";
-
 contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     IFactory public _factory;
     IChat public _chat;
@@ -83,12 +80,12 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
     function sendMessage(uint256 dealId, string calldata message) external {
         SimpleTradeFileParams memory deal = deals[dealId];
-        require(deal.price != 0, "SimpleTradeFileFile: Id not found");
+        require(deal.price != 0, "SimpleTradeFile: Id not found");
 
         require(
             deal.status != SimpleTradeFileStatus.CLOSE &&
                 deal.status != SimpleTradeFileStatus.CANCEL,
-            "SimpleTradeFileFile: Wrong status"
+            "SimpleTradeFile: Wrong status"
         );
 
         _chat.sendMessage(dealId, message, msg.sender);
@@ -105,18 +102,18 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
         require(
             storeAddress != address(0),
-            "SimpleTradeFileFile: Caller does not have a store"
+            "SimpleTradeFile: Caller does not have a store"
         );
 
         require(
             msg.value >= (price * _collateralPercent) / 1e18 &&
                 msg.value >= _collateralAmount,
-            "SimpleTradeFileFile: Wrong collateral"
+            "SimpleTradeFile: Wrong collateral"
         );
 
         require(
             price != 0 && dateExpire > block.timestamp,
-            "SimpleTradeFileFile: Wrong params"
+            "SimpleTradeFile: Wrong params"
         );
 
         uint256 id = _factory.addDeal(storeAddress);
@@ -171,6 +168,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         this.addAccsess(dealId, deal.buyer);
         deal.status = SimpleTradeFileStatus.FINALIZE;
         deal.dateExpire = block.timestamp;
+        emit DealFinalized(dealId);
 
         _chat.sendSystemMessage(
             dealId,
@@ -234,6 +232,8 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
     {
+        require(msg.sender == address(_notary), "AuctionFile: Only notary");
+
         SimpleTradeFileParams storage deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
 
@@ -304,7 +304,8 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     }
 
     function addAccsess(uint256 dealId, address wallet) external {
-        // TODO: Security
+        require(msg.sender == address(_notary), "AuctionFile: Only notary");
+
         bytes memory cid = deals[dealId].cid;
         _accsess[wallet][cid] = true;
     }

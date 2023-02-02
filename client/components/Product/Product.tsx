@@ -9,6 +9,7 @@ import NumberInput from "../ui/NumberInput/NumberInput";
 import { useSigner } from "wagmi";
 import Tooltip from "../ui/Tooltip";
 import BidsTable from "../Products/BidsTable";
+import PlaceBid from "./PlaceBid";
 
 interface IProps {
   item: IAuctionItem,
@@ -24,7 +25,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const isItemsInColumn = useMediaQuery("(max-width: 899px)");
   const signer = useSigner();
   const isBidError = +bid <= +currentBid;
-
   return (
     <Flex flexDir="column">
         <Flex
@@ -86,8 +86,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
             justifyContent={isDesktopHeader[0] ? "normal" : "space-between"}
           >
             <Flex flexDir="column" gap="6px" minW="380px" maxH="240px" justifyContent="space-between">
-              <Heading variant="h4" color="white">
-                {item?.title}
+              <Heading variant="h4" color="white" display="flex">
+                <div style={{"marginRight" : "12px"}}>{item?.title}</div>
+                <div style={{"color" : "gray"}}>#{item?.id}</div>
               </Heading>
               <HStack spacing="16px">
                 <Text textStyle="mediumText" color="gray.500">
@@ -100,7 +101,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                   Current price
                 </Heading>
                 <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
-                  {item?.currentPrice}&nbsp;FIL
+                  {item?.price}&nbsp;FIL
                 </Heading>
               </Flex>
               <Flex justifyContent="space-between">
@@ -118,24 +119,10 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                   // minValue={Number(bid)}
                   width="200px"
                 />
-                <Tooltip
-                  isHidden={signer ? true : false}
-                  label="Connect wallet to place bid"
-                >
-                  <Button
-                    w="100%"
-                    minH="48px"
-                    isDisabled={!signer || isBidError}
-                    textStyle="button"
-                    bg="blue.primary"
-                    color="white"
-                    borderRadius={0}
-                    transition="all .3s"
-                    _hover={{ bg: "blue.hover" }}
-                  >
-                    place bid
-                  </Button>
-                </Tooltip>
+                <PlaceBid
+                  isDisabled={!signer || isBidError}
+                  bid={bid}
+                  id={item?.id}/>
               </Flex>
             </Flex>
             <Flex

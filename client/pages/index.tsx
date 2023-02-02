@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import { Grid, Heading } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
-import { auctionItems } from "@/constants/shared";
+// import { auctionItems } from "@/constants/shared";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useState } from "react";
 import { IAuctionItem } from "@/types";
@@ -17,9 +17,9 @@ const Home: NextPage = () => {
   const [ items, setItems ] = useState<IAuctionItem[] | []>([]);
   const [ hasMore, setHasMore ] = useState(true);
 
-  useEffect(() => {
-    setHasMore(auctionItems.length > items.length ? true : false);
-  }, [items]);
+  // useEffect(() => {
+  //   setHasMore(auctionItems.length > items.length ? true : false);
+  // }, [items]);
 
   useEffect(() => {
     setStartCount(5);
@@ -45,8 +45,8 @@ const Home: NextPage = () => {
         const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
         const ownedBy = result[0][7]
         const saleEndDateNew = result[0][9]
-        const startPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
-        const endPrice = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
+        const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
+        const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const status = result[0][11].toString()
 
         let dateYear = new Date(saleEndDateNew * 1)
@@ -56,15 +56,15 @@ const Home: NextPage = () => {
         let days = date.getDay()
         let year =  dateYear.getFullYear()
         let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
-
+        
         return {
           id,
           title,
-          currentPrice: price,
+          price: price < priceStart ? priceStart : price,
           ownedBy,
           saleEndDate,
-          price: startPrice,
-          priceEnd: endPrice,
+          priceStart,
+          priceEnd,
           description,
           status,
           totalBids: 20
@@ -81,16 +81,11 @@ const Home: NextPage = () => {
   };
   return (
     <Layout pageTitle="Market">
-      <InfiniteScroll
+      {/* <InfiniteScroll
         dataLength={items.length}
         next={getMoreItems}
         hasMore={hasMore}
-        loader={
-          <Heading textAlign="center" mt="36px" color="white" variant="h5">
-            {/* Loading... */}
-          </Heading>
-        }
-      >
+        loader={} > */}
         <Grid
           gap="32px"
           justifyContent="space-around"
@@ -102,13 +97,13 @@ const Home: NextPage = () => {
               key={auctionItem.id}
               to={auctionItem.id}
               title={auctionItem.title}
-              price={auctionItem.priceEnd}
+              price={auctionItem.price}
               ownedBy={auctionItem.ownedBy}
               saleEndDate={auctionItem.saleEndDate}
             />
           ))}
         </Grid>
-      </InfiniteScroll>
+      {/* </InfiniteScroll> */}
     </Layout>
   );
 };

@@ -100,7 +100,6 @@ const GetIntegrationInfo = ({
   useEffect(() => {
     let priceOfStart = +startPrice.split(",").join("");
     if (data) {
-      // console.log(data, "data");
       const collateralAmountValue = BigNumber?.from(data.collateralAmount);
       const minCollateralAmount = +ethers.utils.formatEther(
         collateralAmountValue
@@ -113,7 +112,6 @@ const GetIntegrationInfo = ({
       priceOfStart * minCollateralPercent > minCollateralAmount
           ? priceOfStart * minCollateralPercent
           : minCollateralAmount;
-      // console.log(minimalCollateral.toFixed(2), "value");
       const myCollateral =
         minimalCollateral >= (priceOfStart * minCollateralPercent) / 1e18
           ? minimalCollateral
@@ -174,7 +172,6 @@ const NewPoduct = () => {
     uploaded: number;
   }) => {
     let percentageDone = 100 - total / uploaded;
-    console.log(percentageDone.toFixed(2));
   };
 
   const deployEncrypted = async (e: any, isFile: boolean) => {
@@ -186,7 +183,6 @@ const NewPoduct = () => {
       signedMessage,
       progressCallback
     );
-    console.log(response);
     const conditionsId = await lighthouse?.getAccessConditions(
       response?.data?.Hash
     );
@@ -236,7 +232,6 @@ const NewPoduct = () => {
   const isDateStopError = stopDate === '';
 
   useEffect(() => {
-    console.log(store, 'store');
     if (store === '0x0000000000000000000000000000000000000000') {
       setIsStore(false);
 
@@ -349,7 +344,6 @@ const NewPoduct = () => {
                   min={getTodaysDate()}
                   value={stopDate}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    console.log('date time', typeof event, event)
                     // const start = Date.now() - event.target.value
                     setStopDate(event.target.value);
                   }}
@@ -404,7 +398,6 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
-                    console.log('NOW HERE', e)
                     deployEncrypted(e, true);
                   }}
                 />

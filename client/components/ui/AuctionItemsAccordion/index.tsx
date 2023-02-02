@@ -14,7 +14,7 @@ import { NextPage } from "next";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import {
-  auctionItems,
+  // auctionItems,
   VotesBlockchain,
   VotesParameters,
 } from "@/constants/shared";
@@ -117,7 +117,7 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                           }
                           color="white"
                         >
-                          {item.currentPrice}&nbsp;FIL
+                          {item.price}&nbsp;FIL
                         </Text>
                       </HStack>
                       <HStack spacing={isAccordionTextInColumn[0] ? 0 : "24px"}>

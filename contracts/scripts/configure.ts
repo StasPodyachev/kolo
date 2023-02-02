@@ -10,6 +10,7 @@ import {
   Treasury,
 } from "../typechain"
 import { IDeployment } from "./utils"
+import { Ownable, OwnableInterface } from "../typechain/Ownable"
 const deployments: IDeployment = deployment
 
 const CHAIN_ID: string = network.config.chainId
@@ -74,34 +75,38 @@ async function factory() {
   await factory.setTreasury(treasuryDeployed.address)
   await factory.registerIntegration(0, auctionDeployed.address)
   await factory.registerIntegration(1, simpleTradeDeployed.address)
+
+  const timeLockDeployed = deployments[CHAIN_ID][deployNames.TIME_LOCK]
+  await factory.transferOwnership(timeLockDeployed.address)
+
+  await daoAccess(factory)
 }
 
 async function auctionFile() {
   const factoryDeployed = deployments[CHAIN_ID].Factory
   const notaryDeployed = deployments[CHAIN_ID][deployNames.NOTARY]
-  const chatDeployed = deployments[CHAIN_ID][deployNames.CHAT]
-
   const auction = (await getKnowContractAt(
     deployNames.AUCTION_FILE
   )) as AuctionFile
 
   await auction.setFactory(factoryDeployed.address)
   await auction.setNotary(notaryDeployed.address)
-  // await auction.setChat(chatDeployed.address)
+
+  await daoAccess(auction)
 }
 
 async function simpleTrade() {
   const factoryDeployed = deployments[CHAIN_ID].Factory
   const notaryDeployed = deployments[CHAIN_ID][deployNames.NOTARY]
-  const chatDeployed = deployments[CHAIN_ID][deployNames.CHAT]
 
-  const auction = (await getKnowContractAt(
+  const simple = (await getKnowContractAt(
     deployNames.SIMPLE_TRADE_FILE
   )) as SimpleTradeFile
 
-  await auction.setFactory(factoryDeployed.address)
-  await auction.setNotary(notaryDeployed.address)
-  // await auction.setChat(chatDeployed.address)
+  await simple.setFactory(factoryDeployed.address)
+  await simple.setNotary(notaryDeployed.address)
+
+  await daoAccess(simple)
 }
 
 async function notary() {
@@ -110,6 +115,7 @@ async function notary() {
   const notary = (await getKnowContractAt(deployNames.NOTARY)) as Notary
 
   await notary.setFactory(factoryDeployed.address)
+  await daoAccess(notary)
 }
 
 async function treasury() {
@@ -119,6 +125,8 @@ async function treasury() {
 
   await treasury.setKoloToken(koloDeployed.address)
   await treasury.setExchange(exchangeDeployed.address)
+
+  await daoAccess(treasury)
 }
 
 async function koloToken() {
@@ -127,6 +135,8 @@ async function koloToken() {
 
   const BURNABLE_ROLE = await kolo.BURNABLE_ROLE()
   await kolo.grantRole(BURNABLE_ROLE, treasuryDeployed.address)
+
+  await daoAccess(kolo)
 }
 
 async function chat() {
@@ -135,6 +145,7 @@ async function chat() {
   const chat = (await getKnowContractAt(deployNames.CHAT)) as Chat
 
   await chat.setFactory(factoryDeployed.address)
+  await daoAccess(chat)
 }
 
 async function getContractAt(name: string, address: string) {
@@ -148,6 +159,11 @@ async function getKnowContractAt(name: string) {
   const contractDeployed = deployments[CHAIN_ID][name]
 
   return contractFactory.attach(contractDeployed.address)
+}
+
+async function daoAccess(contract: Ownable) {
+  const timeLockDeployed = deployments[CHAIN_ID][deployNames.TIME_LOCK]
+  return contract.transferOwnership(timeLockDeployed.address)
 }
 
 // main()
