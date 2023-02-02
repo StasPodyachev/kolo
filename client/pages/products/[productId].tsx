@@ -25,6 +25,7 @@ const ProductPage: NextPage = () => {
   const [bidDate, setBidDate] = useState("");
   const [bidsTableData, setBidsTableData] = useState<IBidTableData[]>([])
   const router = useRouter();
+  const minStep = 0.01
 
   useEffect(() => {
     if (router.isReady) {
@@ -69,7 +70,6 @@ const ProductPage: NextPage = () => {
       const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
       const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
       const status = result[0][11] && convertStatus(Number(result[0][11]));
-      const minStep = 0.01
 
       // Create a new JavaScript Date object based on the timestamp
       // multiplied by 1000 so that the argument is in milliseconds, not seconds.
@@ -92,18 +92,18 @@ const ProductPage: NextPage = () => {
         status,
         totalBids: 20,
       }
-
-      setBid(price < priceStart ? priceStart + '' : price + minStep + '')
+      const newBid = (price < priceStart ? priceStart + minStep : price + minStep).toFixed(2)
+      setBid(newBid + '')
       setItem(decryptedData)
     }
     if (bidsData && Array.isArray(bidsData)) {
       const decryptedData = bidsData?.map((item: any) => {
-        const currentBid = ethers.utils.formatEther(BigNumber?.from(item.bid._hex));
-        setBid(currentBid);
+        const currentBid = ethers.utils.formatEther(BigNumber?.from(item?.bid?._hex))
+        setBid((+currentBid + minStep).toString());
         const buyerAddress = item.buyer;
         const bidDate = new Date(item.timestamp._hex * 1000).toDateString();
         const slicedDate = bidDate.slice(4).split(' ');
-        const formattedDate = [slicedDate[1], slicedDate[0], slicedDate[2]].join(" ");
+        const formattedDate = [slicedDate[1], slicedDate[0], slicedDate[2]]?.join(" ");
         setBidDate(formattedDate);
         return {
           address: buyerAddress,
@@ -122,7 +122,7 @@ const ProductPage: NextPage = () => {
         item={item}
         bid={bid}
         setBid={setBid}
-        currentBid={bid}
+        currentBid={item?.price}
         bidsTableData={bidsTableData}
         bidsAmount={bidsAmount}
       />
