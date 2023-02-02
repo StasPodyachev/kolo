@@ -29,8 +29,8 @@ const NumberInput = ({
   width,
 }: IProps) => {
   return (
-    <>
-      <InputGroup
+  <>
+    <InputGroup
       minW={isNotFullWidth ? "278px" : width ? width : "100%"}
       width={width}
       minH="48px"
@@ -48,7 +48,7 @@ const NumberInput = ({
         }}
         onChange={(event) => {
           if (isCollateralInput && minValue && minValue > +event) {
-            setTimeout(() => setValue(minValue.toString()), 2000);
+            setTimeout(() => setValue(minValue.toString()), 3000);
           } else {
             setValue(event);
           }
@@ -84,7 +84,7 @@ const NumberInput = ({
       </ChakraNumberInput>
     </InputGroup>
     <FormErrorMessage>{errorMessage}</FormErrorMessage>
-    </>
+  </>
   );
 };
 

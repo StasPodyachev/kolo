@@ -48,7 +48,7 @@ const Home: NextPage = () => {
         const startPrice = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const endPrice = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const status = result[0][11].toString()
-        
+
         let dateYear = new Date(saleEndDateNew * 1)
         let date = new Date(saleEndDateNew * 1000)
         const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"]

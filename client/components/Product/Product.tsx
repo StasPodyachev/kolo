@@ -1,5 +1,5 @@
 import useDevice from "@/hooks/useDevice";
-import { IAuctionItem } from "@/types";
+import { IAuctionItem, IBidTableData } from "@/types";
 import { Box, Button, Flex, FormControl, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
@@ -10,7 +10,16 @@ import { useSigner } from "wagmi";
 import Tooltip from "../ui/Tooltip";
 import BidsTable from "../Products/BidsTable";
 
-const Product = ({item, bid, setBid, currentBid} : {item: IAuctionItem, bid: string, setBid: (value: string) => void, currentBid: string}) => {
+interface IProps {
+  item: IAuctionItem,
+  bid: string,
+  setBid: (value: string) => void,
+  currentBid: string,
+  bidsTableData: IBidTableData[];
+  bidsAmount: number;
+}
+
+const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: IProps) => {
   const { isDesktopHeader } = useDevice();
   const isItemsInColumn = useMediaQuery("(max-width: 899px)");
   const signer = useSigner();
@@ -37,7 +46,7 @@ const Product = ({item, bid, setBid, currentBid} : {item: IAuctionItem, bid: str
               />
             ) : (
               <Flex
-                position="absolute"
+                position="fixed"
                 justifyContent="center"
                 alignItems="center"
                 h="240px"
@@ -86,7 +95,7 @@ const Product = ({item, bid, setBid, currentBid} : {item: IAuctionItem, bid: str
                 </Text>
                 <AddressCopy address={item?.ownedBy!} color="gray.500" />
               </HStack>
-              <Flex justifyContent="space-between" mt="6px">
+              <Flex justifyContent="space-between">
                 <Heading variant="h6" color="gray.200">
                   Current price
                 </Heading>
@@ -94,7 +103,7 @@ const Product = ({item, bid, setBid, currentBid} : {item: IAuctionItem, bid: str
                   {item?.currentPrice}&nbsp;FIL
                 </Heading>
               </Flex>
-              <Flex justifyContent="space-between" mt="6px">
+              <Flex justifyContent="space-between">
                 <Heading variant="h6" color="gray.200">
                   Price end
                 </Heading>
@@ -106,7 +115,7 @@ const Product = ({item, bid, setBid, currentBid} : {item: IAuctionItem, bid: str
                 <NumberInput
                   value={bid}
                   setValue={setBid}
-                  minValue={+bid}
+                  // minValue={Number(bid)}
                   width="200px"
                 />
                 <Tooltip
@@ -208,11 +217,11 @@ const Product = ({item, bid, setBid, currentBid} : {item: IAuctionItem, bid: str
               <Flex alignItems="center">
                 <UserIcon width="21px" height="20px" />
                 <Heading variant="h6" color="white">
-                  {item?.totalBids}
+                  {bidsAmount}
                 </Heading>
               </Flex>
             </Flex>
-            <BidsTable />
+            <BidsTable data={bidsTableData} />
           </Box>
           <Flex
             flexDir="column"

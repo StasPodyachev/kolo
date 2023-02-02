@@ -10,7 +10,7 @@ import {
 import {
   INavlink,
   IAuctionItem,
-  IBidsTableData,
+  IBidTableData,
   IBlock,
   INotaryTableData,
   IVotesParameter,
@@ -226,21 +226,21 @@ export const auctionItems: IAuctionItem[] = [
   },
 ];
 
-export const BidsTableData: IBidsTableData[] = [
+export const BidsTableData: IBidTableData[] = [
   {
     address: "0x9D21...7a88",
     date: "28 Feb 2023",
-    bid: 68558,
+    currentBid: "68558",
   },
   {
     address: "0x9D21...7a88",
     date: "27 Feb 2023",
-    bid: 11770,
+    currentBid: "11770",
   },
   {
     address: "0x9D21...7a88",
     date: "22 Feb 2023",
-    bid: 9524,
+    currentBid: "9524",
   },
 ];
 

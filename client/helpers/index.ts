@@ -1,7 +1,7 @@
 import { BIG_1E18 } from "./misc";
 import BigDecimal from "decimal.js-light";
 
-export function numberWithCommas(x: number) {
+export function numberWithCommas(x: number | string) {
   return x?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 

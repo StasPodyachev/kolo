@@ -12,16 +12,18 @@ import ABI_FACTORY from "@/contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
 import { useEffect, useState } from "react";
 import { BigNumber, ethers } from "ethers";
-import { IAuctionItem } from "@/types";
+import { IAuctionItem, IBidTableData } from "@/types";
 import { convertExpNumberToNormal, convertStatus } from "@/helpers";
 
 const ProductPage: NextPage = () => {
   const [item, setItem] = useState<IAuctionItem>({} as IAuctionItem);
   const [formattedId, setFormattedId] = useState("");
   const [fetchedData, setFetchedData] = useState<unknown>();
-  const [bidsData, setBidsData] = useState<unknown>();
-  const [bidsAmount, setBidsAmount] = useState();
+  const [bidsData, setBidsData] = useState<unknown>([]);
+  const [bidsAmount, setBidsAmount] = useState(0);
   const [bid, setBid] = useState("0");
+  const [bidDate, setBidDate] = useState("");
+  const [bidsTableData, setBidsTableData] = useState<IBidTableData[]>([])
   const router = useRouter();
 
   useEffect(() => {
@@ -49,7 +51,7 @@ const ProductPage: NextPage = () => {
       }
       fetchData();
     }
-  }, [router?.query?.productId, item?.id, router?.isReady, formattedId])
+  }, [router?.query?.productId, router?.isReady, formattedId])
 
   useEffect(() => {
     if (fetchedData && typeof fetchedData === 'object') {
@@ -96,13 +98,32 @@ const ProductPage: NextPage = () => {
       const decryptedData = bidsData?.map((item: any) => {
         const currentBid = ethers.utils.formatEther(BigNumber?.from(item.bid._hex));
         setBid(currentBid);
-      })
+        const buyerAddress = item.buyer;
+        const bidDate = new Date(item.timestamp._hex * 1000).toDateString();
+        const slicedDate = bidDate.slice(4).split(' ');
+        const formattedDate = [slicedDate[1], slicedDate[0], slicedDate[2]].join(" ");
+        setBidDate(formattedDate);
+        return {
+          address: buyerAddress,
+          date: formattedDate,
+          currentBid: currentBid,
+        };
+      });
+      setBidsTableData(decryptedData.sort((a, b) => +b.currentBid - +a.currentBid));
+      setBidsAmount(decryptedData.length);
     }
-  }, [fetchedData, bidsData]);
+  }, [fetchedData, bidsData, bidsAmount]);
   return (
     item.id ?
     <Layout pageTitle="Item">
-      <Product item={item} bid={bid} setBid={setBid} currentBid={item.currentPrice.toString()} />
+      <Product
+        item={item}
+        bid={bid}
+        setBid={setBid}
+        currentBid={item.currentPrice.toString()}
+        bidsTableData={bidsTableData}
+        bidsAmount={bidsAmount}
+      />
     </Layout> : null
   );
 };
