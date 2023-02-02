@@ -220,6 +220,14 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         deal.status = AuctionStatus.CANCEL;
 
+        address storeAddress = _factory.getStore(deal.seller);
+        IStore(storeAddress).transferWinToSeller(
+            dealId,
+            address(0),
+            deal.seller,
+            _serviceFee
+        );
+
         _chat.sendSystemMessage(dealId, "Deal canceled.");
 
         emit DealCanceled(dealId, msg.sender);

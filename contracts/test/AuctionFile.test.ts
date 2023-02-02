@@ -28,7 +28,7 @@ describe("AuctionFile", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ;({ auctionFile, factory } = await loadFixture(async () => {
+    ; ({ auctionFile, factory } = await loadFixture(async () => {
       const { auctionFile, factory } = await auctionFileFixture()
 
       return { auctionFile, factory }
@@ -150,7 +150,6 @@ describe("AuctionFile", () => {
   describe("#cancel", () => {
     it("should cancel bid", async () => {
       await factory.createStore()
-      const oldBalance = (await wallet.getBalance()).toString()
 
       await auctionFile.create(
         "NAME",
@@ -164,9 +163,19 @@ describe("AuctionFile", () => {
         }
       )
 
-      await expect(auctionFile.cancel(1))
+      const oldBalance = (await wallet.getBalance()).toString()
+
+      const tx = await auctionFile.cancel(1)
+      await expect(tx)
         .to.emit(auctionFile, "DealCanceled")
         .withArgs(1, wallet.address)
+
+      let txRec = await tx.wait()
+      let gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
+      const newBalanceWallet = (await wallet.getBalance()).toString()
+
+      expect(BigNumber.from("100000000000000000").add(oldBalance).sub(gas)).to.eq(newBalanceWallet)
+
     })
 
     it("fails if id not found", async () => {
@@ -470,7 +479,6 @@ describe("AuctionFile", () => {
     it("should finalize with no bids", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -899,6 +907,8 @@ describe("AuctionFile", () => {
       const priceStart = 10000000000
       const priceForceStop = 100000000000
       const dateExpire = Date.now() + 1000
+      const dateDispute = Date.now() + 1000 + time.duration.days(5)
+
       const cid =
         "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
       const collateral = "100000000000000000"
@@ -918,7 +928,7 @@ describe("AuctionFile", () => {
       const coder = ethers.utils.defaultAbiCoder
       const data = coder.encode(
         [
-          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
+          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256,bytes, uint256)",
         ],
         [
           [
@@ -932,6 +942,7 @@ describe("AuctionFile", () => {
             wallet.address,
             ethers.constants.AddressZero,
             dateExpire,
+            dateDispute,
             cid,
             0,
           ],
