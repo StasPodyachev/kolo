@@ -9,6 +9,7 @@ import "../interfaces/IStore.sol";
 import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
 import "../interfaces/IChat.sol";
+import "hardhat/console.sol";
 
 contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     IFactory public _factory;
@@ -23,6 +24,11 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
     mapping(uint256 => SimpleTradeFileParams) private deals;
     mapping(address => mapping(bytes => bool)) private _accsess;
+
+    modifier onlyNotary() {
+        require(msg.sender == address(_notary), "SimpleTradeFile: Only notary");
+        _;
+    }
 
     function setServiceFee(uint256 value) external onlyOwner {
         _serviceFee = value;
@@ -79,17 +85,15 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         });
     }
 
-    function sendMessage(uint256 dealId, string calldata message) external {
-        SimpleTradeFileParams memory deal = deals[dealId];
+    function _checkStatusAndGetDeal(
+        uint256 dealId,
+        SimpleTradeFileStatus status
+    ) internal view returns (SimpleTradeFileParams storage) {
+        SimpleTradeFileParams storage deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
+        require(deal.status == status, "SimpleTradeFile: Wrong status");
 
-        require(
-            deal.status != SimpleTradeFileStatus.CLOSE &&
-                deal.status != SimpleTradeFileStatus.CANCEL,
-            "SimpleTradeFile: Wrong status"
-        );
-
-        _chat.sendMessage(dealId, message, msg.sender);
+        return deal;
     }
 
     function create(
@@ -142,12 +146,9 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     }
 
     function buy(uint256 dealId) external payable {
-        SimpleTradeFileParams storage deal = deals[dealId];
-        require(deal.price != 0, "SimpleTradeFile: Id not found");
-
-        require(
-            deal.status == SimpleTradeFileStatus.OPEN,
-            "SimpleTradeFile: Wrong status"
+        SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            SimpleTradeFileStatus.OPEN
         );
 
         require(
@@ -167,40 +168,55 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
         deal.buyer = msg.sender;
 
-        _addAccess(dealId, deal.buyer);
-        deal.status = SimpleTradeFileStatus.FINALIZE;
-        deal.dateExpire = block.timestamp;
-        emit DealFinalized(dealId);
-
+        _finalize(deal);
         _chat.sendSystemMessage(
             dealId,
             string(abi.encodePacked(deal.buyer, "bought an item"))
         );
     }
 
-    function cancel(uint256 dealId) external {
-        SimpleTradeFileParams storage deal = deals[dealId];
+    function _finalize(SimpleTradeFileParams storage deal) internal {
+        _addAccess(deal.id, deal.buyer);
 
-        require(deal.price != 0, "SimpleTradeFile: Id not found");
+        deal.status = SimpleTradeFileStatus.FINALIZE;
+        deal.dateExpire = block.timestamp;
+        emit DealFinalized(deal.id);
+    }
+
+    function cancel(uint256 dealId) external {
+        SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            SimpleTradeFileStatus.OPEN
+        );
+
         require(
             deal.seller == msg.sender,
             "SimpleTradeFile: Caller is not a seller"
         );
-        require(
-            deal.status == SimpleTradeFileStatus.OPEN,
-            "SimpleTradeFile: Wrong status"
-        );
 
         deal.status = SimpleTradeFileStatus.CANCEL;
 
+        _sendSellerCollateral(dealId, deal.seller);
         _chat.sendSystemMessage(dealId, "Deal canceled.");
 
         emit DealCanceled(dealId, msg.sender);
     }
 
+    function _sendSellerCollateral(uint256 dealId, address seller) internal {
+        address storeAddress = _factory.getStore(seller);
+        IStore(storeAddress).transferWinToSeller(
+            dealId,
+            address(0),
+            seller,
+            _serviceFee
+        );
+    }
+
     function dispute(uint256 dealId) external payable {
-        SimpleTradeFileParams storage deal = deals[dealId];
-        require(deal.price != 0, "SimpleTradeFile: Id not found");
+        SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            SimpleTradeFileStatus.FINALIZE
+        );
 
         require(
             deal.buyer == msg.sender,
@@ -209,11 +225,6 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         require(
             block.timestamp < deal.dateExpire + _periodDispute,
             "SimpleTradeFile: Time for dispute is up"
-        );
-
-        require(
-            deal.status == SimpleTradeFileStatus.FINALIZE,
-            "SimpleTradeFile: Wrong status"
         );
 
         require(
@@ -227,38 +238,21 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         deal.status = SimpleTradeFileStatus.DISPUTE;
 
         _notary.chooseNotaries(dealId);
-
         _chat.sendSystemMessage(dealId, "Dispute started.");
+
+        emit DisputeCreated(dealId);
     }
 
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
+        onlyNotary
     {
-        require(msg.sender == address(_notary), "AuctionFile: Only notary");
-
-        SimpleTradeFileParams storage deal = deals[dealId];
-        require(deal.price != 0, "SimpleTradeFile: Id not found");
-
-        require(
-            deal.status == SimpleTradeFileStatus.DISPUTE,
-            "SimpleTradeFile: Wrong status"
+        SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            SimpleTradeFileStatus.DISPUTE
         );
 
-        address storeAddress = _factory.getStore(deal.seller);
-        IStore store = IStore(storeAddress);
-
-        if (winner == IIntegration.DisputeWinner.Buyer) {
-            store.transferWinToBuyer(dealId, deal.buyer);
-        } else {
-            store.transferWinToSeller(
-                dealId,
-                deal.buyer,
-                deal.seller,
-                _serviceFee
-            );
-        }
-
-        deal.status = SimpleTradeFileStatus.CLOSE;
+        _sendWin(deal, winner);
 
         _chat.sendSystemMessage(
             dealId,
@@ -274,14 +268,9 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         );
     }
 
-    function finalize(uint256 dealId) external {
+    function receiveReward(uint256 dealId) external {
         SimpleTradeFileParams storage deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
-
-        require(
-            block.timestamp > deal.dateExpire,
-            "SimpleTradeFile: Date is not expire"
-        );
 
         require(
             (block.timestamp > deal.dateExpire &&
@@ -291,23 +280,33 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
             "SimpleTradeFile: Error"
         );
 
-        address storeAddress = _factory.getStore(deal.seller);
-
-        IStore(storeAddress).transferWinToSeller(
-            dealId,
-            deal.buyer,
-            deal.seller,
-            _serviceFee
-        );
-
-        deal.status = SimpleTradeFileStatus.CLOSE;
-
+        _sendWin(deal, IIntegration.DisputeWinner.Seller);
         _chat.sendSystemMessage(dealId, "Deal closed.");
     }
 
-    function addAccess(uint256 dealId, address wallet) external {
-        require(msg.sender == address(_notary), "SimpleTradeFile: Only notary");
+    function _sendWin(
+        SimpleTradeFileParams storage deal,
+        IIntegration.DisputeWinner winner
+    ) internal {
+        address storeAddress = _factory.getStore(deal.seller);
+        IStore store = IStore(storeAddress);
 
+        if (winner == IIntegration.DisputeWinner.Seller) {
+            store.transferWinToSeller(
+                deal.id,
+                deal.buyer,
+                deal.seller,
+                _serviceFee
+            );
+        } else {
+            store.transferWinToBuyer(deal.id, deal.buyer);
+        }
+
+        deal.status = SimpleTradeFileStatus.CLOSE;
+        emit DealClosed(deal.id);
+    }
+
+    function addAccess(uint256 dealId, address wallet) external onlyNotary {
         _addAccess(dealId, wallet);
     }
 
@@ -342,5 +341,18 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
 
         //QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
         //QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
+    }
+
+    function sendMessage(uint256 dealId, string calldata message) external {
+        SimpleTradeFileParams memory deal = deals[dealId];
+        require(deal.price != 0, "SimpleTradeFile: Id not found");
+
+        require(
+            deal.status != SimpleTradeFileStatus.CLOSE &&
+                deal.status != SimpleTradeFileStatus.CANCEL,
+            "SimpleTradeFile: Wrong status"
+        );
+
+        _chat.sendMessage(dealId, message, msg.sender);
     }
 }

@@ -480,6 +480,7 @@ describe("AuctionFile", () => {
       await factory.createStore()
 
       const ts = await time.latest()
+      const collateral = BigNumber.from("100000000000000000")
 
       await auctionFile.create(
         "NAME",
@@ -489,21 +490,31 @@ describe("AuctionFile", () => {
         ts + 2000,
         "0x",
         {
-          value: BigNumber.from("100000000000000000"),
+          value: collateral,
         }
       )
 
       await time.increase(time.duration.hours(1))
 
-      await expect(auctionFile.finalize(1))
+      const oldBalance = (await wallet.getBalance()).toString()
+
+
+      const tx = await auctionFile.finalize(1)
+      await expect(tx)
         .to.emit(auctionFile, "DealClosed")
         .withArgs(1)
+
+      const txRec = await tx.wait()
+      const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
+      const newBalance = (await wallet.getBalance()).toString()
+
+      expect(collateral.add(oldBalance).sub(gas)).to.eq(newBalance)
+
     })
 
     it("should finalize with bids", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -557,7 +568,7 @@ describe("AuctionFile", () => {
       await time.increase(time.duration.hours(1))
 
       await expect(auctionFile.finalize(1)).to.revertedWith(
-        "AuctionFile: Auction is not open"
+        "AuctionFile: Wrong status"
       )
     })
 
@@ -612,6 +623,7 @@ describe("AuctionFile", () => {
 
       const ts = await time.latest()
 
+      const collateral = BigNumber.from("100000000000000000")
       await auctionFile.create(
         "NAME",
         "DESCRIPTION",
@@ -620,7 +632,7 @@ describe("AuctionFile", () => {
         ts + 2000,
         "0x",
         {
-          value: BigNumber.from("100000000000000000"),
+          value: collateral,
         }
       )
 
@@ -632,13 +644,20 @@ describe("AuctionFile", () => {
 
       await auctionFile.finalize(1)
 
-      await expect(
-        auctionFile.connect(other).dispute(1, {
-          value: BigNumber.from("100000000000000000"),
-        })
-      )
+      const oldBalance = (await other.getBalance()).toString()
+
+      const tx = await auctionFile.connect(other).dispute(1, {
+        value: BigNumber.from("100000000000000000"),
+      })
+      await expect(tx)
         .to.emit(auctionFile, "DisputeCreated")
         .withArgs(1)
+
+      const txRec = await tx.wait()
+      const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
+      const newBalance = (await other.getBalance()).toString()
+
+      expect(collateral.add(newBalance).add(gas)).to.eq(oldBalance)
     })
 
     it("fails without finalize", async () => {
@@ -780,8 +799,10 @@ describe("AuctionFile", () => {
     it("should receiveReward", async () => {
       await factory.createStore()
 
-      console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
+      const collateral = BigNumber.from("100000000000000000")
+      const price = BigNumber.from("10000000000")
+      const fee = BigNumber.from("200000000")
 
       await auctionFile.create(
         "NAME",
@@ -791,21 +812,35 @@ describe("AuctionFile", () => {
         ts + 2000,
         "0x",
         {
-          value: BigNumber.from("100000000000000000"),
+          value: collateral,
         }
       )
 
       await auctionFile.connect(other).bid(1, {
-        value: BigNumber.from("10000000000"),
+        value: price
       })
 
       await time.increase(time.duration.hours(1))
       await auctionFile.finalize(1)
       await time.increase(time.duration.days(6))
 
-      await expect(auctionFile.receiveReward(1))
+      const oldBalanceSeller = (await wallet.getBalance()).toString()
+      const oldBalanceBuyer = (await other.getBalance()).toString()
+
+      const tx = await auctionFile.receiveReward(1)
+      await expect(tx)
         .to.emit(auctionFile, "DealClosed")
         .withArgs(1)
+
+      const txRec = await tx.wait()
+      const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
+
+
+      const newBalanceSeller = (await wallet.getBalance()).toString()
+      const newBalanceBuyer = (await other.getBalance()).toString()
+
+      expect(collateral.add(oldBalanceSeller).add(price).sub(gas).sub(fee)).to.eq(newBalanceSeller)
+      expect(newBalanceBuyer).to.eq(oldBalanceBuyer)
     })
 
     it("fails if its time for dispute", async () => {

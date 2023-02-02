@@ -188,7 +188,10 @@ contract Notary is INotary, Ownable {
         while (count < min) {
             uint256 rnd = _random(max, i++);
 
-            if (notaries[dealId][notariesArr[rnd]]) continue;
+            if (
+                notaries[dealId][notariesArr[rnd]] ||
+                deposits[notariesArr[rnd]] < _minDeposit
+            ) continue;
 
             notaries[dealId][notariesArr[rnd]] = true;
             IIntegration(integration).addAccess(dealId, notariesArr[rnd]);

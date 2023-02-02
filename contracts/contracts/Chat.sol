@@ -12,6 +12,14 @@ import "./Store.sol";
 contract Chat is IChat, Ownable {
     IFactory public _factory;
 
+    modifier integrationOnly() {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Chat: Only integration"
+        );
+        _;
+    }
+
     mapping(uint256 => ChatParams[]) private chats;
 
     function setFactory(address factory) external onlyOwner {
@@ -44,20 +52,14 @@ contract Chat is IChat, Ownable {
         uint256 dealId,
         string memory message,
         address sender
-    ) external {
-        require(
-            _factory.integrationExist(msg.sender),
-            "Chat: Only integration"
-        );
-
+    ) external integrationOnly {
         _sendMessage(dealId, message, sender);
     }
 
-    function sendSystemMessage(uint256 dealId, string memory message) external {
-        require(
-            _factory.integrationExist(msg.sender),
-            "Chat: Only integration"
-        );
+    function sendSystemMessage(uint256 dealId, string memory message)
+        external
+        integrationOnly
+    {
         _sendMessage(dealId, message, address(0));
     }
 }
