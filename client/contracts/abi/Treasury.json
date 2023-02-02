@@ -20,6 +20,19 @@
   },
   {
     "inputs": [],
+    "name": "_exchange",
+    "outputs": [
+      {
+        "internalType": "contract MockExchange",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "burnReward",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -59,6 +72,19 @@
   {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract MockExchange",
+        "name": "exchange",
+        "type": "address"
+      }
+    ],
+    "name": "setExchange",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -114,5 +140,9 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]

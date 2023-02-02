@@ -36,8 +36,7 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
 
   return (
     <Accordion mt="16px" index={accordionIndex}>
-      {deals?.map((item) => {
-        let normalizedId = +convertExpNumberToNormal(item.id);
+      {deals?.map((item, index) => {
         return (
           <AccordionItem
             border="1px solid"
@@ -151,12 +150,13 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                   <AccordionButton
                     cursor="pointer"
                     onClick={(event) => {
+                      console.log('id', item.id, typeof item.id);
                       event.preventDefault();
                       setNumberOfClicks(1);
-                      setAccordionIndex(normalizedId - 1);
+                      setAccordionIndex(index);
                       if (numberOfClicks % 2 === 1) {
-                        if (normalizedId !== accordionIndex + 1) {
-                          setAccordionIndex(normalizedId - 1);
+                        if (index !== accordionIndex) {
+                          setAccordionIndex(index);
                           setNumberOfClicks(1);
                         } else {
                           setNumberOfClicks(0);
@@ -176,7 +176,7 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                 </Flex>
               </Flex>
             </Link>
-            <AccordionPanel bg="inherit" p="16px 20px 18px 36px">
+            <AccordionPanel dis bg="inherit" p="16px 20px 18px 36px">
               <Text textStyle="smallText" color="white">
                 Description:&nbsp;{item.description}
               </Text>

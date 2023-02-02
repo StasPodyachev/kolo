@@ -68,6 +68,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         returns (DealParams memory deal)
     {
         SimpleTradeFileParams memory params = deals[dealId];
+        params.dateDispute = params.dateExpire + _periodDispute;
 
         deal = DealParams({
             id: dealId,
@@ -125,6 +126,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
             collateralAmount: msg.value,
             price: price,
             dateExpire: dateExpire,
+            dateDispute: dateExpire + _periodDispute,
             seller: msg.sender,
             buyer: address(0),
             cid: cid,

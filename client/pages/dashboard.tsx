@@ -24,12 +24,12 @@ const Dashboard: NextPage = () => {
   const [buyerWaitForPaymentCount, setBuyerWaitForPaymentCount] = useState(0);
   const [buyerDisputCount, setBuyerDisputCount] = useState(0);
   const { isConnected } = useAccount();
+  const { address } = useAccount();
   const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
     functionName: "getAllDeals",
   });
-  const address = "0x9D21bbaF17d1a71153FBB08E9396E5A293157a88";
   useEffect(() => {
     if (Array.isArray(data)) {
       const decryptedData = data?.map((item: any) => {
@@ -38,7 +38,7 @@ const Dashboard: NextPage = () => {
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
         ], item.data);
 
-        const id = +ethers.utils.formatEther(BigNumber?.from(result[0][0]));
+        const id = +result[0][0].toString();
         const title = result[0][1];
         const description = result[0][2]
         const ownedBy = result[0][7]
@@ -74,20 +74,20 @@ const Dashboard: NextPage = () => {
           priceEnd,
           description,
           status,
-          totalBids: 20
+          totalBids: 20,
         };
       });
       const filteredDealsBySeller = decryptedData.filter((item: any) => item.ownedBy === address);
       const filteredDealsByBuyer = decryptedData.filter((item: any) => item.buyerAddress === address);
-      const activeItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status === "Active").length;
+      const activeItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status === "Open").length;
       setSellerActiveItemsCount(activeItemsCountSeller);
-      const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status === "Finalize").length;
+      const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status === "Wait finalize").length;
       setSellerWaitForPaymentCount(waitForPaymentItemsCountSeller);
       const itemsInDisputCountSeller = filteredDealsBySeller.filter((item: any) => item.status === "Dispute").length;
       setSellerDisputCount(itemsInDisputCountSeller);
-      const activeItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status === "Active").length;
+      const activeItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status === "Open").length;
       setBuyerActiveItemsCount(activeItemsCountBuyer);
-      const waitForPaymentItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status === "Finalize").length;
+      const waitForPaymentItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status === "Wait finalize").length;
       setBuyerWaitForPaymentCount(waitForPaymentItemsCountBuyer);
       const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status === "Dispute").length;
       setBuyerDisputCount(itemsInDisputCountBuyer);

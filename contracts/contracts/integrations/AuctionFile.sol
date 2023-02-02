@@ -73,6 +73,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         returns (DealParams memory deal)
     {
         AuctionFileParams memory params = deals[dealId];
+        params.dateDispute = params.dateExpire + _periodDispute;
 
         deal = DealParams({
             id: dealId,
@@ -138,6 +139,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             seller: msg.sender,
             buyer: address(0),
             cid: cid,
+            dateDispute: dateExpire + _periodDispute,
             status: AuctionStatus.OPEN
         });
 

@@ -1,7 +1,7 @@
 import { BIG_1E18 } from "./misc";
 import BigDecimal from "decimal.js-light";
 
-export function numberWithCommas(x: number) {
+export function numberWithCommas(x: number | string) {
   return x?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
@@ -38,14 +38,14 @@ export function convertExpNumberToNormal(expId: number) {
 export function convertStatus(status: number) {
   switch(status) {
     case 0:
-      return "Active"
+      return "Open"
     case 1:
-      return "Cancel"
+      return "Canceled"
     case 2:
-      return "Close"
+      return "Closed"
     case 3:
       return "Dispute"
     case 4:
-      return "Finalize"
+      return "Wait finalize"
   }
 }

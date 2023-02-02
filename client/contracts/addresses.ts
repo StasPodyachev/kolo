@@ -1,31 +1,31 @@
 const addresses = [
   {
     name: "Factory",
-    address: "0xdaBe9Aa89c7D1B4642dF47Ee262607AAa6715611"
+    address: "0x8C0a75f833692b9Ae110c2c3831acce737D6F45e"
   },
   {
     name: "AuctionFile",
-    address: "0x95a26314fA5A7B50734724639ff81B4435e8A4BE"
+    address: "0xaaFE6fc6378e5054990a7F6076e4Ac9CDf250946"
   },
   {
     name: "Notary",
-    address: "0x9F49421799e4Ab169F171e0Bd22aE9c846297Ec2"
+    address: "0x035F2476F03e95676777a7F89e6DC3A84D5626e7"
   },
   {
     name: "SimpleTradeFile",
-    address: "0xB6846692E541dD2E34Ff3e84A6cA057386228575"
+    address: "0x4009214Ee8D50D64ea73267feB4234d155238312"
   },
   {
     name: "Chat",
-    address: "0x251981DCf3bf21fE07E5a18BFe1c1d3c992145de"
+    address: "0xB9CB6aCc222D55330778c94ffc63d326C0388c2b"
   },
   {
     name: "Treasury",
-    address: "0xD49b8210a69d9271267A04e61CF04153ad307804"
+    address: "0xfc5372405427d66d2b81D17Cff2c32E7e70bF55D"
   },
   {
     name: "KoloToken",
-    address: "0x570f8389E18dCAd715e70b8114E96f782B960581"
+    address: "0x0583DF8E7CB6d4aCC7687410Ff2edb9b54CFE17F"
   }
 ]
 export default addresses

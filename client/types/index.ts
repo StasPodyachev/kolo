@@ -25,10 +25,10 @@ export interface IAuctionItem {
   totalBids: number;
 };
 
-export interface IBidsTableData {
+export interface IBidTableData {
   address: string;
   date: string;
-  bid: number;
+  currentBid: string;
 };
 
 export interface IBlock {
