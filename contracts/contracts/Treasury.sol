@@ -8,6 +8,12 @@ import "./interfaces/ITreasury.sol";
 import "./dao/KoloToken.sol";
 import "./MockExchange.sol";
 
+/**
+ * @title Kolo treasury
+ *
+ * This contract contains the main profit of the service that can be used to
+ *
+ **/
 contract Treasury is ITreasury, Ownable {
     MockExchange public _exchange;
 

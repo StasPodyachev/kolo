@@ -4,9 +4,17 @@ pragma abicoder v2;
 
 import "./interfaces/IControlAccess.sol";
 
+/**
+ * @title Kolo control access
+ *
+ * This contract stores all messages of all deals
+ *
+ */
 abstract contract ControlAccess {
+    /// @dev Holds a mapping of wallet to cids.
     mapping(address => mapping(bytes => bool)) private _accsess;
 
+    /// @dev Adds an access a mapping of wallet to cids.
     function _addAccess(address wallet, bytes storage cid) internal {
         _accsess[wallet][cid] = true;
     }
