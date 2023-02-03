@@ -1,0 +1,17 @@
+.input {
+  width: 100%;
+  background-color: #3A3D4D;
+  padding: 0 16px;
+  border: 1px solid;
+  border-color: #696C80;
+  border-radius: 4px;
+  transition: all .3s;
+}
+
+.input:focus-visible {
+  background-color: #3A3D4D;
+  box-shadow: none;
+  outline: none;
+  border: 1px solid;
+  border-color: white;
+}

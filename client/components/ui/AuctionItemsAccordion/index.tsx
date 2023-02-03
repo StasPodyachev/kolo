@@ -10,7 +10,6 @@ import {
   Text,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import {
@@ -22,7 +21,6 @@ import AddressCopy from "../AddressCopy";
 import Link from "next/link";
 import { useState } from "react";
 import { IAuctionItem } from "@/types";
-import { convertExpNumberToNormal } from "@/helpers";
 
 interface IProps {
   deals: IAuctionItem[];
@@ -176,7 +174,7 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                 </Flex>
               </Flex>
             </Link>
-            <AccordionPanel dis bg="inherit" p="16px 20px 18px 36px">
+            <AccordionPanel bg="inherit" p="16px 20px 18px 36px">
               <Text textStyle="smallText" color="white">
                 Description:&nbsp;{item.description}
               </Text>

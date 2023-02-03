@@ -2,10 +2,9 @@ import {
   Badge,
   InputGroup,
   InputRightElement,
-  NumberInputField,
-  NumberInput as ChakraNumberInput,
   FormErrorMessage,
 } from "@chakra-ui/react";
+import styles from "./NumberInput.module.css";
 
 interface IProps {
   value: string;
@@ -13,18 +12,15 @@ interface IProps {
   isNeededMarginTop?: boolean;
   isNotFullWidth?: boolean;
   minValue?: number;
-  isCollateralInput?: boolean;
   errorMessage?: string;
   width?: string;
 }
-
 const NumberInput = ({
   value,
   setValue,
   isNeededMarginTop,
   isNotFullWidth,
   minValue,
-  isCollateralInput,
   errorMessage,
   width,
 }: IProps) => {
@@ -36,40 +32,25 @@ const NumberInput = ({
       minH="48px"
       mt={isNeededMarginTop ? "16px" : 0}
     >
-      <ChakraNumberInput
+      <input
+        id="numberInput"
         min={minValue}
+        type="number"
+        className={styles.input}
         value={value}
-        onKeyPress={(event) => {
-          if (event.key === "e" || event.key === "E" || event.key === "-") {
-            setTimeout(() => {
-              setValue("0");
-            }, 100);
-          }
-        }}
         onChange={(event) => {
-          if (isCollateralInput && minValue && minValue > +event) {
-            setTimeout(() => setValue(minValue.toString()), 3000);
+          if (event.target.value.includes('.')) {
+            const decimalsCount = event.target.value.split('.');
+            if (decimalsCount.length && decimalsCount[1].length > 2) {
+              setValue((+event.target.value).toFixed(2))
+            } else {
+              setValue(event.target.value)
+            }
           } else {
-            setValue(event);
+            setValue(event.target.value)
           }
         }}
-        w="100%"
-        bg="gray.700"
-        borderRadius="md"
-      >
-        <NumberInputField
-          _placeholder={{ color: "white" }}
-          w="100%"
-          h="100%"
-          p="12px 16px"
-          transition="all .3s"
-          color="white"
-          _focusVisible={{
-            boxShadow: "none",
-            border: "1px solid",
-            borderColor: "gray.300",
-          }}
-        />
+      />
         <InputRightElement top="5px" right="13px">
           <Badge
             letterSpacing="1px"
@@ -81,7 +62,6 @@ const NumberInput = ({
             FIL
           </Badge>
         </InputRightElement>
-      </ChakraNumberInput>
     </InputGroup>
     <FormErrorMessage>{errorMessage}</FormErrorMessage>
   </>
