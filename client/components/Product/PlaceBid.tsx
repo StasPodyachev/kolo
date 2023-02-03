@@ -9,19 +9,19 @@ import { BIG_1E18 } from "@/helpers/misc";
 import { BigNumber } from "ethers";
 
 const PlaceBid = ({isDisabled,bid,id}:{isDisabled: boolean, bid: string, id: number}) => {
-  const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
-  const { config } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: 'bid',
-    args: [BigNumber.from(id), {value: bidValue}]
-  })
-  const { write } = useContractWrite(config)
+  // const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
+  // const { config } = usePrepareContractWrite({
+  //   address: addresses[1].address as `0x${string}`,
+  //   abi: ABI_AUCTION_FILE,
+  //   functionName: 'bid',
+  //   args: [BigNumber.from(id), {value: bidValue}]
+  // })
+  // const { write } = useContractWrite(config)
   return (
     <Button
-      w="100%"
+      minW="170px"
       minH="48px"
-      onClick={() => write?.()}
+      // onClick={() => write?.()}
       isDisabled={isDisabled}
       textStyle="button"
       bg="blue.primary"

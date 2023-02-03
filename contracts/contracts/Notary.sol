@@ -26,8 +26,8 @@ contract Notary is INotary, Ownable {
     address[] notariesArr;
 
     uint256 public _minDeposit = 1e18;
-    uint256 public _consensusCount = 5;
-    uint256 public _countInvaitedNotary = 10;
+    uint256 public _consensusCount = 2;
+    uint256 public _countInvaitedNotary = 4;
 
     uint256 public _penalty = 1e18;
 
