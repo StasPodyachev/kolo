@@ -20,15 +20,4 @@ interface IIntegration {
     function finalizeDispute(uint256 dealId, DisputeWinner winner) external;
 
     function addAccess(uint256 dealId, address wallet) external;
-
-    function checkAccess(bytes calldata cid, address wallet)
-        external
-        view
-        returns (uint8);
-
-    function checkAccess(
-        bytes32[] calldata cid,
-        uint8 size,
-        address wallet
-    ) external view returns (uint8);
 }

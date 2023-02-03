@@ -28,11 +28,42 @@ describe("AuctionFile", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ; ({ auctionFile, factory } = await loadFixture(async () => {
-      const { auctionFile, factory } = await auctionFileFixture()
+    ; ({ auctionFile, factory, chat } = await loadFixture(async () => {
+      const { auctionFile, factory, chat } = await auctionFileFixture()
 
-      return { auctionFile, factory }
+      return { auctionFile, factory, chat }
     }))
+  })
+
+  describe("#setters", () => {
+    it("setServiceFee", async () => {
+      await expect(auctionFile.setServiceFee(111111111)).to.be.not.reverted;
+      await expect(auctionFile.connect(other).setServiceFee(111111111)).to.be.reverted;
+    })
+
+    it("setPeriodDispute", async () => {
+      await expect(auctionFile.setPeriodDispute(111111111)).to.be.not.reverted;
+      await expect(auctionFile.connect(other).setPeriodDispute(111111111)).to.be.reverted;
+
+      const params = await auctionFile.getIntegrationInfo()
+      expect(params.periodDispute).to.eq(111111111)
+    })
+
+    it("setCollateralAmount", async () => {
+      await expect(auctionFile.setCollateralPercent(111111111)).to.be.not.reverted;
+      await expect(auctionFile.connect(other).setCollateralPercent(111111111)).to.be.reverted;
+
+      const params = await auctionFile.getIntegrationInfo()
+      expect(params.collateralPercent).to.eq(111111111)
+    })
+
+    it("setCollateralAmount", async () => {
+      await expect(auctionFile.setCollateralAmount(111111111)).to.be.not.reverted;
+      await expect(auctionFile.connect(other).setCollateralAmount(111111111)).to.be.reverted;
+
+      const params = await auctionFile.getIntegrationInfo()
+      expect(params.collateralAmount).to.eq(111111111)
+    })
   })
 
   describe("#create", () => {
@@ -925,6 +956,77 @@ describe("AuctionFile", () => {
       await expect(auctionFile.receiveReward(1000)).to.revertedWith(
         "AuctionFile: Id not found"
       )
+    })
+  })
+
+  describe("#sendMessage", () => {
+    it("should send message", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest()
+
+      const collateral = BigNumber.from("100000000000000000")
+      await auctionFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: collateral,
+        }
+      )
+      await auctionFile.sendMessage(1, "Hello!")
+      const param = await chat.getChat(1)
+      expect(param.length).eq(2)
+      expect(param[1].message).eq("Hello!")
+      expect(param[1].sender).eq(wallet.address)
+    })
+
+    it("fails if status cancel", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest()
+
+      const collateral = BigNumber.from("100000000000000000")
+      await auctionFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: collateral,
+        }
+      )
+
+      await auctionFile.cancel(1)
+      await expect(auctionFile.sendMessage(1, "Hello!")).to.be.revertedWith("AuctionFile: Wrong status")
+    })
+
+    it("fails if status close", async () => {
+      await factory.createStore()
+
+      const ts = await time.latest()
+
+      const collateral = BigNumber.from("100000000000000000")
+      await auctionFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: collateral,
+        }
+      )
+
+      await time.increase(time.duration.hours(1))
+      await auctionFile.finalize(1)
+      await expect(auctionFile.sendMessage(1, "Hello!")).to.be.revertedWith("AuctionFile: Wrong status")
     })
   })
 

@@ -9,9 +9,16 @@ import "../interfaces/IStore.sol";
 import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
 import "../interfaces/IChat.sol";
+import "../ControlAccess.sol";
+
 import "hardhat/console.sol";
 
-contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
+contract SimpleTradeFile is
+    ISimpleTradeFile,
+    IIntegration,
+    ControlAccess,
+    Ownable
+{
     IFactory public _factory;
     IChat public _chat;
     INotary public _notary;
@@ -176,7 +183,7 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
     }
 
     function _finalize(SimpleTradeFileParams storage deal) internal {
-        _addAccess(deal.id, deal.buyer);
+        _addAccess(deal.buyer, deal.cid);
 
         deal.status = SimpleTradeFileStatus.FINALIZE;
         deal.dateExpire = block.timestamp;
@@ -281,7 +288,6 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
         );
 
         _sendWin(deal, IIntegration.DisputeWinner.Seller);
-        _chat.sendSystemMessage(dealId, "Deal closed.");
     }
 
     function _sendWin(
@@ -302,45 +308,14 @@ contract SimpleTradeFile is ISimpleTradeFile, IIntegration, Ownable {
             store.transferWinToBuyer(deal.id, deal.buyer);
         }
 
+        _chat.sendSystemMessage(deal.id, "Deal closed.");
+
         deal.status = SimpleTradeFileStatus.CLOSE;
         emit DealClosed(deal.id);
     }
 
     function addAccess(uint256 dealId, address wallet) external onlyNotary {
-        _addAccess(dealId, wallet);
-    }
-
-    function _addAccess(uint256 dealId, address wallet) internal {
-        bytes memory cid = deals[dealId].cid;
-        _accsess[wallet][cid] = true;
-    }
-
-    function checkAccess(bytes calldata cid, address wallet)
-        external
-        view
-        returns (uint8)
-    {
-        return _accsess[wallet][cid] ? 1 : 0;
-    }
-
-    function checkAccess(
-        bytes32[] calldata cid,
-        uint8 size,
-        address wallet
-    ) external view returns (uint8) {
-        size -= 32;
-        bytes memory tmp = new bytes(size);
-
-        // TODO: change to assembly
-
-        for (uint256 i = 0; i < size; i++) {
-            tmp[i] = cid[1][i];
-        }
-
-        return this.checkAccess(bytes.concat(cid[0], tmp), wallet);
-
-        //QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
-        //QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
+        _addAccess(wallet, deals[dealId].cid);
     }
 
     function sendMessage(uint256 dealId, string calldata message) external {
