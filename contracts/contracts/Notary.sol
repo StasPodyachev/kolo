@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 import "./interfaces/INotary.sol";
 import "./interfaces/IStore.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/integrations/IIntegration.sol";
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/dao/IKoloToken.sol";
 
 import "hardhat/console.sol";
 
@@ -26,8 +28,8 @@ contract Notary is INotary, Ownable {
     address[] notariesArr;
 
     uint256 public _minDeposit = 1e18;
-    uint256 public _consensusCount = 5;
-    uint256 public _countInvaitedNotary = 10;
+    uint256 public _consensusCount = 2;
+    uint256 public _countInvaitedNotary = 4;
 
     uint256 public _penalty = 1e18;
 
@@ -50,6 +52,10 @@ contract Notary is INotary, Ownable {
 
     function setCountInvitedNotary(uint256 value) external onlyOwner {
         _countInvaitedNotary = value;
+    }
+
+    function _airdropDao(address wallet) internal {
+        IKoloToken(_factory.daoToken()).airdrop(wallet);
     }
 
     function deposit() external payable {
@@ -146,6 +152,8 @@ contract Notary is INotary, Ownable {
             address integration = store.getIntegration(dealId);
             IIntegration(integration).finalizeDispute(dealId, winner);
         }
+
+        _airdropDao(msg.sender);
     }
 
     function getDealIDbyNotary(address notary)

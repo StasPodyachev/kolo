@@ -5,6 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/integrations/IAuctionFile.sol";
 import "../interfaces/integrations/IIntegration.sol";
+
+import "../interfaces/dao/IKoloToken.sol";
+
 import "../interfaces/IStore.sol";
 import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
@@ -109,6 +112,10 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         return deal;
     }
 
+    function _airdropDao(address wallet) internal {
+        IKoloToken(_factory.daoToken()).airdrop(wallet);
+    }
+
     function create(
         string calldata name,
         string calldata description,
@@ -160,6 +167,8 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
 
         emit DealCreated(id, msg.sender);
 
+        _airdropDao(msg.sender);
+
         return id;
     }
 
@@ -210,6 +219,8 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         );
 
         emit BidCreated(dealId, deal.buyer, deal.price);
+
+        _airdropDao(msg.sender);
 
         if (msg.value >= deal.priceForceStop) {
             _finalize(deal);
