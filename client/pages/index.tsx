@@ -42,7 +42,7 @@ const Home: NextPage = () => {
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
         ], item?.data);
         console.log(result, 'result');
-        
+
         const id = +result[0][0]?.toString();
         const title = result[0][1]
         const description = result[0][2]
@@ -59,7 +59,7 @@ const Home: NextPage = () => {
         // const saleEndDate = [slicedDate[1], slicedDate[0], slicedDate[2]]?.join(" ");
         const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
-        const status = result[0][11].toString()
+        const status = result[0][12].toString()
 
         let dateYear = new Date(saleEndDateNew * 1)
         let date = new Date(saleEndDateNew * 1000)

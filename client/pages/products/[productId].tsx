@@ -69,7 +69,7 @@ const ProductPage: NextPage = () => {
       const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
       const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
       const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
-      const status = result[0][11] && convertStatus(Number(result[0][11]));
+      const status = result[0][12] && convertStatus(Number(result[0][12]));
 
       // Create a new JavaScript Date object based on the timestamp
       // multiplied by 1000 so that the argument is in milliseconds, not seconds.
