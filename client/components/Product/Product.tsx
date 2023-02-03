@@ -6,8 +6,7 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useAccount, useContractWrite, usePrepareContractWrite, useSigner, useWaitForTransaction } from "wagmi";
-import Tooltip from "../ui/Tooltip";
+import { useContractWrite, usePrepareContractWrite, useSigner, useWaitForTransaction } from "wagmi";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
@@ -17,8 +16,7 @@ import addresses from "@/contracts/addresses";
 import { BigNumber } from "ethers";
 import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
-import { useEffect, useState } from "react";
-import { waitForTransaction } from "@wagmi/core";
+import { useState } from "react";
 
 
 interface IProps {
@@ -230,18 +228,13 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               >
                 {item?.description}
               </Text>
-              <Tooltip
-                label="Connect wallet to buy"
-                isHidden={signer ? true : false}
-              >
-                  <BuyNow
-                    isDisabled={!signer}
-                    onClick={() => {
-                      setIsOpenModal(true);
-                      placeBidWrite?.();
-                    }}
-                  />
-              </Tooltip>
+                <BuyNow
+                  isDisabled={!signer}
+                  onClick={() => {
+                    setIsOpenModal(true);
+                    placeBidWrite?.();
+                  }}
+                />
             </Flex>
           </Flex>
         </Flex>
