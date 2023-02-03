@@ -1,22 +1,24 @@
 import useDevice from "@/hooks/useDevice";
-import { IAuctionItem, IBidTableData } from "@/types";
+import { IAuctionItem, IBidTableData, IChatMessage } from "@/types";
 import { Box, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useContractWrite, usePrepareContractWrite, useSigner, useWaitForTransaction } from "wagmi";
+import { useContractRead, useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
 import Modal from "../ui/Modal/Modal";
 import { BIG_1E18 } from "@/helpers/misc";
 import addresses from "@/contracts/addresses";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
-import { useState } from "react";
+import ABI_CHAT from "@/contracts/abi/Chat.json";
+import { useEffect, useState } from "react";
+import Chat from "./Chat";
 
 
 interface IProps {
@@ -34,6 +36,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const signer = useSigner();
   const isBidError = +bid <= +currentBid;
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [chatMessages, setChatMessages] = useState<IChatMessage[] | []>([]);
 
   const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
   const { config } = usePrepareContractWrite({
@@ -57,6 +60,31 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     isSuccess: isBuyKnowSuccess,
     isError: isBuyKnowError,
   } = useContractWrite(buyKnowconfig)
+
+  const { data: chatData } = useContractRead({
+    address: addresses[4].address as `0x${string}`,
+    abi: ABI_CHAT,
+    functionName: "getChat",
+    args: [item?.id],
+  });
+
+  useEffect(() => {
+    if (Array.isArray(chatData)) {
+      const decryptedData = chatData?.map((item: any) => {
+        const sender = item?.sender.toString();
+        const message = item?.message.toString();
+        const sendTime = parseInt(item?.timestamp?._hex, 16);
+        const formattedSendTime = new Date(+sendTime).toLocaleDateString();
+
+        return {
+          message,
+          sender,
+          time: formattedSendTime,
+        }
+      })
+      setChatMessages(decryptedData);
+    }
+  }, [chatData])
 
   return (
     <>
@@ -85,8 +113,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
           changeVisibility={setIsOpenModal}
         />
       ) : null}
-      <Flex flexDir="column">
+      <Flex flexDir="column" w="fit-content">
         <Flex
+          w="max-content"
           height="240px"
           flexDir={isDesktopHeader[0] ? "row" : "column"}
           gap={isDesktopHeader[0] ? "56px" : 0}
@@ -239,8 +268,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
           </Flex>
         </Flex>
         <Flex
+          justifyContent={isDesktopHeader[0] ? "space-between" : "normal"}
           flexDir={isDesktopHeader[0] ? "row" : "column"}
-          gap={isDesktopHeader[0] ? "162px" : "52px"}
+          gap={isDesktopHeader[0] ? 0 : "52px"}
           mt={isDesktopHeader[0] ? "36px" : "52px"}
         >
           <Box minW="400px">
@@ -257,21 +287,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
             </Flex>
             <BidsTable data={bidsTableData} />
           </Box>
-          <Flex
-            flexDir="column"
-            gap="8px"
-            maxW={isDesktopHeader[0] ? "517px" : "100%"}
-            minH="465px"
-            bg="gray.800"
-            p="32px 24px"
-          >
-            <AddressCopy address={item?.ownedBy!} color="gray.50" />
-            <Text textStyle="smallText" color="gray.400">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras
-              pulvinar commodo lacus eu dapibus. Aliquam vestibulum, lectus at
-              tempor vestibulum, sapien purus.
-            </Text>
-          </Flex>
+          <Chat sellerAdress={item?.ownedBy} messages={chatMessages} />
         </Flex>
       </Flex>
     </>

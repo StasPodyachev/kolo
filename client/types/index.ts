@@ -64,3 +64,9 @@ export interface FaqAccordionItem {
 export interface IChildren {
   children: JSX.Element | JSX.Element[];
 }
+
+export interface IChatMessage {
+  message: string;
+  sender: string;
+  time: string;
+}
