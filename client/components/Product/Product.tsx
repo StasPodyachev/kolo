@@ -130,9 +130,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
           isOpen={isOpenModal}
           changeVisibility={setIsOpenModal}/>
       ) : null}
-      <Flex flexDir="column" w="fit-content">
+      <Flex flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
         <Flex
-          w="max-content"
+          w={isDesktopHeader[0] ? "max-content" : "100%"}
           height="240px"
           flexDir={isDesktopHeader[0] ? "row" : "column"}
           gap={isDesktopHeader[0] ? "56px" : 0}>
