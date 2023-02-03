@@ -110,16 +110,14 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
           isSuccess={false}
           isError={isPlaceBidError || isBuyKnowError}
           isOpen={isOpenModal}
-          changeVisibility={setIsOpenModal}
-        />
+          changeVisibility={setIsOpenModal}/>
       ) : null}
       <Flex flexDir="column" w="fit-content">
         <Flex
           w="max-content"
           height="240px"
           flexDir={isDesktopHeader[0] ? "row" : "column"}
-          gap={isDesktopHeader[0] ? "56px" : 0}
-        >
+          gap={isDesktopHeader[0] ? "56px" : 0}>
           <Flex
             flexDir="column"
             alignItems={isDesktopHeader[0] ? "normal" : "center"}
@@ -200,21 +198,28 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                   {item?.priceEnd}&nbsp;FIL
                 </Heading>
               </Flex>
-              <Flex justifyContent="space-between">
-                <NumberInput
-                  value={bid}
-                  setValue={setBid}
-                  minValue={Number(bid)}
-                  width="200px"
-                />
-                <PlaceBid
-                  isDisabled={!signer || isBidError}
-                  onClick={() => {
-                    setIsOpenModal(true);
-                    placeBidWrite?.()
-                  }}
-                />
-              </Flex>
+
+                <Flex height={'48px'} justifyContent="space-between">
+                  {
+                    item?.status?.title === "Open" ?
+                      <>
+                        <NumberInput
+                          value={bid}
+                          setValue={setBid}
+                          minValue={Number(bid)}
+                          width="200px"
+                        />
+                        <PlaceBid
+                          isDisabled={!signer || isBidError}
+                          onClick={() => {
+                            setIsOpenModal(true);
+                            placeBidWrite?.()
+                          }}
+                        />
+                      </>
+                    : null
+                  }
+                </Flex>
             </Flex>
             <Flex
               mt={isItemsInColumn[0] ? "32px" : 0}
@@ -257,13 +262,15 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               >
                 {item?.description}
               </Text>
-                <BuyNow
-                  isDisabled={!signer}
-                  onClick={() => {
-                    setIsOpenModal(true);
-                    placeBidWrite?.();
-                  }}
-                />
+                {
+                  item?.status?.title == "Open" ?
+                  <BuyNow
+                    isDisabled={!signer}
+                    onClick={() => {
+                      setIsOpenModal(true);
+                      buyKnowWrite?.();
+                    }}/> : null
+                }
             </Flex>
           </Flex>
         </Flex>
