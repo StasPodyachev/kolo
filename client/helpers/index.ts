@@ -38,14 +38,29 @@ export function convertExpNumberToNormal(expId: number) {
 export function convertStatus(status: number) {
   switch(status) {
     case 0:
-      return "Open"
+      return {
+        title: "Open",
+        color: "#0E8C43"
+      }
     case 1:
-      return "Canceled"
+      return {
+        title: "Canceled",
+        color: "?gray?"
+      }
     case 2:
-      return "Closed"
+      return {
+        title: "Closed",
+        color: "#964B00",
+      }
     case 3:
-      return "Dispute"
+      return {
+        title: "Dispute",
+        color: "#E52E2E",
+      }
     case 4:
-      return "Wait finalize"
+      return {
+        title: "Wait finalize",
+        color: "#004DE5",
+      }
   }
 }
