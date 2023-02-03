@@ -34,17 +34,21 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (Array.isArray(data)) {
+      console.log(data, "data");
+      
       const decryptedData = data?.map((item: any) => {
-        const coder = ethers.utils.defaultAbiCoder;
-        const result = coder.decode([
-          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
-        ], item.data);
-        const id = +result[0][0].toString();
+        const coder = ethers?.utils?.defaultAbiCoder;
+        const result = coder?.decode([
+          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
+        ], item?.data);
+        console.log(result, 'result');
+        
+        const id = +result[0][0]?.toString();
         const title = result[0][1]
         const description = result[0][2]
-        const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
+        const price = +ethers?.utils?.formatEther(BigNumber?.from(result[0][4]));
         const ownedBy = result[0][7]
-        const saleEndDateNew = result[0][9]._hex
+        const saleEndDateNew = result[0][9]?._hex
         // console.log('sale end', saleEndDateNew)
         // const bidDate = new Date(result[0][9]._hex * 1000);
         // const year = bidDate.getFullYear();

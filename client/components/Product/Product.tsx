@@ -1,16 +1,25 @@
 import useDevice from "@/hooks/useDevice";
 import { IAuctionItem, IBidTableData } from "@/types";
-import { Box, Button, Flex, FormControl, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
+import { Box, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useSigner } from "wagmi";
+import { useAccount, useContractWrite, usePrepareContractWrite, useSigner, useWaitForTransaction } from "wagmi";
 import Tooltip from "../ui/Tooltip";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
+import Modal from "../ui/Modal/Modal";
+import { BIG_1E18 } from "@/helpers/misc";
+import addresses from "@/contracts/addresses";
+import { BigNumber } from "ethers";
+import BigDecimal from "decimal.js-light";
+import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
+import { useEffect, useState } from "react";
+import { waitForTransaction } from "@wagmi/core";
+
 
 interface IProps {
   item: IAuctionItem,
@@ -26,6 +35,37 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const isItemsInColumn = useMediaQuery("(max-width: 899px)");
   const signer = useSigner();
   const isBidError = +bid <= +currentBid;
+  const { status } = useAccount();
+  const [waitingData, setWaitingData] = useState<unknown>();
+  console.log('status', status)
+
+  const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
+  const { config } = usePrepareContractWrite({
+    address: addresses[1].address as `0x${string}`,
+    abi: ABI_AUCTION_FILE,
+    functionName: 'bid',
+    args: [BigNumber.from(item?.id), {value: bidValue}]
+  })
+  const { write, isLoading, data, isSuccess } = useContractWrite(config)
+
+  useEffect(() => {
+    console.log('waiting data', waitingData);
+  }, [waitingData])
+
+  useEffect(() => {
+    if (data) {
+      const getMetaMaskLoading = async () => {
+        const waitData = await waitForTransaction({
+          hash: data.hash,
+        })
+        setWaitingData(waitData)
+      }
+      getMetaMaskLoading();
+      console.log('wait data', getMetaMaskLoading())
+    }
+  }, [data])
+
+  console.log('data', data)
   return (
     <Flex flexDir="column">
       <Flex
@@ -113,17 +153,20 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                 {item?.priceEnd}&nbsp;FIL
               </Heading>
             </Flex>
-            <Flex gap="24px">
+            <Flex justifyContent="space-between">
               <NumberInput
                 value={bid}
                 setValue={setBid}
-                // minValue={Number(bid)}
+                minValue={Number(bid)}
                 width="200px"
               />
-              <PlaceBid
-                isDisabled={!signer || isBidError}
-                bid={bid}
-                id={item?.id}/>
+              <Modal title="Are you sure you want to place a bid?" isLoading={isSuccess} confirmHandler={() => write?.()}>
+                <PlaceBid
+                  isDisabled={!signer || isBidError}
+                  bid={bid}
+                  id={item?.id}
+                />
+              </Modal>
             </Flex>
           </Flex>
           <Flex
@@ -144,18 +187,14 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               <Box
                 boxSize="10px"
                 borderRadius="50%"
-                bg={
-                  item?.status === "Active"
-                    ? "green.active"
-                    : "red.active"
-                }
+                bg={item?.status.color}
               />
               <Text
                 textStyle="smallText"
                 color="white"
                 textTransform="capitalize"
               >
-                {item?.status}
+                {item?.status?.title}
               </Text>
             </Flex>
             <Text
@@ -175,7 +214,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               label="Connect wallet to buy"
               isHidden={signer ? true : false}
             >
-              {/* BuyNow = ({isDisabled, price, id} */}
               <BuyNow isDisabled={!signer} price={item?.priceEnd} id={item?.id} />
             </Tooltip>
           </Flex>

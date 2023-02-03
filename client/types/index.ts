@@ -10,6 +10,11 @@ export interface INavlink {
   icon: JSX.Element;
 };
 
+interface IStatus {
+  title: string;
+  color: string;
+}
+
 export interface IAuctionItem {
   id: number;
   title: string;
@@ -21,7 +26,7 @@ export interface IAuctionItem {
   priceEnd: number;
   image?: string;
   description: string;
-  status: string;
+  status: IStatus;
   totalBids: number;
 };
 
