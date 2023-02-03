@@ -19,6 +19,8 @@ import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import ABI_CHAT from "@/contracts/abi/Chat.json";
 import { useEffect, useState } from "react";
 import Chat from "./Chat";
+import Dispute from "./Dispute";
+import Finalize from "./Finalize";
 
 
 interface IProps {
@@ -67,6 +69,22 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     functionName: "getChat",
     args: [item?.id],
   });
+
+  const { config: disputeConfig } = usePrepareContractWrite({
+    address: addresses[1].address as `0x${string}`,
+    abi: ABI_AUCTION_FILE,
+    functionName: 'dispute',
+  });
+
+  const { write: disputeWrite } = useContractWrite(disputeConfig);
+
+  const { config: finalizeConfig } = usePrepareContractWrite({
+    address: addresses[1].address as `0x${string}`,
+    abi: ABI_AUCTION_FILE,
+    functionName: 'finalize',
+  });
+
+  const { write: finalizeWrite } = useContractWrite(finalizeConfig);
 
   useEffect(() => {
     if (Array.isArray(chatData)) {
@@ -217,7 +235,11 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           }}
                         />
                       </>
-                    : null
+                    :
+                    <Flex w="100%" justifyContent="space-between">
+                      <Dispute onClick={() => disputeWrite?.()} />
+                      <Finalize onClick={() => finalizeWrite?.()} />
+                    </Flex>
                   }
                 </Flex>
             </Flex>
