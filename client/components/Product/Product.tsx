@@ -45,6 +45,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const { write: placeBidWrite, isLoading: isPlaceBidLoading, isSuccess: isPlaceBidSuccess, isError: isPlaceBidError } = useContractWrite(config)
 
   const priceValue = BigInt(new BigDecimal(item?.priceEnd).mul(BIG_1E18 + "").toFixed(0)) + ""
+  
   const { config: buyKnowconfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -232,7 +233,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                   isDisabled={!signer}
                   onClick={() => {
                     setIsOpenModal(true);
-                    placeBidWrite?.();
+                    buyKnowWrite?.();
                   }}
                 />
             </Flex>
