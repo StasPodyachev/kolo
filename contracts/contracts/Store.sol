@@ -10,12 +10,23 @@ import "./interfaces/IStoreDeployer.sol";
 import "./interfaces/integrations/IIntegration.sol";
 import "hardhat/console.sol";
 
+/**
+ * @title Store
+ */
 contract Store is IStore, Ownable {
+    /// @dev Holds a mapping of deals to integration addresses.
     mapping(uint256 => address) private deals;
+
+    /// @dev Holds a mapping of deals to buyers to amounts.
     mapping(uint256 => mapping(address => uint256)) private buyers;
+
+    /// @dev Holds a mapping of deals to sellers collaterals.
     mapping(uint256 => uint256) private sellerCollaterals;
+
+    /// @dev Holds a mapping of deals to buyers collaterals.
     mapping(uint256 => uint256) private buyerCollaterals;
 
+    /// @dev Array of all deals.
     uint256[] private dealsArr;
     IFactory _factory;
 
@@ -28,25 +39,52 @@ contract Store is IStore, Ownable {
         return deals[dealId];
     }
 
+    /**
+     * @notice Creating a new deal
+     *
+     * @param dealId ID of a new deal
+     * @dev this function is called when a deal is created
+     */
     function createDeal(uint256 dealId) external payable {
         deals[dealId] = msg.sender;
         sellerCollaterals[dealId] = msg.value;
         dealsArr.push(dealId);
     }
 
+    /**
+     * @notice Deposit buyer collateral
+     *
+     * @param dealId ID of a deal
+     * @dev this function is called when buyer creates a dispute
+     */
     function depositBuyerCollateral(uint256 dealId) external payable {
         buyerCollaterals[dealId] = msg.value;
     }
 
+    /**
+     * @notice Buyer deposit
+     *
+     * @param dealId ID of a deal
+     * @param buyer The buyer address
+     * @dev this function is called when the buyer bid or buys
+     */
     function depositBuyer(uint256 dealId, address buyer) external payable {
         buyers[dealId][buyer] += msg.value;
     }
 
+    /**
+     * @notice Buyer withdrawal
+     *
+     * @param dealId ID of a deal
+     * @param buyer The buyer address
+     * @dev this function is called when the buyer receives a refund of their bid
+     */
     function withdrawBuyer(uint256 dealId, address buyer) external {
         payable(buyer).transfer(buyers[dealId][buyer]);
         buyers[dealId][buyer] = 0;
     }
 
+    /// @notice Get deal parameters by ID
     function getDeal(uint256 dealId)
         external
         view
@@ -56,6 +94,7 @@ contract Store is IStore, Ownable {
         return IIntegration(intgr).getDeal(dealId);
     }
 
+    /// @notice Get all deals
     function getAllDeals()
         external
         view
@@ -73,6 +112,7 @@ contract Store is IStore, Ownable {
         }
     }
 
+    /// @notice Get seller collateral by deal ID
     function getSellerCollateral(uint256 dealId)
         external
         view
@@ -81,6 +121,7 @@ contract Store is IStore, Ownable {
         return sellerCollaterals[dealId];
     }
 
+    /// @notice Get buyer collateral by deal ID
     function getBuyerCollateral(uint256 dealId)
         external
         view
@@ -89,6 +130,15 @@ contract Store is IStore, Ownable {
         return buyerCollaterals[dealId];
     }
 
+    /**
+     * @notice Transfers a win to seller
+     *
+     * @param dealId ID of a deal
+     * @param buyer Buyer address
+     * @param seller Seller address
+     * @param serviceFee Service fee
+     *
+     */
     function transferWinToSeller(
         uint256 dealId,
         address buyer,
@@ -110,6 +160,13 @@ contract Store is IStore, Ownable {
         sellerCollaterals[dealId] = 0;
     }
 
+    /**
+     * @notice Transfers a win to buyer
+     *
+     * @param dealId ID of a deal
+     * @param buyer Buyer address
+     *
+     */
     function transferWinToBuyer(uint256 dealId, address buyer) external {
         payable(buyer).transfer(
             buyerCollaterals[dealId] + buyers[dealId][buyer]
