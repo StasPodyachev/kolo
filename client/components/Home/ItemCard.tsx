@@ -4,7 +4,6 @@ import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon } from "@/icons";
 import Link from "next/link";
-import { addressTruncation } from "@/helpers";
 import AddressCopy from "../ui/AddressCopy";
 interface IProps {
   to: number;
@@ -88,17 +87,17 @@ const ItemCard = ({
               <FileIcon boxSize="32px" />
             </Box>
           </Flex>
-          <Button
-            w="100%"
-            bg="blue.primary"
-            color="white"
-            borderRadius={0}
-            textStyle="button"
-            transition="all .3s"
-            _hover={{ bg: "blue.hover" }}
-          >
-            buy
-          </Button>
+            <Button
+              w="100%"
+              bg="blue.primary"
+              color="white"
+              borderRadius={0}
+              textStyle="button"
+              transition="all .3s"
+              _hover={{ bg: "blue.hover" }}
+            >
+              buy
+            </Button>
         </Flex>
       </Box>
     </Link>

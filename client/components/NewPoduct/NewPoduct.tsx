@@ -335,7 +335,6 @@ const NewPoduct = () => {
                   setValue={setMyCollateral}
                   isNeededMarginTop
                   minValue={+startPrice * 0.1}
-                  isCollateralInput
                 />
               </FormControl>
             </Box>
