@@ -5,6 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/integrations/ISimpleTradeFile.sol";
 import "../interfaces/integrations/IIntegration.sol";
+
+import "../interfaces/dao/IKoloToken.sol";
+
 import "../interfaces/IStore.sol";
 import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
@@ -103,6 +106,10 @@ contract SimpleTradeFile is
         return deal;
     }
 
+    function _airdropDao(address wallet) internal {
+        IKoloToken(_factory.daoToken()).airdrop(wallet);
+    }
+
     function create(
         string calldata name,
         string calldata description,
@@ -149,6 +156,8 @@ contract SimpleTradeFile is
 
         emit DealCreated(id, msg.sender);
 
+        _airdropDao(msg.sender);
+
         return id;
     }
 
@@ -174,6 +183,8 @@ contract SimpleTradeFile is
         IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
         deal.buyer = msg.sender;
+
+        _airdropDao(msg.sender);
 
         _finalize(deal);
         _chat.sendSystemMessage(

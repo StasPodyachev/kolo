@@ -35,7 +35,7 @@ contract Treasury is ITreasury, Ownable {
         _rewardBurnPeriod = value;
     }
 
-    function burnReward() external {
+    function burnReward() external onlyOwner {
         require(
             block.timestamp >= _dateTx + _rewardBurnPeriod,
             "Treasury: Wrong timestamp"

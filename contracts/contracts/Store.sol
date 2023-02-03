@@ -29,20 +29,40 @@ contract Store is IStore, Ownable {
     }
 
     function createDeal(uint256 dealId) external payable {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Store: Only integration"
+        );
+
         deals[dealId] = msg.sender;
         sellerCollaterals[dealId] = msg.value;
         dealsArr.push(dealId);
     }
 
     function depositBuyerCollateral(uint256 dealId) external payable {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Store: Only integration"
+        );
+
         buyerCollaterals[dealId] = msg.value;
     }
 
     function depositBuyer(uint256 dealId, address buyer) external payable {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Store: Only integration"
+        );
+
         buyers[dealId][buyer] += msg.value;
     }
 
     function withdrawBuyer(uint256 dealId, address buyer) external {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Store: Only integration"
+        );
+
         payable(buyer).transfer(buyers[dealId][buyer]);
         buyers[dealId][buyer] = 0;
     }
@@ -95,6 +115,11 @@ contract Store is IStore, Ownable {
         address seller,
         uint256 serviceFee
     ) external {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Store: Only integration"
+        );
+
         uint256 amount = sellerCollaterals[dealId];
 
         if (buyers[dealId][buyer] != 0) {
@@ -111,6 +136,11 @@ contract Store is IStore, Ownable {
     }
 
     function transferWinToBuyer(uint256 dealId, address buyer) external {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Store: Only integration"
+        );
+
         payable(buyer).transfer(
             buyerCollaterals[dealId] + buyers[dealId][buyer]
         );
