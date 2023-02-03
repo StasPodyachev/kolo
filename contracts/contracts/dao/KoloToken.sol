@@ -16,7 +16,7 @@ contract KoloToken is ERC20Votes, Ownable, AccessControl {
     uint256 public constant HALF_YEAR = 0.5 * 365 days;
     uint256 public constant AIRDROP_FACTOR = 1 ether;
 
-    uint256 public _dateStart;
+    uint256 public immutable _dateStart;
     uint256 public _nextUnlockTime;
     uint256[] public PERIOD_UNLOCKED;
 

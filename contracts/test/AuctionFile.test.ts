@@ -28,7 +28,7 @@ describe("AuctionFile", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ; ({ auctionFile, factory, chat } = await loadFixture(async () => {
+    ;({ auctionFile, factory, chat } = await loadFixture(async () => {
       const { auctionFile, factory, chat } = await auctionFileFixture()
 
       return { auctionFile, factory, chat }
@@ -37,29 +37,35 @@ describe("AuctionFile", () => {
 
   describe("#setters", () => {
     it("setServiceFee", async () => {
-      await expect(auctionFile.setServiceFee(111111111)).to.be.not.reverted;
-      await expect(auctionFile.connect(other).setServiceFee(111111111)).to.be.reverted;
+      await expect(auctionFile.setServiceFee(111111111)).to.be.not.reverted
+      await expect(auctionFile.connect(other).setServiceFee(111111111)).to.be
+        .reverted
     })
 
     it("setPeriodDispute", async () => {
-      await expect(auctionFile.setPeriodDispute(111111111)).to.be.not.reverted;
-      await expect(auctionFile.connect(other).setPeriodDispute(111111111)).to.be.reverted;
+      await expect(auctionFile.setPeriodDispute(111111111)).to.be.not.reverted
+      await expect(auctionFile.connect(other).setPeriodDispute(111111111)).to.be
+        .reverted
 
       const params = await auctionFile.getIntegrationInfo()
       expect(params.periodDispute).to.eq(111111111)
     })
 
     it("setCollateralAmount", async () => {
-      await expect(auctionFile.setCollateralPercent(111111111)).to.be.not.reverted;
-      await expect(auctionFile.connect(other).setCollateralPercent(111111111)).to.be.reverted;
+      await expect(auctionFile.setCollateralPercent(111111111)).to.be.not
+        .reverted
+      await expect(auctionFile.connect(other).setCollateralPercent(111111111))
+        .to.be.reverted
 
       const params = await auctionFile.getIntegrationInfo()
       expect(params.collateralPercent).to.eq(111111111)
     })
 
     it("setCollateralAmount", async () => {
-      await expect(auctionFile.setCollateralAmount(111111111)).to.be.not.reverted;
-      await expect(auctionFile.connect(other).setCollateralAmount(111111111)).to.be.reverted;
+      await expect(auctionFile.setCollateralAmount(111111111)).to.be.not
+        .reverted
+      await expect(auctionFile.connect(other).setCollateralAmount(111111111)).to
+        .be.reverted
 
       const params = await auctionFile.getIntegrationInfo()
       expect(params.collateralAmount).to.eq(111111111)
@@ -205,8 +211,9 @@ describe("AuctionFile", () => {
       let gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
       const newBalanceWallet = (await wallet.getBalance()).toString()
 
-      expect(BigNumber.from("100000000000000000").add(oldBalance).sub(gas)).to.eq(newBalanceWallet)
-
+      expect(
+        BigNumber.from("100000000000000000").add(oldBalance).sub(gas)
+      ).to.eq(newBalanceWallet)
     })
 
     it("fails if id not found", async () => {
@@ -529,18 +536,14 @@ describe("AuctionFile", () => {
 
       const oldBalance = (await wallet.getBalance()).toString()
 
-
       const tx = await auctionFile.finalize(1)
-      await expect(tx)
-        .to.emit(auctionFile, "DealClosed")
-        .withArgs(1)
+      await expect(tx).to.emit(auctionFile, "DealClosed").withArgs(1)
 
       const txRec = await tx.wait()
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
       const newBalance = (await wallet.getBalance()).toString()
 
       expect(collateral.add(oldBalance).sub(gas)).to.eq(newBalance)
-
     })
 
     it("should finalize with bids", async () => {
@@ -680,9 +683,7 @@ describe("AuctionFile", () => {
       const tx = await auctionFile.connect(other).dispute(1, {
         value: BigNumber.from("100000000000000000"),
       })
-      await expect(tx)
-        .to.emit(auctionFile, "DisputeCreated")
-        .withArgs(1)
+      await expect(tx).to.emit(auctionFile, "DisputeCreated").withArgs(1)
 
       const txRec = await tx.wait()
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
@@ -848,7 +849,7 @@ describe("AuctionFile", () => {
       )
 
       await auctionFile.connect(other).bid(1, {
-        value: price
+        value: price,
       })
 
       await time.increase(time.duration.hours(1))
@@ -859,18 +860,17 @@ describe("AuctionFile", () => {
       const oldBalanceBuyer = (await other.getBalance()).toString()
 
       const tx = await auctionFile.receiveReward(1)
-      await expect(tx)
-        .to.emit(auctionFile, "DealClosed")
-        .withArgs(1)
+      await expect(tx).to.emit(auctionFile, "DealClosed").withArgs(1)
 
       const txRec = await tx.wait()
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
 
-
       const newBalanceSeller = (await wallet.getBalance()).toString()
       const newBalanceBuyer = (await other.getBalance()).toString()
 
-      expect(collateral.add(oldBalanceSeller).add(price).sub(gas).sub(fee)).to.eq(newBalanceSeller)
+      expect(
+        collateral.add(oldBalanceSeller).add(price).sub(gas).sub(fee)
+      ).to.eq(newBalanceSeller)
       expect(newBalanceBuyer).to.eq(oldBalanceBuyer)
     })
 
@@ -1003,7 +1003,9 @@ describe("AuctionFile", () => {
       )
 
       await auctionFile.cancel(1)
-      await expect(auctionFile.sendMessage(1, "Hello!")).to.be.revertedWith("AuctionFile: Wrong status")
+      await expect(auctionFile.sendMessage(1, "Hello!")).to.be.revertedWith(
+        "AuctionFile: Wrong status"
+      )
     })
 
     it("fails if status close", async () => {
@@ -1026,7 +1028,9 @@ describe("AuctionFile", () => {
 
       await time.increase(time.duration.hours(1))
       await auctionFile.finalize(1)
-      await expect(auctionFile.sendMessage(1, "Hello!")).to.be.revertedWith("AuctionFile: Wrong status")
+      await expect(auctionFile.sendMessage(1, "Hello!")).to.be.revertedWith(
+        "AuctionFile: Wrong status"
+      )
     })
   })
 
@@ -1112,7 +1116,7 @@ describe("AuctionFile", () => {
           "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a66",
           "0x4d325a696577414e6b4855574d4b000000000000000000000000000000000000",
         ],
-        46,
+        45,
         wallet.address
       )
 

@@ -59,9 +59,7 @@ const Home: NextPage = () => {
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const status = result[0][11].toString()
         const saleEndDateNew = parseInt(result[0][9]?._hex, 16)
-        
-        let date = new Date(+saleEndDateNew).toLocaleDateString()
-        let saleEndDate = date
+        let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
 
         return {
           id,
