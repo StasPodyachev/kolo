@@ -10,6 +10,7 @@ import { useContractRead } from "wagmi";
 import ABI_FACTORY from "../contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
 import { BigNumber, ethers } from "ethers";
+import web3 from "web3";
 
 const Home: NextPage = () => {
   const [ startCount, setStartCount ] = useState(0);
@@ -34,21 +35,18 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (Array.isArray(data)) {
-      console.log(data, "data");
-      
       const decryptedData = data?.map((item: any) => {
         const coder = ethers?.utils?.defaultAbiCoder;
         const result = coder?.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
         ], item?.data);
-        console.log(result, 'result');
         
         const id = +result[0][0]?.toString();
         const title = result[0][1]
         const description = result[0][2]
         const price = +ethers?.utils?.formatEther(BigNumber?.from(result[0][4]));
         const ownedBy = result[0][7]
-        const saleEndDateNew = result[0][9]?._hex
+        
         // console.log('sale end', saleEndDateNew)
         // const bidDate = new Date(result[0][9]._hex * 1000);
         // const year = bidDate.getFullYear();
@@ -60,14 +58,10 @@ const Home: NextPage = () => {
         const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const status = result[0][11].toString()
-
-        let dateYear = new Date(saleEndDateNew * 1)
-        let date = new Date(saleEndDateNew * 1000)
-        const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"]
-        let month = monthList[date.getMonth()]
-        let days = date.getDay()
-        let year =  dateYear.getFullYear()
-        let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
+        const saleEndDateNew = parseInt(result[0][9]?._hex, 16)
+        
+        let date = new Date(+saleEndDateNew).toLocaleDateString()
+        let saleEndDate = date
 
         return {
           id,

@@ -242,6 +242,10 @@ const NewPoduct = () => {
     }
   }, [store])
 
+  useEffect(() => {
+    console.log(stopDate, 'stopDate',);
+  }, [stopDate])
+
   return (
     <Flex justifyContent="center">
       <Box maxW="70%" minW={isDesktop[0] ? 0 : "70%"}>
