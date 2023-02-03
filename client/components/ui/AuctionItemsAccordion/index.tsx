@@ -176,7 +176,7 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                 </Flex>
               </Flex>
             </Link>
-            <AccordionPanel bg="inherit" p="16px 20px 18px 36px">
+            <AccordionPanel dis bg="inherit" p="16px 20px 18px 36px">
               <Text textStyle="smallText" color="white">
                 Description:&nbsp;{item.description}
               </Text>

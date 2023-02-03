@@ -9,10 +9,11 @@ import "../interfaces/IStore.sol";
 import "../interfaces/IFactory.sol";
 import "../interfaces/INotary.sol";
 import "../interfaces/IChat.sol";
+import "../ControlAccess.sol";
 
 import "hardhat/console.sol";
 
-contract AuctionFile is IAuctionFile, IIntegration, Ownable {
+contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     IFactory public _factory;
     IChat public _chat;
     INotary public _notary;
@@ -27,7 +28,11 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     mapping(uint256 => mapping(address => uint256)) private bids;
     mapping(uint256 => BidParams[]) private bidHistory;
     mapping(uint256 => address[]) private bidBuyers;
-    mapping(address => mapping(bytes => bool)) private _accsess;
+
+    modifier onlyNotary() {
+        require(msg.sender == address(_notary), "AuctionFile: Only notary");
+        _;
+    }
 
     function setServiceFee(uint256 value) external onlyOwner {
         _serviceFee = value;
@@ -73,6 +78,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         returns (DealParams memory deal)
     {
         AuctionFileParams memory params = deals[dealId];
+        params.dateDispute = params.dateExpire + _periodDispute;
 
         deal = DealParams({
             id: dealId,
@@ -83,17 +89,24 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         });
     }
 
-    function sendMessage(uint256 dealId, string calldata message) external {
-        AuctionFileParams memory deal = deals[dealId];
+    function getBidHistory(uint256 dealId)
+        external
+        view
+        returns (BidParams[] memory)
+    {
+        return bidHistory[dealId];
+    }
+
+    function _checkStatusAndGetDeal(uint256 dealId, AuctionStatus status)
+        internal
+        view
+        returns (AuctionFileParams storage)
+    {
+        AuctionFileParams storage deal = deals[dealId];
         require(deal.priceStart != 0, "AuctionFile: Id not found");
+        require(deal.status == status, "AuctionFile: Wrong status");
 
-        require(
-            deal.status != AuctionStatus.CLOSE &&
-                deal.status != AuctionStatus.CANCEL,
-            "AuctionFile: Wrong status"
-        );
-
-        _chat.sendMessage(dealId, message, msg.sender);
+        return deal;
     }
 
     function create(
@@ -138,6 +151,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
             seller: msg.sender,
             buyer: address(0),
             cid: cid,
+            dateDispute: dateExpire + _periodDispute,
             status: AuctionStatus.OPEN
         });
 
@@ -150,11 +164,10 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function bid(uint256 dealId) external payable {
-        AuctionFileParams storage deal = deals[dealId];
-
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
-
-        require(deal.status == AuctionStatus.OPEN, "AuctionFile: Wrong status");
+        AuctionFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            AuctionStatus.OPEN
+        );
 
         require(
             deal.seller != msg.sender,
@@ -204,9 +217,11 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function cancel(uint256 dealId) external {
-        AuctionFileParams storage deal = deals[dealId];
+        AuctionFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            AuctionStatus.OPEN
+        );
 
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
         require(
             deal.seller == msg.sender,
             "AuctionFile: Caller is not a seller"
@@ -218,24 +233,32 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
 
         deal.status = AuctionStatus.CANCEL;
 
+        _sendSellerCollateral(dealId, deal.seller);
         _chat.sendSystemMessage(dealId, "Deal canceled.");
 
         emit DealCanceled(dealId, msg.sender);
     }
 
+    function _sendSellerCollateral(uint256 dealId, address seller) internal {
+        address storeAddress = _factory.getStore(seller);
+        IStore(storeAddress).transferWinToSeller(
+            dealId,
+            address(0),
+            seller,
+            _serviceFee
+        );
+    }
+
     function dispute(uint256 dealId) external payable {
-        AuctionFileParams storage deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
+        AuctionFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            AuctionStatus.FINALIZE
+        );
 
         require(deal.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
         require(
             block.timestamp < deal.dateExpire + _periodDispute,
             "AuctionFile: Time for dispute is up"
-        );
-
-        require(
-            deal.status == AuctionStatus.FINALIZE,
-            "AuctionFile: Wrong status"
         );
 
         require(
@@ -255,33 +278,19 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function finalize(uint256 dealId) external {
-        AuctionFileParams storage deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
+        AuctionFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            AuctionStatus.OPEN
+        );
 
         require(
             block.timestamp > deal.dateExpire,
             "AuctionFile: Date is not expire"
         );
 
-        require(
-            deal.status == AuctionStatus.OPEN,
-            "AuctionFile: Auction is not open"
-        );
-
-        address storeAddress = _factory.getStore(deal.seller);
-
         if (deal.buyer == address(0)) {
-            IStore(storeAddress).transferWinToSeller(
-                dealId,
-                address(0),
-                deal.seller,
-                _serviceFee
-            );
-
-            deal.status = AuctionStatus.CLOSE;
+            _sendWin(deal, IIntegration.DisputeWinner.Seller);
             _chat.sendSystemMessage(dealId, "Deal closed.");
-
-            emit DealClosed(dealId);
 
             return;
         }
@@ -290,8 +299,7 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function _finalize(AuctionFileParams storage deal) internal {
-        // _withdrawBids(deal.id, deal.buyer, store);
-        this.addAccsess(deal.id, deal.buyer);
+        _addAccess(deal.buyer, deal.cid);
 
         deal.status = AuctionStatus.FINALIZE;
         deal.dateExpire = block.timestamp;
@@ -300,50 +308,16 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
         emit DealFinalized(deal.id);
     }
 
-    // function _withdrawBids(
-    //     uint256 dealId,
-    //     address buyer,
-    //     IStore store
-    // ) internal {
-    //     address[] memory buyers = bidBuyers[dealId];
-
-    //     for (uint256 i = 0; i < buyers.length; i++) {
-    //         if (buyers[i] == buyer) continue;
-
-    //         store.withdrawBuyer(dealId, buyers[i]);
-    //     }
-    // }
-
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
+        onlyNotary
     {
-        require(msg.sender == address(_notary), "AuctionFile: Only notary");
-
-        AuctionFileParams storage deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
-
-        require(
-            deal.status == AuctionStatus.DISPUTE,
-            "AuctionFile: Wrong status"
+        AuctionFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            AuctionStatus.DISPUTE
         );
 
-        address storeAddress = _factory.getStore(deal.seller);
-        IStore store = IStore(storeAddress);
-
-        if (winner == IIntegration.DisputeWinner.Buyer) {
-            store.transferWinToBuyer(dealId, deal.buyer);
-        } else {
-            store.transferWinToSeller(
-                dealId,
-                deal.buyer,
-                deal.seller,
-                _serviceFee
-            );
-        }
-
-        deal.status = AuctionStatus.CLOSE;
-
-        emit DealClosed(dealId);
+        _sendWin(deal, winner);
 
         _chat.sendSystemMessage(
             dealId,
@@ -360,57 +334,55 @@ contract AuctionFile is IAuctionFile, IIntegration, Ownable {
     }
 
     function receiveReward(uint256 dealId) external {
-        AuctionFileParams storage deal = deals[dealId];
-        require(deal.priceStart != 0, "AuctionFile: Id not found");
-        require(
-            deal.status == AuctionStatus.FINALIZE,
-            "AuctionFile: Wrong status"
+        AuctionFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            AuctionStatus.FINALIZE
         );
+
         require(
             block.timestamp > deal.dateExpire + _periodDispute,
             "AuctionFile: Time for dispute"
         );
 
+        _sendWin(deal, IIntegration.DisputeWinner.Seller);
+    }
+
+    function _sendWin(
+        AuctionFileParams storage deal,
+        IIntegration.DisputeWinner winner
+    ) internal {
         address storeAddress = _factory.getStore(deal.seller);
         IStore store = IStore(storeAddress);
 
-        store.transferWinToSeller(dealId, deal.buyer, deal.seller, _serviceFee);
+        if (winner == IIntegration.DisputeWinner.Seller) {
+            store.transferWinToSeller(
+                deal.id,
+                deal.buyer,
+                deal.seller,
+                _serviceFee
+            );
+        } else {
+            store.transferWinToBuyer(deal.id, deal.buyer);
+        }
+        _chat.sendSystemMessage(deal.id, "Deal closed.");
 
         deal.status = AuctionStatus.CLOSE;
-
-        emit DealClosed(dealId);
-
-        _chat.sendSystemMessage(dealId, "Dispute closed.");
+        emit DealClosed(deal.id);
     }
 
-    function getBidHistory(uint256 dealId)
-        external
-        view
-        returns (BidParams[] memory)
-    {
-        return bidHistory[dealId];
+    function addAccess(uint256 dealId, address wallet) external onlyNotary {
+        _addAccess(wallet, deals[dealId].cid);
     }
 
-    function addAccsess(uint256 dealId, address wallet) external {
-        require(msg.sender == address(_notary), "AuctionFile: Only notary");
+    function sendMessage(uint256 dealId, string calldata message) external {
+        AuctionFileParams memory deal = deals[dealId];
 
-        bytes memory cid = deals[dealId].cid;
-        _accsess[wallet][cid] = true;
-    }
+        require(
+            deal.status != AuctionStatus.CLOSE &&
+                deal.status != AuctionStatus.CANCEL,
+            "AuctionFile: Wrong status"
+        );
 
-    function checkAccsess(bytes calldata cid, address wallet)
-        external
-        view
-        returns (uint8)
-    {
-        return _accsess[wallet][cid] ? 1 : 0;
-    }
-
-    function checkAccsess(
-        bytes32[] calldata cid,
-        uint8 size,
-        address wallet
-    ) external view returns (uint8) {
-        return this.checkAccsess(bytes.concat(cid[0]), wallet);
+        _chat.sendMessage(dealId, message, msg.sender);
     }
 }

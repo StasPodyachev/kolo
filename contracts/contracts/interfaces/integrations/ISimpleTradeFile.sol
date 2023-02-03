@@ -21,6 +21,7 @@ interface ISimpleTradeFile {
         address seller;
         address buyer;
         uint256 dateExpire;
+        uint256 dateDispute;
         bytes cid;
         SimpleTradeFileStatus status;
     }
@@ -64,5 +65,5 @@ interface ISimpleTradeFile {
 
     function dispute(uint256 dealId) external payable;
 
-    function finalize(uint256 dealId) external;
+    function receiveReward(uint256 dealId) external;
 }

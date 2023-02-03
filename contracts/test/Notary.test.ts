@@ -124,11 +124,15 @@ describe("Notary", () => {
         value: BigNumber.from("100000000000000000")
       })
 
-      // await notary.vote(1, true)
-      // await notary.connect(other).vote(1, true)
-      // await notary.connect(buyer).vote(1, true)
-      // await notary.connect(buyer1).vote(1, true)
-      // await notary.connect(buyer2).vote(1, true)
+      await notary.vote(1, true)
+      await notary.connect(other).vote(1, true)
+      await notary.connect(buyer).vote(1, true)
+      await notary.connect(buyer1).vote(1, true)
+      await notary.connect(buyer2).vote(1, true)
+      await notary.connect(buyer3).vote(1, true)
+      await notary.connect(buyer4).vote(1, false)
+      await notary.connect(buyer5).vote(1, false)
+
     })
 
 

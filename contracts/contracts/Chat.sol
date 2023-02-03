@@ -9,15 +9,31 @@ import "./interfaces/IStore.sol";
 import "./StoreDeployer.sol";
 import "./Store.sol";
 
+/**
+ * @title Kolo chat storage
+ *
+ * This contract stores all messages of all deals
+ *
+ */
 contract Chat is IChat, Ownable {
     IFactory public _factory;
 
+    modifier integrationOnly() {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Chat: Only integration"
+        );
+        _;
+    }
+
+    /// @dev Holds a mapping of deals to chats.
     mapping(uint256 => ChatParams[]) private chats;
 
     function setFactory(address factory) external onlyOwner {
         _factory = IFactory(factory);
     }
 
+    /// @notice Get chat by `dealId`
     function getChat(uint256 dealId)
         external
         view
@@ -26,6 +42,7 @@ contract Chat is IChat, Ownable {
         return chats[dealId];
     }
 
+    ///  @notice Adding `message` by `dealId` into chat storage
     function _sendMessage(
         uint256 dealId,
         string memory message,
@@ -40,24 +57,43 @@ contract Chat is IChat, Ownable {
         );
     }
 
+    /**
+     * @notice Send a message
+     *
+     * @param dealId ID of a deal
+     * @param message Text of a message
+     * @param sender A sender of a message
+     * @dev this function adds a message into chat storage
+     *
+     * Requirements:
+     *
+     * - Only integration contract can call this function
+     *
+     */
     function sendMessage(
         uint256 dealId,
         string memory message,
         address sender
-    ) external {
-        require(
-            _factory.integrationExist(msg.sender),
-            "Chat: Only integration"
-        );
-
+    ) external integrationOnly {
         _sendMessage(dealId, message, sender);
     }
 
-    function sendSystemMessage(uint256 dealId, string memory message) external {
-        require(
-            _factory.integrationExist(msg.sender),
-            "Chat: Only integration"
-        );
+    /**
+     * @notice Send a system message
+     *
+     * @param dealId ID of a deal
+     * @param message Text of a message
+     * @dev this function adds a message into chat storage
+     *
+     * Requirements:
+     *
+     * - Only integration contract can call this function
+     *
+     */
+    function sendSystemMessage(uint256 dealId, string memory message)
+        external
+        integrationOnly
+    {
         _sendMessage(dealId, message, address(0));
     }
 }
