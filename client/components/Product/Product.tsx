@@ -6,7 +6,7 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useContractWrite, usePrepareContractWrite, useSigner, useWaitForTransaction } from "wagmi";
+import { useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
@@ -17,7 +17,6 @@ import { BigNumber } from "ethers";
 import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import { useState } from "react";
-
 
 interface IProps {
   item: IAuctionItem,
@@ -45,7 +44,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const { write: placeBidWrite, isLoading: isPlaceBidLoading, isSuccess: isPlaceBidSuccess, isError: isPlaceBidError } = useContractWrite(config)
 
   const priceValue = BigInt(new BigDecimal(item?.priceEnd).mul(BIG_1E18 + "").toFixed(0)) + ""
-  
   const { config: buyKnowconfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -83,15 +81,13 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
           isSuccess={false}
           isError={isPlaceBidError || isBuyKnowError}
           isOpen={isOpenModal}
-          changeVisibility={setIsOpenModal}
-        />
+          changeVisibility={setIsOpenModal}/>
       ) : null}
       <Flex flexDir="column">
         <Flex
           height="240px"
           flexDir={isDesktopHeader[0] ? "row" : "column"}
-          gap={isDesktopHeader[0] ? "56px" : 0}
-        >
+          gap={isDesktopHeader[0] ? "56px" : 0}>
           <Flex
             flexDir="column"
             alignItems={isDesktopHeader[0] ? "normal" : "center"}
@@ -172,21 +168,28 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                   {item?.priceEnd}&nbsp;FIL
                 </Heading>
               </Flex>
-              <Flex justifyContent="space-between">
-                <NumberInput
-                  value={bid}
-                  setValue={setBid}
-                  minValue={Number(bid)}
-                  width="200px"
-                />
-                <PlaceBid
-                  isDisabled={!signer || isBidError}
-                  onClick={() => {
-                    setIsOpenModal(true);
-                    placeBidWrite?.()
-                  }}
-                />
-              </Flex>
+              
+                <Flex height={'48px'} justifyContent="space-between">
+                  {
+                    item?.status?.title === "Open" ?
+                      <>
+                        <NumberInput
+                          value={bid}
+                          setValue={setBid}
+                          minValue={Number(bid)}
+                          width="200px"
+                        />
+                        <PlaceBid
+                          isDisabled={!signer || isBidError}
+                          onClick={() => {
+                            setIsOpenModal(true);
+                            placeBidWrite?.()
+                          }}
+                        />
+                      </>
+                    : null
+                  }
+                </Flex> 
             </Flex>
             <Flex
               mt={isItemsInColumn[0] ? "32px" : 0}
@@ -229,13 +232,15 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               >
                 {item?.description}
               </Text>
-                <BuyNow
-                  isDisabled={!signer}
-                  onClick={() => {
-                    setIsOpenModal(true);
-                    buyKnowWrite?.();
-                  }}
-                />
+                {
+                  item?.status?.title == "Open" ?
+                  <BuyNow
+                    isDisabled={!signer}
+                    onClick={() => {
+                      setIsOpenModal(true);
+                      buyKnowWrite?.();
+                    }}/> : null
+                }
             </Flex>
           </Flex>
         </Flex>
