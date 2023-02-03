@@ -1,6 +1,6 @@
 import useDevice from "@/hooks/useDevice";
 import { IAuctionItem, IBidTableData } from "@/types";
-import { Box, Button, Flex, FormControl, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
+import { Box, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
@@ -117,13 +117,14 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               <NumberInput
                 value={bid}
                 setValue={setBid}
-                // minValue={Number(bid)}
+                minValue={Number(bid)}
                 width="200px"
               />
               <PlaceBid
                 isDisabled={!signer || isBidError}
                 bid={bid}
-                id={item?.id}/>
+                id={item?.id}
+              />
             </Flex>
           </Flex>
           <Flex
@@ -145,7 +146,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                 boxSize="10px"
                 borderRadius="50%"
                 bg={
-                  item?.status === "Active"
+                  item?.status === "Open"
                     ? "green.active"
                     : "red.active"
                 }
@@ -175,7 +176,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               label="Connect wallet to buy"
               isHidden={signer ? true : false}
             >
-              {/* BuyNow = ({isDisabled, price, id} */}
               <BuyNow isDisabled={!signer} price={item?.priceEnd} id={item?.id} />
             </Tooltip>
           </Flex>

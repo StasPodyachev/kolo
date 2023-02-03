@@ -9,7 +9,7 @@ import { BIG_1E18 } from "@/helpers/misc";
 import { BigNumber } from "ethers";
 
 const PlaceBid = ({isDisabled,bid,id}:{isDisabled: boolean, bid: string, id: number}) => {
-  const bidValue = BigInt(new BigDecimal(bid ? +bid : 0.1).mul(BIG_1E18 + "").toFixed(2)) + ""
+  const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
   const { config } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,

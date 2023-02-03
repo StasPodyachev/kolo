@@ -202,8 +202,8 @@ const NewPoduct = () => {
   const { isDesktopHeader, isDesktop } = useDevice();
   const isItemNameError = itemName === '';
   const isItemDescriptionError = itemDescription === '';
-  const isStartPriceError = startPrice === '0';
-  const isForceStopPriceError = forceStopPrice === '0';
+  const isStartPriceError = startPrice === '0' || startPrice === '';
+  const isForceStopPriceError = forceStopPrice === '0' || forceStopPrice === '';
   const isDateStopError = stopDate === '';
 
   useEffect(() => {

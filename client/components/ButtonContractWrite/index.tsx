@@ -17,9 +17,9 @@ const ButtonContractWrite = ({ title, address, abi, method, parrams, isDisabled 
   const { name, description, priceStart, priceForceStop, dateExpire, cid, collateral} = parrams
   const date = new Date(dateExpire);
   const newDateExpire = date.getTime();
-  const newPriceStart = BigInt(new BigDecimal(priceStart).mul(BIG_1E18 + "").toFixed(0)) + ""
-  const newForceStop = BigInt(new BigDecimal(priceForceStop).mul(BIG_1E18 + "").toFixed(0)) + ""
-  const newCollateral = BigInt(new BigDecimal(collateral).mul(BIG_1E18 + "").toFixed(0)) + ""
+  const newPriceStart = BigInt(new BigDecimal(priceStart.length && priceStart).mul(BIG_1E18 + "").toFixed(0)) + ""
+  const newForceStop = BigInt(new BigDecimal(priceForceStop.length && priceForceStop).mul(BIG_1E18 + "").toFixed(0)) + ""
+  const newCollateral = BigInt(new BigDecimal(collateral.length && collateral).mul(BIG_1E18 + "").toFixed(0)) + ""
 
   let newCid = web3.utils.asciiToHex(cid)
   const { config } = usePrepareContractWrite({
