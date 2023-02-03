@@ -39,8 +39,10 @@ const Home: NextPage = () => {
       const decryptedData = data?.map((item: any) => {
         const coder = ethers?.utils?.defaultAbiCoder;
         const result = coder?.decode([
-          "tuple(uint256,uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
+          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
         ], item?.data);
+        console.log(result, 'result');
+        
         const id = +result[0][0]?.toString();
         const title = result[0][1]
         const description = result[0][2]
