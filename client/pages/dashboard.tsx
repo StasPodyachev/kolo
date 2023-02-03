@@ -43,25 +43,13 @@ const Dashboard: NextPage = () => {
         const description = result[0][2]
         const ownedBy = result[0][7]
         const buyerAddress = result[0][8];
-        const saleEndDateNew = result[0][9]
         const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
         const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
 
         const status = result[0][11] && convertStatus(Number(result[0][11]));
-
-        // Create a new JavaScript Date object based on the timestamp
-        // multiplied by 1000 so that the argument is in milliseconds, not seconds.
-        let dateYear = new Date(saleEndDateNew * 1);
-        let date = new Date(saleEndDateNew * 1000);
-        const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        // Hours part from the timestamp
-        let month = monthList[date.getMonth()];
-        // Minutes part from the timestamp
-        let days = date.getDay();
-        let year =  dateYear.getFullYear();
-        // Will display time in 10:30:23 format
-        let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year;
+        const saleEndDateNew = parseInt(result[0][9]?._hex, 16)
+        let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
 
         return {
           id,
