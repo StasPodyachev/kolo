@@ -28,6 +28,7 @@ import ABI_FACTORY from "../../contracts/abi/Factory.json";
 import useDevice from "@/hooks/useDevice";
 import { ISaleTypeMenuItem } from "@/types";
 import CreateStore from "./CreateStore";
+import web3 from "web3";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
 const CustomInput = chakra(Input, {
@@ -158,9 +159,7 @@ const NewPoduct = () => {
       signedMessage,
       progressCallback
     );
-    const conditionsId = await lighthouse?.getAccessConditions(
-      response?.data?.Hash
-    );
+ 
     if (response?.data && isFile) {
       setFileName(response?.data?.Name);
     } else {
@@ -171,19 +170,45 @@ const NewPoduct = () => {
 
     const accesCondition = async () => {
       const { publicKey, signedMessage } : any = await encryptionSignature();
+
+      // cid: QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK 
+
+      // const cidHex = "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
+            
+      const cidHex= web3.utils.asciiToHex(response?.data?.Hash).slice(2)
+      console.log(cidHex, 'cidHex');
+      
+      const arrStr = ["0x" + cidHex.slice(0, 64), "0x" + cidHex.slice(64) + "000000000000000000000000000000000000"]
+      console.log({
+        item1: arrStr[0],
+        size: arrStr[0].length,
+
+      },
+      {
+        item1: arrStr[1],
+        size: arrStr[1].length,
+
+      },);
+      
+
+      // const cidArr =  [
+      //   "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a66",
+      //   "0x4d325a696577414e6b4855574d4b000000000000000000000000000000000000",
+      // ]
+
       const conditions = [
         {
           id: 1,
           chain: "Hyperspace",
           method: "checkAccess",
           standardContractType: "Custom",
-          contractAddress: "0x49bD7e073c52cb831cBFebfc894A751a09c3521D",
+          contractAddress: activeItem?.address,
           returnValueTest: {
           comparator: "==",
           value: "1"
           },
-          parameters: [':userAddress', ':userAddress',':userAddress'],
-          inputArrayType: ['bytes32[]', 'uint8', 'address'],
+          parameters: [ arrStr, '64' ,':userAddress'],
+          inputArrayType: [ 'bytes32[]', 'uint8', 'address' ],
           outputType: "uint8"
       }
       ]
