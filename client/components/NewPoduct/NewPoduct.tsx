@@ -196,7 +196,7 @@ const NewPoduct = () => {
           comparator: "==",
           value: "1"
           },
-          parameters: [ arrStr, '64' ,':userAddress'],
+          parameters: [ arrStr, (cidHex.length-2)/2 ,':userAddress'],
           inputArrayType: [ 'bytes32[]', 'uint8', 'address' ],
           outputType: "uint8"
       }
