@@ -17,6 +17,8 @@ import lighthouse from "@lighthouse-web3/sdk";
 import Finalize from "./Finalize";
 import Vote from "./Vote";
 import Cancel from "./Cancel";
+import Link from "next/link";
+import { LinkIcon } from "@chakra-ui/icons";
 interface IProps {
   item: IAuctionItem,
   bid: string,
@@ -259,6 +261,13 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               }
           </Flex>
         </Flex>
+      </Flex>
+      <Flex mt={5}>
+        <Link style={{"display" : "flex", "alignItems": "center"}} target="_blank" href={`https://files.lighthouse.storage/viewFile/${item?.cid}`}>
+          <Text color={"#ccc"} mr={2}>Cid Link:</Text>
+          <Text mr={2}> {item?.cid?.slice(0, 22)} ...</Text>
+          <LinkIcon />
+        </Link>
       </Flex>
       <Bids isDesktopHeader={isDesktopHeader} bidsAmount={bidsAmount}
         bidsTableData={bidsTableData} id={item?.id}
