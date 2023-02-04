@@ -14,7 +14,7 @@ const Chat = ({ id }: {id: number}) => {
   const { onConfirm, onTransaction } = useTransactionManager()
   const { isDesktopHeader } = useDevice();
   const [chatMessages, setChatMessages] = useState<IChatMessage[] | []>([]);
-  const [message, setMessage] = useState(" ");
+  const [message, setMessage] = useState("");
   const [isOpenModal, setIsOpenModal] = useState(false);
   const { address } = useAccount();
 
@@ -29,7 +29,7 @@ const Chat = ({ id }: {id: number}) => {
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: "sendMessage",
-    args: [id, message],
+    args: [id, message ? message : " "],
   })
 
   const { write, isLoading, isSuccess, data } = useContractWrite(config);
@@ -120,7 +120,7 @@ const Chat = ({ id }: {id: number}) => {
           borderRadius={0}
           placeholder="SEND MESSAGE..."
           border="none"
-          _placeholder={{ color: 'gray.200'}}
+          _placeholder={{ color: 'gray.200' }}
           _focusVisible={{ outline: 'none' }}
         />
         <Button

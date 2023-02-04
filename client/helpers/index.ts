@@ -45,7 +45,7 @@ export function convertStatus(status: number) {
     case 1:
       return {
         title: "Canceled",
-        color: "?gray?"
+        color: "#BABDCC"
       }
     case 2:
       return {
