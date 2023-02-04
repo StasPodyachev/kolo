@@ -8,8 +8,6 @@ interface INotary {
         uint8 mark; // 0 - no mark, 1 - yes, 2 - no
     }
 
-    function setFactory(address factory) external;
-
     function setPenalty(uint256 value) external;
 
     function setMinDeposit(uint256 value) external;

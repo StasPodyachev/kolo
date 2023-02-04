@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 import "./IIntegration.sol";
+import "./../IChat.sol";
+import "./../INotary.sol";
 
 interface IAuctionFile {
     enum AuctionStatus {
@@ -51,7 +53,9 @@ interface IAuctionFile {
         view
         returns (ConfigureParams memory);
 
-    function setFactory(address factory) external;
+    function setChat(IChat chat) external;
+
+    function setNotary(INotary chat) external;
 
     function setPeriodDispute(uint256 value) external;
 

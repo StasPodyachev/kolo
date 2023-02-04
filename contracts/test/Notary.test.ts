@@ -9,12 +9,22 @@ import { expect } from "chai"
 import { auctionFileFixture } from "./shared/fixtures"
 import { moveBlocks } from "./utils/move-blocks"
 import { moveTime } from "./utils/move-time"
-import { time } from "@nomicfoundation/hardhat-network-helpers";
+import { time } from "@nomicfoundation/hardhat-network-helpers"
 
 const createFixtureLoader = waffle.createFixtureLoader
 
 describe("Notary", () => {
-  let wallet: Wallet, other: Wallet, buyer: Wallet, buyer1: Wallet, buyer2: Wallet, buyer3: Wallet, buyer4: Wallet, buyer5: Wallet, buyer6: Wallet, buyer7: Wallet, buyer8: Wallet
+  let wallet: Wallet,
+    other: Wallet,
+    buyer: Wallet,
+    buyer1: Wallet,
+    buyer2: Wallet,
+    buyer3: Wallet,
+    buyer4: Wallet,
+    buyer5: Wallet,
+    buyer6: Wallet,
+    buyer7: Wallet,
+    buyer8: Wallet
 
   let auctionFile: AuctionFile
   let factory: Factory
@@ -25,13 +35,42 @@ describe("Notary", () => {
   let loadFixture: ReturnType<typeof createFixtureLoader>
 
   before("create fixture loader", async () => {
-    ;[wallet, other, buyer, buyer1, buyer2, buyer3, buyer4, buyer5, buyer6, buyer7, buyer8] = await (ethers as any).getSigners()
-    loadFixture = createFixtureLoader([wallet, other, buyer, buyer1, buyer2, buyer3, buyer4, buyer5, buyer6, buyer7, buyer8])
+    ;[
+      wallet,
+      other,
+      buyer,
+      buyer1,
+      buyer2,
+      buyer3,
+      buyer4,
+      buyer5,
+      buyer6,
+      buyer7,
+      buyer8,
+    ] = await (ethers as any).getSigners()
+    loadFixture = createFixtureLoader([
+      wallet,
+      other,
+      buyer,
+      buyer1,
+      buyer2,
+      buyer3,
+      buyer4,
+      buyer5,
+      buyer6,
+      buyer7,
+      buyer8,
+    ])
   })
 
   beforeEach("deploy fixture", async () => {
-    ; ({ auctionFile, factory, notary } = await loadFixture(async () => {
-      const { auctionFile, factory, notary } = await auctionFileFixture()
+    ;({ auctionFile, factory, notary } = await loadFixture(async () => {
+      const { auctionFile, factory, notary, koloToken } =
+        await auctionFileFixture()
+
+      const AIRDROP_ROLE = await koloToken.AIRDROP_ROLE()
+      await koloToken.grantRole(AIRDROP_ROLE, notary.address)
+      await koloToken.grantRole(AIRDROP_ROLE, auctionFile.address)
 
       return { auctionFile, factory, notary }
     }))
@@ -39,37 +78,36 @@ describe("Notary", () => {
 
   describe("#deposit", () => {
     it("should make deposit", async () => {
-      await notary.setMinDeposit(BIGNUM_1E18);
+      await notary.setMinDeposit(BIGNUM_1E18)
 
       const oldBalance = (await wallet.getBalance()).toString()
 
       const tx = await notary.deposit({
-        value: BIGNUM_1E18
+        value: BIGNUM_1E18,
       })
       const txRec = await tx.wait()
 
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
       const newBalance = (await wallet.getBalance()).toString()
 
-      expect(BIGNUM_1E18.add(newBalance).add(gas)).to.eq(oldBalance);
-
+      expect(BIGNUM_1E18.add(newBalance).add(gas)).to.eq(oldBalance)
     })
 
     it("fails if deposit is not enough", async () => {
-      await notary.setMinDeposit(BIGNUM_1E18);
+      await notary.setMinDeposit(BIGNUM_1E18)
 
-
-      await expect(notary.deposit({
-        value: BIGNUM_1E18.div(2)
-      })).to.revertedWith("Notary: deposit is not enough")
+      await expect(
+        notary.deposit({
+          value: BIGNUM_1E18.div(2),
+        })
+      ).to.revertedWith("Notary: deposit is not enough")
     })
-  });
+  })
 
   describe("#withdraw", () => {
     it("should make withdraw", async () => {
-
       await notary.deposit({
-        value: BIGNUM_1E18
+        value: BIGNUM_1E18,
       })
 
       const oldBalance = (await wallet.getBalance()).toString()
@@ -80,15 +118,15 @@ describe("Notary", () => {
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
       const newBalance = (await wallet.getBalance()).toString()
 
-      expect(BIGNUM_1E18.add(oldBalance).sub(gas)).to.eq(newBalance);
-
+      expect(BIGNUM_1E18.add(oldBalance).sub(gas)).to.eq(newBalance)
     })
 
     it("fails if balance is not enough", async () => {
-      await expect(notary.withdraw(BIGNUM_1E18))
-        .to.revertedWith("Notary: Not enough balance")
+      await expect(notary.withdraw(BIGNUM_1E18)).to.revertedWith(
+        "Notary: Not enough balance"
+      )
     })
-  });
+  })
 
   describe("#vote", () => {
     it("should vote", async () => {
@@ -106,22 +144,28 @@ describe("Notary", () => {
       await notary.connect(buyer7).deposit({ value: BIGNUM_1E18 })
       await notary.connect(buyer8).deposit({ value: BIGNUM_1E18 })
 
-      await factory.createStore()
-
-      const ts = await time.latest();
-      await auctionFile.create("NAME", "DESCRIPTION", 10000000000, 100000000000, ts + 2000, "0x", {
-        value: BigNumber.from("100000000000000000")
-      })
+      const ts = await time.latest()
+      await auctionFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
 
       await auctionFile.connect(other).bid(1, {
-        value: BigNumber.from("10000000000")
+        value: BigNumber.from("10000000000"),
       })
 
-      await time.increase(time.duration.hours(1));
-      await auctionFile.finalize(1);
+      await time.increase(time.duration.hours(1))
+      await auctionFile.finalize(1)
 
       await auctionFile.connect(other).dispute(1, {
-        value: BigNumber.from("100000000000000000")
+        value: BigNumber.from("100000000000000000"),
       })
 
       await notary.vote(1, true)
@@ -132,11 +176,8 @@ describe("Notary", () => {
       await notary.connect(buyer3).vote(1, true)
       await notary.connect(buyer4).vote(1, false)
       await notary.connect(buyer5).vote(1, false)
-
     })
-
-
-  });
+  })
 
   // describe("#create", () => {
   //   it("should create store", async () => {
@@ -197,7 +238,6 @@ describe("Notary", () => {
   //       )
   //     ).to.be.revertedWith("AuctionFile: Wrong params")
   //   })
-
 
   //   it("fails if wrong dateExpire was passed", async () => {
 

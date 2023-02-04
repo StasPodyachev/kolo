@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+import "./interfaces/IFactory.sol";
 import "./interfaces/ITreasury.sol";
 import "./dao/KoloToken.sol";
 import "./MockExchange.sol";
@@ -15,6 +16,7 @@ import "./MockExchange.sol";
  *
  **/
 contract Treasury is ITreasury, Ownable {
+    IFactory public immutable _factory;
     MockExchange public _exchange;
 
     uint256 private _rewardBurnCoef = 5e17;
@@ -25,8 +27,8 @@ contract Treasury is ITreasury, Ownable {
 
     receive() external payable {}
 
-    function setKoloToken(address token) external onlyOwner {
-        _token = token;
+    constructor(IFactory factory) {
+        _factory = factory;
     }
 
     function setExchange(MockExchange exchange) external onlyOwner {
@@ -50,7 +52,7 @@ contract Treasury is ITreasury, Ownable {
         uint256 filAmount = (address(this).balance * _rewardBurnCoef) / 1e18;
         uint256 tokenAmount = _exchange.exactInputSingle(filAmount, _token);
 
-        KoloToken(_token).burn(address(this), tokenAmount);
+        KoloToken(_factory.daoToken()).burn(address(this), tokenAmount);
         _dateTx = block.timestamp;
     }
 

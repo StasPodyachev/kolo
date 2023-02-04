@@ -9,7 +9,7 @@ import "./Store.sol";
 /**
  * @title Store deploying functionality
  **/
-contract StoreDeployer is IStoreDeployer {
+abstract contract StoreDeployer is IStoreDeployer {
     struct Parameters {
         address factory;
     }
@@ -25,8 +25,6 @@ contract StoreDeployer is IStoreDeployer {
     function deploy(address factory) internal returns (address storeAddress) {
         parameters = Parameters({factory: factory});
         storeAddress = address(new Store());
-
-        Store(storeAddress).transferOwnership(msg.sender);
 
         delete parameters;
     }

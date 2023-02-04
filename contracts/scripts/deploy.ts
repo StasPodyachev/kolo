@@ -25,24 +25,33 @@ const getArgs = () => [
   1,
 ]
 
+const getFactoryArgs = () => [
+  deployments[CHAIN_ID][deployNames.FACTORY].address,
+]
+
 const contracts: ContractDeploy[] = [
   {
     contractName: deployNames.FACTORY,
   },
   {
     contractName: deployNames.TREASURY,
+    args: getFactoryArgs,
   },
   {
     contractName: deployNames.AUCTION_FILE,
+    args: getFactoryArgs,
   },
   {
     contractName: deployNames.SIMPLE_TRADE_FILE,
+    args: getFactoryArgs,
   },
   {
     contractName: deployNames.NOTARY,
+    args: getFactoryArgs,
   },
   {
     contractName: deployNames.CHAT,
+    args: getFactoryArgs,
   },
   {
     contractName: deployNames.MOCK_EXCHANGE,

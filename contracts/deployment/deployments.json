@@ -1,1 +1,44 @@
-{"3141":{"Factory":{"address":"0xF7c854b3F487909fc3A58AcB8B2181342E2D91b4","creationTime":1675350575268},"AuctionFile":{"address":"0x65F7Fdbb52d9CE3027b8251Fd4d6d5A273D9bB29","creationTime":1675350696296},"Notary":{"address":"0xb31deE4b4bA80637757DbB7ADedA7132fDe1fb10","creationTime":1675350812523},"SimpleTradeFile":{"address":"0xD6ddDF27496feB5e1e4d1e31a85F9D41ae6F1374","creationTime":1675350754349},"Chat":{"address":"0x390A6C64E99C62Ef1691fA28DdcFAe9C18711959","creationTime":1675351131028},"Treasury":{"address":"0x2282D1D7B3377C3E875c7512C29CD85e36D2D01C","creationTime":1675350634043},"KoloToken":{"address":"0x22BDe55E3bde1a6525C354357D553Bf304B19909","creationTime":1675351266365},"TimeLock":{"address":"0xb1De2abdF3F902B1Fd98Ac5C7bE9787c1F05C03B","creationTime":1675351324828},"GovernorContract":{"address":"0x98785438092ED0C8a6b4ec8D8F98064C11D49e04","creationTime":1675351383422},"MockExchange":{"address":"0x1F6bf815E687390A4551Da50295057e2134BCE69","creationTime":1675351203997}}}
+{
+  "3141": {
+    "Factory": {
+      "address": "0x79057B7d5342486a3197401aF64b3189D33baf2d",
+      "creationTime": 1675511974763
+    },
+    "AuctionFile": {
+      "address": "0xe8e9AD50ECCc956b7bC6f7fbC92C886035cf4c76",
+      "creationTime": 1675512124994
+    },
+    "Notary": {
+      "address": "0x0779A70916Fa0CC76317Ae79eBf2402E3cab89f9",
+      "creationTime": 1675512244812
+    },
+    "SimpleTradeFile": {
+      "address": "0xAD5CcBfab0D3554EeE9AFC0F1521f4eB1cE6f580",
+      "creationTime": 1675512183057
+    },
+    "Chat": {
+      "address": "0x94339E3Bb2ab9644C02E4C9B19e9Ee5ad34CbE27",
+      "creationTime": 1675512303848
+    },
+    "Treasury": {
+      "address": "0x3Ae730Cb337a971992459f3268978F59020e3A41",
+      "creationTime": 1675512032905
+    },
+    "KoloToken": {
+      "address": "0x9b6aCD65Abf1dD3D504050167d88Bc2A174fE1C6",
+      "creationTime": 1675512423644
+    },
+    "TimeLock": {
+      "address": "0xD098d07193Ad760a9e2655f8011eCe67e58f4c8c",
+      "creationTime": 1675512486041
+    },
+    "GovernorContract": {
+      "address": "0x62CB43a5C47B7A1c711D6456EC396942D147e5a1",
+      "creationTime": 1675512543791
+    },
+    "MockExchange": {
+      "address": "0xE39cdD99951476A381eA1A96E66a47C9C86E756C",
+      "creationTime": 1675512365577
+    }
+  }
+}

@@ -57,14 +57,17 @@ contract Factory is IFactory, StoreDeployer, AccessControl, Ownable {
      * Emits a `StoreCreated` event.
      *
      */
-    function createStore() external returns (address storeAddress) {
+    function createStore(address wallet)
+        external
+        returns (address storeAddress)
+    {
         require(
             stores[msg.sender] == address(0),
             "Factory: Store already exist"
         );
 
         storeAddress = deploy(address(this));
-        stores[msg.sender] = storeAddress;
+        stores[wallet] = storeAddress;
 
         emit StoreCreated(storeAddress, msg.sender);
     }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IStore.sol";
@@ -13,7 +12,7 @@ import "hardhat/console.sol";
 /**
  * @title Store
  */
-contract Store is IStore, Ownable {
+contract Store is IStore {
     /// @dev Holds a mapping of deals to integration addresses.
     mapping(uint256 => address) private deals;
 
