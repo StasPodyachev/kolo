@@ -7,8 +7,11 @@ import { BigNumber } from "ethers";
 import {
   Button
 } from "@chakra-ui/react";
+import { useTransactionManager } from "@/context/TransactionManageProvider";
+import { useEffect } from "react";
 
 const PlaceBid = ({isDisabled, price, id}:{isDisabled: boolean, price: string, id: number}) => {
+  const { onConfirm, onTransaction } = useTransactionManager()
   const bidValue = BigInt(new BigDecimal(price.length && price).mul(BIG_1E18 + "").toString()) + ""
   const { config } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
@@ -16,7 +19,19 @@ const PlaceBid = ({isDisabled, price, id}:{isDisabled: boolean, price: string, i
     functionName: 'bid',
     args: [BigNumber.from(id), {value: bidValue}]
   })
-  const { write } = useContractWrite(config)
+  const { write, isLoading, data, isSuccess } = useContractWrite(config)
+  useEffect(() => {
+    if (isLoading) {
+      onConfirm()
+    }
+  }, [isLoading, onConfirm])
+
+  useEffect(() => {
+    if (data && isSuccess) {
+      onTransaction(data?.hash)
+      // push('/dashboard')
+    }
+  }, [data])
   return (
     <Button
       minW="170px"

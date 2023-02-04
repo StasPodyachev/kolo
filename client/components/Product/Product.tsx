@@ -43,15 +43,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const [ isBuyer, setIsBuyer ] = useState(false);
   const [ isNotary, setIsNotary ] = useState(false);
 
-  const { config: disputeConfig } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: 'dispute',
-    args: [BigNumber.from(item?.id)]
-  });
-
-  const { write: disputeWrite } = useContractWrite(disputeConfig);
-
   const { config: finalizeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -168,13 +159,13 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                         />
                         <PlaceBid
                           id={item?.id}
-                          price={priceValue}
+                          price={bid}
                           isDisabled={!signer || isBidError || item?.ownedBy === address}
                         />
                       </>
                     : isBuyer ?
                     <Flex w="100%" justifyContent="space-between">
-                      <Dispute onClick={() => disputeWrite?.()} />
+                      <Dispute id={item?.id} />
 
                       {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
                     </Flex> : null
