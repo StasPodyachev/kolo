@@ -13,7 +13,7 @@ import BuyNow from "./BuyNow";
 import Modal from "../ui/Modal/Modal";
 import { BIG_1E18 } from "@/helpers/misc";
 import addresses from "@/contracts/addresses";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber } from "ethers";
 import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import { useState } from "react";
