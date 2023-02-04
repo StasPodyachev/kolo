@@ -14,7 +14,7 @@ const AddressCopy = ({ address, color, textStyle }: IProps) => {
   return (
     <Tooltip label={hasCopied ? "Copied" : "Copy"}>
       <Text
-        w="max-content"
+        minW="max-content"
         textStyle={textStyle ? textStyle : "mediumText"}
         color={color ? color : "white"}
         _hover={{ cursor: "pointer" }}

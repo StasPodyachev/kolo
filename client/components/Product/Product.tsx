@@ -1,19 +1,19 @@
 import useDevice from "@/hooks/useDevice";
-import { IAuctionItem, IBidTableData } from "@/types";
+import { IAuctionItem, IBidTableData, IChatMessage } from "@/types";
 import { Box, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
 import Modal from "../ui/Modal/Modal";
 import { BIG_1E18 } from "@/helpers/misc";
 import addresses from "@/contracts/addresses";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber } from "ethers";
 import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import { useState } from "react";
@@ -37,6 +37,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const signer = useSigner();
   const isBidError = +bid <= +currentBid;
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const { address } = useAccount();
 
   const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
   const { config } = usePrepareContractWrite({
@@ -201,7 +202,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           width="200px"
                         />
                         <PlaceBid
-                          isDisabled={!signer || isBidError}
+                          isDisabled={!signer || isBidError || item?.ownedBy === address}
                           onClick={() => {
                             setIsOpenModal(true);
                             placeBidWrite?.()
@@ -260,7 +261,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                 {
                   item?.status?.title == "Open" ?
                   <BuyNow
-                    isDisabled={!signer}
+                    isDisabled={!signer || item?.ownedBy === address}
                     onClick={() => {
                       setIsOpenModal(true);
                       buyKnowWrite?.();
