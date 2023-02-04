@@ -41,6 +41,7 @@ const Home: NextPage = () => {
         const ownedBy = result[0][7]
         const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
+        const collateral = result[0][6]
         const status = result[0][12] && convertStatus(Number(result[0][12]));
         const saleEndDateNew = status?.title == "Open" ? parseInt(result[0][9]?._hex, 16) : parseInt(result[0][9]?._hex, 16) * 1000
         let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
@@ -55,7 +56,8 @@ const Home: NextPage = () => {
           priceEnd,
           description,
           status,
-          totalBids: 20
+          totalBids: 20,
+          collateral 
         };
       });
       setItems(decryptedData);

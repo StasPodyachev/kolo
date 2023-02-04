@@ -53,12 +53,12 @@ export default function ErrorModal({
                 <Link
                   p={4}
                   isExternal
-                  href={chain?.id === 420 ? `https://goerli-optimism.etherscan.io/tx/${address}` : `https://mumbai.polygonscan.com/tx/${address}`}
+                  href={`https://hyperspace.filfox.info/en/message/${address}`}
                   fontSize="sm"
                   color="#00C097"
                   fontWeight={600}
                 >
-                  View on Erherscan
+                  View on Explorer
                 </Link>
               </Box>
             )}
