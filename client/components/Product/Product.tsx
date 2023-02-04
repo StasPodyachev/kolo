@@ -15,6 +15,7 @@ import Chat from "./Chat";
 import Dispute from "./Dispute";
 import lighthouse from "@lighthouse-web3/sdk";
 import Finalize from "./Finalize";
+import Cancel from "./Cancel";
 interface IProps {
   item: IAuctionItem,
   bid: string,
@@ -69,7 +70,11 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   }, [item, address])
 
   useEffect(() => {
-    if (item?.ownedBy === address) setIsSeller(true)
+    if (item?.ownedBy === address) {
+      console.log(item?.ownedBy === address);
+      
+      setIsSeller(true)
+    }
   }, [item, address])
 
   useEffect(() => {
@@ -168,7 +173,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
               <Flex height={'48px'} justifyContent="space-between">
                 {
-                  item?.status?.title === "Open" ?
+                  item?.status?.title === "Open" && !isSeller ?
                     <>
                       <NumberInput
                         value={bid}
@@ -187,7 +192,8 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                     <Dispute id={item?.id} collateral={item?.collateral} />
 
                     {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
-                  </Flex> : null
+                  </Flex> : isSeller && item?.status?.title === "Open" ?
+                  <Cancel id={item?.id} /> : null
                 }
               </Flex>
           </Flex>
@@ -233,7 +239,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               {item?.description}
             </Text>
               {
-                item?.status?.title == "Open" ?
+                item?.status?.title == "Open" && !isSeller ?
                 <BuyNow
                   isDisabled={!signer || item?.ownedBy === address}
                   id={item?.id}
