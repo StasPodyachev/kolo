@@ -6,7 +6,7 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useContractRead, useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
@@ -39,6 +39,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const isBidError = +bid <= +currentBid;
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [chatMessages, setChatMessages] = useState<IChatMessage[] | []>([]);
+  const { address } = useAccount();
 
   const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
   const { config } = usePrepareContractWrite({
@@ -228,7 +229,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           width="200px"
                         />
                         <PlaceBid
-                          isDisabled={!signer || isBidError}
+                          isDisabled={!signer || isBidError || item?.ownedBy === address}
                           onClick={() => {
                             setIsOpenModal(true);
                             placeBidWrite?.()
@@ -287,7 +288,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                 {
                   item?.status?.title == "Open" ?
                   <BuyNow
-                    isDisabled={!signer}
+                    isDisabled={!signer || item?.ownedBy === address}
                     onClick={() => {
                       setIsOpenModal(true);
                       buyKnowWrite?.();
