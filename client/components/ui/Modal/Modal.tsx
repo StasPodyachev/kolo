@@ -43,7 +43,7 @@ const Modal = ({ isLoading, isSuccess, isError, isOpen, changeVisibility }: IPro
           </Heading>
         </ModalBody>
         <ModalFooter>
-          {isLoading || isSuccess ? (
+          {isLoading ? (
             <PulseLoader
               cssOverride={override}
               color="white"

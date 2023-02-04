@@ -14,7 +14,7 @@ const AddressCopy = ({ address, color, textStyle }: IProps) => {
   return (
     <Tooltip label={hasCopied ? "Copied" : "Copy"}>
       <Text
-        w="max-content"
+        minW="max-content"
         textStyle={textStyle ? textStyle : "mediumText"}
         color={color ? color : "white"}
         _hover={{ cursor: "pointer" }}
@@ -25,7 +25,7 @@ const AddressCopy = ({ address, color, textStyle }: IProps) => {
           setTimeout(() => setHasCopied(false), 500);
         }}
       >
-        {addressTruncation(address)}
+        {addressTruncation(address)} :
       </Text>
     </Tooltip>
   );

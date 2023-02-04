@@ -16,8 +16,7 @@ import addresses from "@/contracts/addresses";
 import { BigNumber, ethers } from "ethers";
 import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
-import ABI_CHAT from "@/contracts/abi/Chat.json";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Chat from "./Chat";
 import Dispute from "./Dispute";
 import Finalize from "./Finalize";
@@ -38,7 +37,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const signer = useSigner();
   const isBidError = +bid <= +currentBid;
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [chatMessages, setChatMessages] = useState<IChatMessage[] | []>([]);
   const { address } = useAccount();
 
   const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
@@ -64,13 +62,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     isError: isBuyKnowError,
   } = useContractWrite(buyKnowconfig)
 
-  const { data: chatData } = useContractRead({
-    address: addresses[4].address as `0x${string}`,
-    abi: ABI_CHAT,
-    functionName: "getChat",
-    args: [item?.id],
-  });
-
   const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -86,24 +77,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   });
 
   const { write: finalizeWrite } = useContractWrite(finalizeConfig);
-
-  useEffect(() => {
-    if (Array.isArray(chatData)) {
-      const decryptedData = chatData?.map((item: any) => {
-        const sender = item?.sender.toString();
-        const message = item?.message.toString();
-        const sendTime = parseInt(item?.timestamp?._hex, 16);
-        const formattedSendTime = new Date(+sendTime).toLocaleDateString();
-
-        return {
-          message,
-          sender,
-          time: formattedSendTime,
-        }
-      })
-      setChatMessages(decryptedData);
-    }
-  }, [chatData])
 
   return (
     <>
@@ -317,7 +290,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
             </Flex>
             <BidsTable data={bidsTableData} />
           </Box>
-          <Chat sellerAdress={item?.ownedBy} messages={chatMessages} />
+          <Chat id={item?.id} />
         </Flex>
       </Flex>
     </>
