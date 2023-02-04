@@ -74,7 +74,6 @@ const ProductPage: NextPage = () => {
       const status = result[0][12] && convertStatus(Number(result[0][12]));
       const collateral = result[0][6]
       const cid = web3?.utils?.hexToAscii(result[0][11])
-      console.log(cid, 'cid');
       
       const saleEndDateNew = status?.title == "Open" ? parseInt(result[0][9]?._hex, 16) : parseInt(result[0][9]?._hex, 16) * 1000
       let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()

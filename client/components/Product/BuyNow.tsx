@@ -12,9 +12,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 
 const BuyNow = ({isDisabled, id, price}:{isDisabled: boolean,id: number, price: number}) => {
-  console.log({
-    id, price
-  });
   const { onConfirm, onTransaction } = useTransactionManager()
   const priceValue = BigInt(new BigDecimal(price).mul(BIG_1E18 + "").toFixed(0)) + ""
   const { config } = usePrepareContractWrite({
