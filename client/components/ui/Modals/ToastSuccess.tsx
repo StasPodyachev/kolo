@@ -1,20 +1,18 @@
 import { CloseButton } from '@chakra-ui/close-button'
 import { CheckCircleIcon } from '@chakra-ui/icons'
 import { Box, Flex, Link } from '@chakra-ui/layout'
-import { useNetwork } from 'wagmi'
+import { useAccount } from 'wagmi'
 
 export default function ToastSuccess({
   onClose,
   title = 'Transaction is completed.',
   description,
-  address = null,
 }: {
   title?: string
   description?: any
   onClose: () => void
-  address: string | null
 }) {
-  const { chain } = useNetwork()
+  const { address } = useAccount()
   return (
     <Flex
       justifyContent="space-between"
@@ -33,7 +31,7 @@ export default function ToastSuccess({
           {address && (
             <Link
               isExternal
-              href={chain?.id === 420 ? `https://goerli-optimism.etherscan.io/tx/${address}` : `https://mumbai.polygonscan.com/tx/${address}`}
+              href={`https://hyperspace.filfox.info/en/address/${address}`}
               fontSize="sm"
               color="#00C097"
               fontWeight={600}

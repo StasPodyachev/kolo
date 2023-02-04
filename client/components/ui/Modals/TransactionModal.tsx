@@ -8,7 +8,7 @@ import {
  Link,
  useDisclosure,
 } from '@chakra-ui/react'
-import { useNetwork } from 'wagmi'
+import { useAccount } from 'wagmi'
 
 interface Props {
  address?: string
@@ -17,28 +17,28 @@ interface Props {
  onOpen: () => void
 }
 
-export default function TransactionModal({ isOpen, onClose, onOpen, address = '' }: Props) {
+export default function TransactionModal({ isOpen, onClose, onOpen }: Props) {
  const modal = useDisclosure({ isOpen, onClose, onOpen })
- const { chain } = useNetwork()
+ const { address } = useAccount();
  return (
    <>
      <Modal size="sm" isOpen={modal?.isOpen} onClose={modal?.onClose}>
        <ModalOverlay />
        <ModalContent textAlign="center">
          <ModalCloseButton />
-         <ModalBody py={4}>
+         <ModalBody py={4} display="flex" flexDir="column">
            <Box fontSize="lg" fontWeight={600} my={4}>
              Your contract is submitted!
            </Box>
            {address && (
              <Link
                isExternal
-               href={chain?.id === 420 ? `https://goerli-optimism.etherscan.io/tx/${address}` : `https://mumbai.polygonscan.com/tx/${address}`}
+               href={`https://hyperspace.filfox.info/en/address/${address}`}
                fontSize="sm"
                color="#00C097"
                fontWeight={600}
              >
-               View on Erherscan
+               View on Filfox
              </Link>
            )}
 
