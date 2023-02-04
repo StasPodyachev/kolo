@@ -69,4 +69,5 @@ export interface IChatMessage {
   message: string;
   sender: string;
   time: string;
+  id: number
 }
