@@ -15,6 +15,7 @@ import Chat from "./Chat";
 import Dispute from "./Dispute";
 import lighthouse from "@lighthouse-web3/sdk";
 import Finalize from "./Finalize";
+import Vote from "./Vote";
 import Cancel from "./Cancel";
 interface IProps {
   item: IAuctionItem,
@@ -62,24 +63,19 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
   const [ isSeller, setIsSeller ] = useState(false);
   const [ isBuyer, setIsBuyer ] = useState(false);
-  const [ isNotary, setIsNotary ] = useState(false);
-
+  const [ isNotary, setIsNotary ] = useState(true);
 
   useEffect(() => {
     if (item?.buyer === address) setIsBuyer(true)
   }, [item, address])
 
   useEffect(() => {
-    if (item?.ownedBy === address) {
-      console.log(item?.ownedBy === address);
-      
-      setIsSeller(true)
-    }
+    if (item?.ownedBy === address) setIsSeller(true)
   }, [item, address])
 
   useEffect(() => {
     if (item?.cid) {
-     
+
     }
   }, [item])
 
@@ -192,8 +188,15 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                     <Dispute id={item?.id} collateral={item?.collateral} />
 
                     {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
-                  </Flex> : isSeller && item?.status?.title === "Open" ?
-                  <Cancel id={item?.id} /> : null
+                    </Flex> : isSeller && item?.status?.title === "Open" ?
+                  <Cancel id={item?.id} />  : isNotary && item?.status?.title === "Dispute" ? (
+                    <Vote
+                      id={item?.id}
+                      mark={false}
+                      variant="blue"
+                      title="vote for seller"
+                    />
+                  ) : null
                 }
               </Flex>
           </Flex>
@@ -239,12 +242,20 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               {item?.description}
             </Text>
               {
-                item?.status?.title == "Open" && !isSeller ?
+                item?.status?.title == "Open" ?
                 <BuyNow
                   isDisabled={!signer || item?.ownedBy === address}
                   id={item?.id}
                   price={item?.priceEnd}
-                  /> : null
+                  /> :  isNotary && item?.status?.title === "Dispute" ? (
+                    <Vote
+                      id={item?.id}
+                      mark
+                      variant="darkBlue"
+                      title="vote for buyer"
+                      isNeededMarginTop
+                    /> 
+                  ) : null
               }
           </Flex>
         </Flex>
