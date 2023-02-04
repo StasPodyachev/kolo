@@ -6,7 +6,7 @@ import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
+import { useAccount, useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
@@ -38,6 +38,10 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const isBidError = +bid <= +currentBid;
   const [isOpenModal, setIsOpenModal] = useState(false);
   const { address } = useAccount();
+
+  const [ isSeller, setIsSeller ] = useState(false);
+  const [ isBuyer, setIsBuyer ] = useState(false);
+  const [ isNotary, setIsNotary ] = useState(false);
 
   const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
   const { config } = usePrepareContractWrite({
@@ -209,11 +213,11 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           }}
                         />
                       </>
-                    :
+                    : item?.status?.title === "Open" ?
                     <Flex w="100%" justifyContent="space-between">
                       <Dispute onClick={() => disputeWrite?.()} />
                       <Finalize onClick={() => finalizeWrite?.()} />
-                    </Flex>
+                    </Flex> : null
                   }
                 </Flex>
             </Flex>
