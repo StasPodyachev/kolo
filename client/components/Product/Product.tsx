@@ -50,7 +50,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     functionName: 'bid',
     args: [BigNumber.from(item?.id), {value: bidValue}]
   })
-  
+
   const { write: placeBidWrite, isLoading: isPlaceBidLoading, isSuccess: isPlaceBidSuccess, isError: isPlaceBidError } = useContractWrite(config)
 
   const priceValue = BigInt(new BigDecimal(item?.priceEnd).mul(BIG_1E18 + "").toFixed(0)) + ""
@@ -216,11 +216,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           width="200px"
                         />
                         <PlaceBid
+                          id={item?.id}
+                          price={priceValue}
                           isDisabled={!signer || isBidError || item?.ownedBy === address}
-                          onClick={() => {
-                            setIsOpenModal(true);
-                            placeBidWrite?.()
-                          }}
                         />
                       </>
                     : isBuyer ?
