@@ -13,6 +13,7 @@ import BuyNow from "./BuyNow";
 import { useEffect, useState } from "react";
 import Chat from "./Chat";
 import Dispute from "./Dispute";
+import lighthouse from "@lighthouse-web3/sdk";
 import Finalize from "./Finalize";
 interface IProps {
   item: IAuctionItem,
@@ -68,9 +69,10 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   }, [item, address])
 
   useEffect(() => {
-    if (item?.collateral) {
-      console.log(item?.collateral, 'collateral');
-      
+    if (item?.cid) {
+      lighthouse.getAccessConditions(item?.cid).then(
+        (conditions) => console.log('conditions' ,{conditions})
+      )
     }
   }, [item])
 

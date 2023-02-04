@@ -159,35 +159,20 @@ const NewPoduct = () => {
     }
     setCid(response?.data?.Hash);
     setAcces(true);
-
+    
     const accesCondition = async () => {
       const { publicKey, signedMessage } : any = await encryptionSignature();
-
-      // cid: QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
-
-      // const cidHex = "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
-
       const cidHex= web3.utils.asciiToHex(response?.data?.Hash).slice(2)
       console.log(cidHex, 'cidHex');
-
       const arrStr = ["0x" + cidHex.slice(0, 64), "0x" + cidHex.slice(64) + "000000000000000000000000000000000000"]
       console.log({
         item1: arrStr[0],
         size: arrStr[0].length,
-
       },
       {
         item1: arrStr[1],
         size: arrStr[1].length,
-
       },);
-
-
-      // const cidArr =  [
-      //   "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a66",
-      //   "0x4d325a696577414e6b4855574d4b000000000000000000000000000000000000",
-      // ]
-
       const conditions = [
         {
           id: 1,
