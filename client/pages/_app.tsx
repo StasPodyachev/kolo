@@ -4,6 +4,7 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
+import { TransactionManageProvider } from '../context/TransactionManageProvider';
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { filecoinHyperspace, polygonMumbai } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
@@ -48,9 +49,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         chains={chains}
       >
         <ChakraProvider theme={theme}>
+        <TransactionManageProvider>
           <SidebarContextProvider>
             <Component {...pageProps} />
           </SidebarContextProvider>
+          </TransactionManageProvider>
         </ChakraProvider>
       </RainbowKitProvider>
     </WagmiConfig>
