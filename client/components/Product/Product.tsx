@@ -43,16 +43,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const [ isBuyer, setIsBuyer ] = useState(false);
   const [ isNotary, setIsNotary ] = useState(false);
 
-  const bidValue = BigInt(new BigDecimal(bid.length && bid).mul(BIG_1E18 + "").toString()) + ""
-  const { config } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: 'bid',
-    args: [BigNumber.from(item?.id), {value: bidValue}]
-  })
-  
-  const { write: placeBidWrite, isLoading: isPlaceBidLoading, isSuccess: isPlaceBidSuccess, isError: isPlaceBidError } = useContractWrite(config)
-
   const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -177,11 +167,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           width="200px"
                         />
                         <PlaceBid
+                          id={item?.id}
+                          price={priceValue}
                           isDisabled={!signer || isBidError || item?.ownedBy === address}
-                          onClick={() => {
-                            setIsOpenModal(true);
-                            placeBidWrite?.()
-                          }}
                         />
                       </>
                     : isBuyer ?
