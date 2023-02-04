@@ -15,6 +15,7 @@ import Chat from "./Chat";
 import Dispute from "./Dispute";
 import lighthouse from "@lighthouse-web3/sdk";
 import Finalize from "./Finalize";
+import Vote from "./Vote";
 interface IProps {
   item: IAuctionItem,
   bid: string,
@@ -61,12 +62,12 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
   const [ isSeller, setIsSeller ] = useState(false);
   const [ isBuyer, setIsBuyer ] = useState(false);
-  const [ isNotary, setIsNotary ] = useState(false);
+  const [ isNotary, setIsNotary ] = useState(true);
 
 
-  useEffect(() => {
-    if (item?.buyer === address) setIsBuyer(true)
-  }, [item, address])
+  // useEffect(() => {
+  //   if (item?.buyer === address) setIsBuyer(true)
+  // }, [item, address])
 
   useEffect(() => {
     if (item?.cid) {
@@ -186,7 +187,14 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                       <Dispute id={item?.id} collateral={item?.collateral} />
 
                       {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
-                    </Flex> : null
+                    </Flex> : isNotary && item?.status?.title === "Dispute" ? (
+                      <Vote
+                        id={item?.id}
+                        mark={false}
+                        variant="blue"
+                        title="vote for seller"
+                      />
+                    ) : null
                   }
                 </Flex>
             </Flex>
@@ -237,7 +245,15 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                     isDisabled={!signer || item?.ownedBy === address}
                     id={item?.id}
                     price={item?.priceEnd}
-                    /> : null
+                    /> : isNotary && item?.status?.title === "Dispute" ? (
+                      <Vote
+                        id={item?.id}
+                        mark
+                        variant="darkBlue"
+                        title="vote for buyer"
+                        isNeededMarginTop
+                      />
+                    ) : null
                 }
             </Flex>
           </Flex>
