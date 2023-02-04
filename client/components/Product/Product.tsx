@@ -83,13 +83,13 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
   const { write: finalizeWrite } = useContractWrite(finalizeConfig);
 
-  const { config: cancelConfig } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: 'cancel',
-  });
+  useEffect(() => {
+    if (item) {
+      console.log({item});
 
-  const { write: cancelWrite } = useContractWrite(cancelConfig);
+    }
+  }, [item])
+
   return (
     <>
       {isBuyKnowLoading || isPlaceBidLoading ? (
