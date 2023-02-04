@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "../interfaces/integrations/ISimpleTradeFile.sol";
 import "../interfaces/integrations/IIntegration.sol";
@@ -189,7 +190,12 @@ contract SimpleTradeFile is
         _finalize(deal);
         _chat.sendSystemMessage(
             dealId,
-            string(abi.encodePacked(deal.buyer, "bought an item"))
+            string(
+                abi.encodePacked(
+                    Strings.toHexString(uint256(uint160(deal.buyer)), 20),
+                    " bought an item"
+                )
+            )
         );
     }
 
@@ -276,11 +282,18 @@ contract SimpleTradeFile is
             dealId,
             string(
                 abi.encodePacked(
-                    "Dispute closed",
-                    winner == IIntegration.DisputeWinner.Buyer
-                        ? deal.buyer
-                        : deal.seller,
-                    "wins."
+                    "Dispute closed, ",
+                    Strings.toHexString(
+                        uint256(
+                            uint160(
+                                winner == IIntegration.DisputeWinner.Buyer
+                                    ? deal.buyer
+                                    : deal.seller
+                            )
+                        ),
+                        20
+                    ),
+                    " wins."
                 )
             )
         );
