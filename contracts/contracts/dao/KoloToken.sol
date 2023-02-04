@@ -26,7 +26,7 @@ contract KoloToken is ERC20Votes, Ownable, AccessControl {
         _setRoleAdmin(AIRDROP_ROLE, TOKEN_ADMIN_ROLE);
         _setRoleAdmin(WITHDRAW_ROLE, TOKEN_ADMIN_ROLE);
 
-        _setupRole(TOKEN_ADMIN_ROLE, msg.sender);
+        _grantRole(TOKEN_ADMIN_ROLE, msg.sender);
         _grantRole(WITHDRAW_ROLE, msg.sender);
 
         PERIOD_UNLOCKED = new uint256[](3);
@@ -40,6 +40,11 @@ contract KoloToken is ERC20Votes, Ownable, AccessControl {
         _nextUnlockTime = block.timestamp + HALF_YEAR;
 
         _mint(address(this), FIRST_MINT_SUPPLY);
+    }
+
+    function transferOwnership(address newOwner) public override {
+        _grantRole(TOKEN_ADMIN_ROLE, newOwner);
+        super.transferOwnership(newOwner);
     }
 
     function _afterTokenTransfer(

@@ -68,7 +68,7 @@ async function factory() {
     deployments[CHAIN_ID][deployNames.SIMPLE_TRADE_FILE]
   const chatDeployed = deployments[CHAIN_ID][deployNames.CHAT]
   const treasuryDeployed = deployments[CHAIN_ID][deployNames.TREASURY]
-  const koloTokenDeployed = deployNames[CHAIN_ID][deployNames.KOLO_TOKEN]
+  const koloTokenDeployed = deployments[CHAIN_ID][deployNames.KOLO_TOKEN]
 
   const factory = (await getKnowContractAt(deployNames.FACTORY)) as Factory
 
@@ -82,47 +82,42 @@ async function factory() {
 }
 
 async function auctionFile() {
-  const factoryDeployed = deployments[CHAIN_ID].Factory
   const notaryDeployed = deployments[CHAIN_ID][deployNames.NOTARY]
+  const chatDeployed = deployments[CHAIN_ID][deployNames.CHAT]
   const auction = (await getKnowContractAt(
     deployNames.AUCTION_FILE
   )) as AuctionFile
 
-  await auction.setFactory(factoryDeployed.address)
   await auction.setNotary(notaryDeployed.address)
+  await auction.setChat(chatDeployed.address)
 
   await daoAccess(auction)
 }
 
 async function simpleTrade() {
-  const factoryDeployed = deployments[CHAIN_ID].Factory
   const notaryDeployed = deployments[CHAIN_ID][deployNames.NOTARY]
+  const chatDeployed = deployments[CHAIN_ID][deployNames.CHAT]
 
   const simple = (await getKnowContractAt(
     deployNames.SIMPLE_TRADE_FILE
   )) as SimpleTradeFile
 
-  await simple.setFactory(factoryDeployed.address)
   await simple.setNotary(notaryDeployed.address)
+  await simple.setChat(chatDeployed.address)
 
   await daoAccess(simple)
 }
 
 async function notary() {
-  const factoryDeployed = deployments[CHAIN_ID].Factory
-
   const notary = (await getKnowContractAt(deployNames.NOTARY)) as Notary
 
-  await notary.setFactory(factoryDeployed.address)
   await daoAccess(notary)
 }
 
 async function treasury() {
-  const koloDeployed = deployments[CHAIN_ID][deployNames.KOLO_TOKEN]
   const exchangeDeployed = deployments[CHAIN_ID][deployNames.MOCK_EXCHANGE]
   const treasury = (await getKnowContractAt(deployNames.TREASURY)) as Treasury
 
-  await treasury.setKoloToken(koloDeployed.address)
   await treasury.setExchange(exchangeDeployed.address)
 
   await daoAccess(treasury)
@@ -130,22 +125,26 @@ async function treasury() {
 
 async function koloToken() {
   const treasuryDeployed = deployments[CHAIN_ID][deployNames.TREASURY]
+  const auctionDeployed = deployments[CHAIN_ID][deployNames.AUCTION_FILE]
+  const simpleDeployed = deployments[CHAIN_ID][deployNames.SIMPLE_TRADE_FILE]
+  const notaryDeployed = deployments[CHAIN_ID][deployNames.NOTARY]
   const kolo = (await getKnowContractAt(deployNames.KOLO_TOKEN)) as KoloToken
 
   const BURNABLE_ROLE = await kolo.BURNABLE_ROLE()
+  const AIRDROP_ROLE = await kolo.AIRDROP_ROLE()
 
-  // TODO: fixed in contract role access
+  // TODO: fixed in contract role access ??
   await kolo.grantRole(BURNABLE_ROLE, treasuryDeployed.address)
+
+  await kolo.grantRole(AIRDROP_ROLE, auctionDeployed.address)
+  await kolo.grantRole(AIRDROP_ROLE, simpleDeployed.address)
+  await kolo.grantRole(AIRDROP_ROLE, notaryDeployed.address)
 
   await daoAccess(kolo)
 }
 
 async function chat() {
-  const factoryDeployed = deployments[CHAIN_ID].Factory
-
   const chat = (await getKnowContractAt(deployNames.CHAT)) as Chat
-
-  await chat.setFactory(factoryDeployed.address)
   await daoAccess(chat)
 }
 
