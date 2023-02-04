@@ -1,27 +1,19 @@
 import useDevice from "@/hooks/useDevice";
-import { IAuctionItem, IBidTableData, IChatMessage } from "@/types";
-import { Box, Button, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
+import { IAuctionItem, IBidTableData } from "@/types";
+import { Box, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
-import { useAccount, useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
+import { useAccount, useSigner } from "wagmi";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
-import Modal from "../ui/Modal/Modal";
-import { BIG_1E18 } from "@/helpers/misc";
-import addresses from "@/contracts/addresses";
-import { BigNumber } from "ethers";
-import BigDecimal from "decimal.js-light";
-import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Chat from "./Chat";
 import Dispute from "./Dispute";
 import Finalize from "./Finalize";
-
-
 interface IProps {
   item: IAuctionItem,
   bid: string,
@@ -42,21 +34,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const [ isSeller, setIsSeller ] = useState(false);
   const [ isBuyer, setIsBuyer ] = useState(false);
   const [ isNotary, setIsNotary ] = useState(false);
-
-  const { config: finalizeConfig } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: 'finalize',
-  });
-
-  const { write: finalizeWrite } = useContractWrite(finalizeConfig);
-
-  useEffect(() => {
-    if (item) {
-      console.log({item});
-
-    }
-  }, [item])
 
   return (
     <>
