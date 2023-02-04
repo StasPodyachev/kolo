@@ -2,7 +2,6 @@ import { NextPage } from "next";
 import { Grid } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useState } from "react";
 import { IAuctionItem } from "@/types";
 import { useContractRead } from "wagmi";
