@@ -50,6 +50,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     functionName: 'bid',
     args: [BigNumber.from(item?.id), {value: bidValue}]
   })
+  
   const { write: placeBidWrite, isLoading: isPlaceBidLoading, isSuccess: isPlaceBidSuccess, isError: isPlaceBidError } = useContractWrite(config)
 
   const priceValue = BigInt(new BigDecimal(item?.priceEnd).mul(BIG_1E18 + "").toFixed(0)) + ""
@@ -71,6 +72,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: 'dispute',
+    args: [BigNumber.from(item?.id)]
   });
 
   const { write: disputeWrite } = useContractWrite(disputeConfig);
