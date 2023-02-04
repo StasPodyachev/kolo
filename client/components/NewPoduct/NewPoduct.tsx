@@ -26,6 +26,7 @@ declare var window: any;
 import useDevice from "@/hooks/useDevice";
 import { ISaleTypeMenuItem } from "@/types";
 import web3 from "web3";
+import { useTransactionManager } from "@/context/TransactionManageProvider";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
 const CustomInput = chakra(Input, {
@@ -113,6 +114,8 @@ const NewPoduct = () => {
   const [access, setAcces] = useState(false);
   const [fileName, setFileName] = useState("");
   const [thubnailName, setThubnailName] = useState("");
+  const [isFileLoading, setIsFileLoading] = useState(false);
+  const { onConfirm, onSuccess } = useTransactionManager()
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
@@ -219,6 +222,19 @@ const NewPoduct = () => {
   const isStartPriceError = startPrice === '0' || startPrice === '';
   const isForceStopPriceError = forceStopPrice === '0' || forceStopPrice === '';
   const isDateStopError = stopDate.toString().length === 0;
+
+  useEffect(() => {
+    if (isFileLoading) {
+      onConfirm()
+    }
+  }, [isFileLoading, onConfirm])
+
+  useEffect(() => {
+    if (fileName) {
+      // onSuccess()
+      // push('/dashboard')
+    }
+  }, [fileName, onSuccess])
 
   return (
     <Flex justifyContent="center">
@@ -375,7 +391,9 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
+                    setIsFileLoading(true);
                     deployEncrypted(e, true);
+                    setIsFileLoading(false);
                   }}
                 />
                 {fileName ? (
