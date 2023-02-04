@@ -10,16 +10,11 @@ import { useAccount, useContractWrite, usePrepareContractWrite, useSigner } from
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
-import Modal from "../ui/Modal/Modal";
-import { BIG_1E18 } from "@/helpers/misc";
 import addresses from "@/contracts/addresses";
-import { BigNumber } from "ethers";
-import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import { useEffect, useState } from "react";
 import Chat from "./Chat";
 import Dispute from "./Dispute";
-import Finalize from "./Finalize";
 
 
 interface IProps {
@@ -29,6 +24,33 @@ interface IProps {
   currentBid: number,
   bidsTableData: IBidTableData[];
   bidsAmount: number;
+}
+
+const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id} : any) => {
+  return (
+    <Flex
+      justifyContent={isDesktopHeader[0] ? "space-between" : "normal"}
+      flexDir={isDesktopHeader[0] ? "row" : "column"}
+      gap={isDesktopHeader[0] ? 0 : "52px"}
+      mt={isDesktopHeader[0] ? "36px" : "52px"}
+        >
+        <Box minW="400px">
+          <Flex justify="space-between" w="100%">
+            <Heading variant="h6" color="white">
+              Bids
+            </Heading>
+            <Flex alignItems="center">
+              <UserIcon width="21px" height="20px" />
+              <Heading variant="h6" color="white">
+                {bidsAmount}
+              </Heading>
+            </Flex>
+          </Flex>
+          <BidsTable data={bidsTableData} />
+        </Box>
+        <Chat id={id} />
+    </Flex>
+  )
 }
 
 const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: IProps) => {
@@ -224,28 +246,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
             </Flex>
           </Flex>
         </Flex>
-        <Flex
-          justifyContent={isDesktopHeader[0] ? "space-between" : "normal"}
-          flexDir={isDesktopHeader[0] ? "row" : "column"}
-          gap={isDesktopHeader[0] ? 0 : "52px"}
-          mt={isDesktopHeader[0] ? "36px" : "52px"}
-        >
-          <Box minW="400px">
-            <Flex justify="space-between" w="100%">
-              <Heading variant="h6" color="white">
-                Bids
-              </Heading>
-              <Flex alignItems="center">
-                <UserIcon width="21px" height="20px" />
-                <Heading variant="h6" color="white">
-                  {bidsAmount}
-                </Heading>
-              </Flex>
-            </Flex>
-            <BidsTable data={bidsTableData} />
-          </Box>
-          <Chat id={item?.id} />
-        </Flex>
+        <Bids isDesktopHeader={isDesktopHeader} bidsAmount={bidsAmount}
+          bidsTableData={bidsTableData} id={item?.id}
+         />
       </Flex>
     </>
   );
