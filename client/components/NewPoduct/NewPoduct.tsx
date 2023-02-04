@@ -169,7 +169,9 @@ const NewPoduct = () => {
       {
         item1: arrStr[1],
         size: arrStr[1].length,
-      },);
+      }, {
+        size: cidHex.length
+      });
       const conditions = [
         {
           id: 1,
@@ -181,7 +183,7 @@ const NewPoduct = () => {
           comparator: "==",
           value: "1"
           },
-          parameters: [ arrStr, (cidHex.length-2)/2 ,':userAddress'],
+          parameters: [ arrStr, (cidHex.length)/2 ,':userAddress'],
           inputArrayType: [ 'bytes32[]', 'uint8', 'address' ],
           outputType: "uint8"
       }
