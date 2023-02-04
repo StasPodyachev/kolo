@@ -8,9 +8,10 @@ import AddressCopy from "../ui/AddressCopy";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import ABI_CHAT from "@/contracts/abi/Chat.json";
 import { SendIcon } from "@/icons";
-import Modal from "../ui/Modal/Modal";
+import { useTransactionManager } from "@/context/TransactionManageProvider";
 
 const Chat = ({ id }: {id: number}) => {
+  const { onConfirm, onTransaction } = useTransactionManager()
   const { isDesktopHeader } = useDevice();
   const [chatMessages, setChatMessages] = useState<IChatMessage[] | []>([]);
   const [message, setMessage] = useState(" ");
@@ -31,7 +32,20 @@ const Chat = ({ id }: {id: number}) => {
     args: [id, message],
   })
 
-  const { write, isLoading, isSuccess, isError } = useContractWrite(config);
+  const { write, isLoading, isSuccess, data } = useContractWrite(config);
+
+  useEffect(() => {
+    if (isLoading) {
+      onConfirm()
+    }
+  }, [isLoading, onConfirm])
+
+  useEffect(() => {
+    if (data && isSuccess) {
+      onTransaction(data?.hash)
+      // push('/dashboard')
+    }
+  }, [data])
 
   useEffect(() => {
 
@@ -54,90 +68,81 @@ const Chat = ({ id }: {id: number}) => {
   }, [chatData])
 
   return (
-    <>
-      <Modal
-        isLoading={isLoading}
-        isError={isError}
-        isSuccess={isSuccess}
-        changeVisibility={setIsOpenModal}
-        isOpen={isOpenModal}
-      />
+    <Flex
+      flexDir="column"
+      gap="8px"
+      maxW={isDesktopHeader[0] ? "517px" : "100%"}
+      h="465px"
+      minW="400px"
+      w="100%"
+      bg="gray.800"
+      p="32px 0 0 0"
+      position="relative"
+    >
+      <Heading variant="h6" color="white" textAlign="center">Chat</Heading>
+      <Box overflowY="scroll" px="24px">
+        {chatMessages.map((msg) => (
+            <Flex key={msg?.id} flexDir="column" gap="8px" mt="32px">
+              <HStack
+                spacing="8px"
+                h="max-content"
+                alignItems="flex-start"
+                bg="#D9D9D91A"
+                p="8px 6px"
+              >
+                {msg.sender === "0x0000000000000000000000000000000000000000"
+                  ? <Text color="white" minW="max-content">System: </Text>
+                  : <AddressCopy address={msg.sender} color={msg.sender === address ? "green.primary" : "gray.50"} />
+                }
+                <Text color="gray.400">{msg.message}</Text>
+              </HStack>
+              <Text textStyle="smallText" ml="auto" color="#ccc">
+                {msg.time}
+              </Text>
+            </Flex>
+        ))}
+      </Box>
       <Flex
-        flexDir="column"
-        gap="8px"
-        maxW={isDesktopHeader[0] ? "517px" : "100%"}
-        h="465px"
-        minW="400px"
-        w="100%"
-        bg="gray.800"
-        p="32px 0 0 0"
-        position="relative"
+        marginTop="auto"
+        position="sticky"
+        mr="20px"
+        minW="100%"
       >
-        <Heading variant="h6" color="white" textAlign="center">Chat</Heading>
-        <Box overflowY="scroll" px="24px">
-          {chatMessages.map((msg) => (
-              <Flex key={msg?.id} flexDir="column" gap="8px" mt="32px">
-                <HStack
-                  spacing="8px"
-                  h="max-content"
-                  alignItems="flex-start"
-                  bg="#D9D9D91A"
-                  p="8px 6px"
-                >
-                  {msg.sender === "0x0000000000000000000000000000000000000000"
-                    ? <Text color="white" minW="max-content">System: </Text>
-                    : <AddressCopy address={msg.sender} color={msg.sender === address ? "green.primary" : "gray.50"} />
-                  }
-                  <Text color="gray.400">{msg.message}</Text>
-                </HStack>
-                <Text textStyle="smallText" ml="auto" color="#ccc">
-                  {msg.time}
-                </Text>
-              </Flex>
-          ))}
-        </Box>
-        <Flex
-          marginTop="auto"
-          position="sticky"
-          mr="20px"
-          minW="100%"
+        <Input
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
+          w="90%"
+          p="24px 18px"
+          color="white"
+          bg="gray.700"
+          marginTop={2}
+          borderRadius={0}
+          placeholder="SEND MESSAGE..."
+          border="none"
+          _placeholder={{ color: 'gray.200'}}
+          _focusVisible={{ outline: 'none' }}
+        />
+        <Button
+          onClick={() => {
+            setIsOpenModal(true);
+            write?.();
+            setMessage("");
+          }}
+          mt={2}
+          bg="gray.700"
+          transition="all .3s"
+          data-group
+          _hover={{ bg: "gray.700" }}
         >
-          <Input
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-            w="90%"
-            p="24px 18px"
-            color="white"
-            bg="gray.700"
-            marginTop={2}
-            borderRadius={0}
-            placeholder="SEND MESSAGE..."
-            border="none"
-            _placeholder={{ color: 'gray.200'}}
-            _focusVisible={{ outline: 'none' }}
-          />
-          <Button
-            onClick={() => {
-              setIsOpenModal(true);
-              write?.();
-              setMessage("");
-            }}
-            mt={2}
-            bg="gray.700"
+          <SendIcon
+            boxSize="24px"
             transition="all .3s"
-            data-group
-            _hover={{ bg: "gray.700" }}
-          >
-            <SendIcon
-              boxSize="24px"
-              transition="all .3s"
-              fillOpacity={0.25}
-              _groupHover={{ fillOpacity: 1 }}
-            />
-          </Button>
-        </Flex>
+            fillOpacity={0.25}
+            _groupHover={{ fillOpacity: 1 }}
+          />
+        </Button>
       </Flex>
-    </>
+    </Flex>
   );
 };
 
