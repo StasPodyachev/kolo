@@ -26,8 +26,6 @@ abstract contract StoreDeployer is IStoreDeployer {
         parameters = Parameters({factory: factory});
         storeAddress = address(new Store());
 
-        Store(storeAddress).transferOwnership(msg.sender);
-
         delete parameters;
     }
 }

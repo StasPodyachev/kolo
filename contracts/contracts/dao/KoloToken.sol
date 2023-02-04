@@ -24,9 +24,10 @@ contract KoloToken is ERC20Votes, Ownable, AccessControl {
         _setRoleAdmin(TOKEN_ADMIN_ROLE, TOKEN_ADMIN_ROLE);
         _setRoleAdmin(BURNABLE_ROLE, TOKEN_ADMIN_ROLE);
         _setRoleAdmin(AIRDROP_ROLE, TOKEN_ADMIN_ROLE);
-        _setupRole(TOKEN_ADMIN_ROLE, address(this));
+        _setRoleAdmin(WITHDRAW_ROLE, TOKEN_ADMIN_ROLE);
 
-        _grantRole(AIRDROP_ROLE, msg.sender);
+        _setupRole(TOKEN_ADMIN_ROLE, msg.sender);
+        _grantRole(WITHDRAW_ROLE, msg.sender);
 
         PERIOD_UNLOCKED = new uint256[](3);
         PERIOD_UNLOCKED[0] = (FIRST_MINT_SUPPLY * 3) / 100; // 0 - 182 days = 30%

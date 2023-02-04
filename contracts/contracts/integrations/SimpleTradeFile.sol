@@ -110,7 +110,7 @@ contract SimpleTradeFile is
     }
 
     function _airdropDao(address wallet) internal {
-        // IKoloToken(_factory.daoToken()).airdrop(wallet);
+        IKoloToken(_factory.daoToken()).airdrop(wallet);
     }
 
     function create(
@@ -122,10 +122,9 @@ contract SimpleTradeFile is
     ) external payable returns (uint256) {
         address storeAddress = _factory.getStore(msg.sender);
 
-        require(
-            storeAddress != address(0),
-            "SimpleTradeFile: Caller does not have a store"
-        );
+        if (storeAddress == address(0)) {
+            storeAddress = _factory.createStore(msg.sender);
+        }
 
         require(
             msg.value >= (price * _collateralPercent) / 1e18 &&

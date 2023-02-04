@@ -19,7 +19,7 @@ describe("Factory", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ; ({ factory } = await loadFixture(factoryFixture))
+    ;({ factory } = await loadFixture(factoryFixture))
   })
 
   describe("#createStore", async () => {
@@ -28,7 +28,10 @@ describe("Factory", () => {
         ethers.constants.AddressZero
       )
 
-      await expect(factory.createStore()).to.emit(factory, "StoreCreated")
+      await expect(factory.createStore(wallet.address)).to.emit(
+        factory,
+        "StoreCreated"
+      )
 
       expect(await factory["getStore(address)"](wallet.address)).to.be.not.eq(
         ethers.constants.AddressZero
@@ -36,8 +39,8 @@ describe("Factory", () => {
     })
 
     it("fails if store already created", async () => {
-      await factory.createStore()
-      await expect(factory.createStore()).to.be.revertedWith(
+      await factory.createStore(wallet.address)
+      await expect(factory.createStore(wallet.address)).to.be.revertedWith(
         "Factory: Store already exist"
       )
     })
@@ -57,4 +60,3 @@ describe("Factory", () => {
     })
   })
 })
-

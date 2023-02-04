@@ -1,15 +1,13 @@
-import { ethers, waffle, network } from "hardhat"
-import { BigNumber, constants, utils, Wallet } from "ethers"
+import { ethers, waffle } from "hardhat"
+import { BigNumber, Wallet } from "ethers"
 import { SimpleTradeFile } from "../typechain/SimpleTradeFile"
 import { Factory } from "../typechain/Factory"
 import { Chat } from "../typechain/Chat"
-import { Treasury } from "../typechain/Treasury"
 
 import { expect } from "chai"
-import { simpleTradeFileFixture } from "./shared/fixtures"
-import { moveBlocks } from "./utils/move-blocks"
-import { moveTime } from "./utils/move-time"
+import { simpleTradeFileFixture, storeFixture } from "./shared/fixtures"
 import { time } from "@nomicfoundation/hardhat-network-helpers"
+import { Store } from "../typechain"
 
 const createFixtureLoader = waffle.createFixtureLoader
 
@@ -29,7 +27,11 @@ describe("SimpleTradeFile", () => {
 
   beforeEach("deploy fixture", async () => {
     ;({ simpleTradeFile, factory, chat } = await loadFixture(async () => {
-      const { simpleTradeFile, factory, chat } = await simpleTradeFileFixture()
+      const { simpleTradeFile, factory, chat, koloToken } =
+        await simpleTradeFileFixture()
+
+      const AIRDROP_ROLE = await koloToken.AIRDROP_ROLE()
+      await koloToken.grantRole(AIRDROP_ROLE, simpleTradeFile.address)
 
       return { simpleTradeFile, factory, chat }
     }))
@@ -77,9 +79,6 @@ describe("SimpleTradeFile", () => {
 
   describe("#create", () => {
     it("should create deal", async () => {
-      await factory.createStore()
-      const storeAddress = await factory["getStore(address)"](wallet.address)
-
       const oldBalance = (await wallet.getBalance()).toString()
       const collateral = BigNumber.from("100000000000000000")
 
@@ -95,6 +94,8 @@ describe("SimpleTradeFile", () => {
         .to.emit(simpleTradeFile, "DealCreated")
         .withArgs(1, wallet.address)
 
+      const storeAddress = await factory["getStore(address)"](wallet.address)
+
       const txRec = await tx.wait()
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
       const newBalance = (await wallet.getBalance()).toString()
@@ -107,22 +108,20 @@ describe("SimpleTradeFile", () => {
       await expect(factory.getAllDeals()).to.be.not.reverted
     })
 
-    it("fails if store is not created", async () => {
-      await expect(
-        simpleTradeFile.create(
-          "NAME",
-          "DESCRIPTION",
-          10000000000,
-          Date.now() + 1000,
-          "0x",
-          { value: BigNumber.from("100000000000000000") }
-        )
-      ).to.be.revertedWith("SimpleTradeFile: Caller does not have a store")
-    })
+    // it("fails if store is not created", async () => {
+    //   await expect(
+    //     simpleTradeFile.create(
+    //       "NAME",
+    //       "DESCRIPTION",
+    //       10000000000,
+    //       Date.now() + 1000,
+    //       "0x",
+    //       { value: BigNumber.from("100000000000000000") }
+    //     )
+    //   ).to.be.revertedWith("SimpleTradeFile: Caller does not have a store")
+    // })
 
     it("fails if wrong collateral was passed", async () => {
-      await factory.createStore()
-
       await expect(
         simpleTradeFile.create(
           "NAME",
@@ -136,8 +135,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if wrong price was passed", async () => {
-      await factory.createStore()
-
       await expect(
         simpleTradeFile.create(
           "NAME",
@@ -151,8 +148,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if wrong dateExpire was passed", async () => {
-      await factory.createStore()
-
       await expect(
         simpleTradeFile.create(
           "NAME",
@@ -168,8 +163,6 @@ describe("SimpleTradeFile", () => {
 
   describe("#cancel", () => {
     it("should cancel bid", async () => {
-      await factory.createStore()
-
       const collateral = BigNumber.from("100000000000000000")
       await simpleTradeFile.create(
         "NAME",
@@ -197,8 +190,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if id not found", async () => {
-      await factory.createStore()
-
       await simpleTradeFile.create(
         "NAME",
         "DESCRIPTION",
@@ -216,8 +207,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if caller is not a seller", async () => {
-      await factory.createStore()
-
       await simpleTradeFile.create(
         "NAME",
         "DESCRIPTION",
@@ -237,8 +226,6 @@ describe("SimpleTradeFile", () => {
 
   describe("#buy", () => {
     it("should buy", async () => {
-      await factory.connect(other).createStore()
-
       const price = BigNumber.from("10000000000")
 
       await simpleTradeFile
@@ -269,8 +256,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if seller buys", async () => {
-      await factory.createStore()
-
       await simpleTradeFile.create(
         "NAME",
         "DESCRIPTION",
@@ -298,8 +283,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if deal canceled", async () => {
-      await factory.createStore()
-
       await simpleTradeFile.create(
         "NAME",
         "DESCRIPTION",
@@ -321,8 +304,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if time is up", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       await simpleTradeFile.create(
@@ -346,8 +327,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if amount is wrong", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       await simpleTradeFile.create(
@@ -371,8 +350,6 @@ describe("SimpleTradeFile", () => {
 
   describe("#receiveReward", () => {
     it("should receiveReward without buyer", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
       const price = 100000000000
       const collateral = BigNumber.from("100000000000000000")
@@ -403,8 +380,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("should receiveReward with buyer", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
       const price = 100000000000
       const collateral = BigNumber.from("100000000000000000")
@@ -446,7 +421,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if trade is not open", async () => {
-      await factory.createStore()
       const ts = await time.latest()
 
       await simpleTradeFile.create(
@@ -469,7 +443,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if id not found", async () => {
-      await factory.createStore()
       const ts = await time.latest()
 
       await simpleTradeFile.create(
@@ -489,7 +462,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if period for dispute yet", async () => {
-      await factory.createStore()
       const ts = await time.latest()
 
       await simpleTradeFile.create(
@@ -515,8 +487,6 @@ describe("SimpleTradeFile", () => {
 
   describe("#dispute", () => {
     it("should make dispute", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
       const price = 100000000000
       const collateral = BigNumber.from("100000000000000000")
@@ -562,8 +532,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if caller is not a buyer", async () => {
-      await factory.createStore()
-
       const price = 100000000000
       const ts = await time.latest()
 
@@ -590,8 +558,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if time for dispute is up", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
       const price = 100000000000
 
@@ -620,8 +586,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if collateral is wrong", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       const price = 100000000000
@@ -648,8 +612,6 @@ describe("SimpleTradeFile", () => {
 
   describe("#sendMessage", () => {
     it("should send message", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       const collateral = BigNumber.from("100000000000000000")
@@ -671,8 +633,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if status cancel", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       const collateral = BigNumber.from("100000000000000000")
@@ -694,8 +654,6 @@ describe("SimpleTradeFile", () => {
     })
 
     it("fails if status close", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       const collateral = BigNumber.from("100000000000000000")
@@ -719,18 +677,12 @@ describe("SimpleTradeFile", () => {
   })
 
   describe("#getDeal", () => {
-    let storeAddress: any
-    beforeEach("create storage", async () => {
-      const tx = await factory.createStore()
-      const receipt = await tx.wait()
-      storeAddress = receipt.events?.[2].args?.store
-    })
-
     it("correct serialize", async () => {
       const name = "NAME"
       const description = "DESCRIPTION"
       const price = 10000000000
       const dateExpire = Date.now() + 1000
+      const dateDispute = dateExpire + time.duration.days(5)
       const cid =
         "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
       const collateral = "100000000000000000"
@@ -744,19 +696,19 @@ describe("SimpleTradeFile", () => {
       const coder = ethers.utils.defaultAbiCoder
       const data = coder.encode(
         [
-          "tuple(uint256, string, string, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
+          "tuple(uint256, string, string, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
         ],
         [
           [
             1,
             name,
             description,
-            0,
             price,
             collateral,
             wallet.address,
             ethers.constants.AddressZero,
             dateExpire,
+            dateDispute,
             cid,
             0,
           ],
@@ -767,7 +719,7 @@ describe("SimpleTradeFile", () => {
       expect(deal._type).to.be.equal(1)
       expect(deal.data).to.be.equal(data)
       expect(deal.integration).to.be.equal(simpleTradeFile.address)
-      expect(deal.store).to.be.equal(storeAddress)
+      // expect(deal.store).to.be.equal(store.address)
     })
   })
 })

@@ -9,6 +9,8 @@ import "./interfaces/IStore.sol";
 import "./StoreDeployer.sol";
 import "./Store.sol";
 
+import "hardhat/console.sol";
+
 /**
  * @title Kolo chat storage
  *

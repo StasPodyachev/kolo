@@ -129,10 +129,9 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     ) external payable returns (uint256) {
         address storeAddress = _factory.getStore(msg.sender);
 
-        require(
-            storeAddress != address(0),
-            "AuctionFile: Caller does not have a store"
-        );
+        if (storeAddress == address(0)) {
+            storeAddress = _factory.createStore(msg.sender);
+        }
 
         require(
             msg.value >= (priceStart * _collateralPercent) / 1e18 &&
@@ -248,6 +247,7 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         deal.status = AuctionStatus.CANCEL;
 
         _sendSellerCollateral(dealId, deal.seller);
+
         _chat.sendSystemMessage(dealId, "Deal canceled.");
 
         emit DealCanceled(dealId, msg.sender);
@@ -255,6 +255,7 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
 
     function _sendSellerCollateral(uint256 dealId, address seller) internal {
         address storeAddress = _factory.getStore(seller);
+
         IStore(storeAddress).transferWinToSeller(
             dealId,
             address(0),

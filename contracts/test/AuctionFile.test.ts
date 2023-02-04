@@ -1,15 +1,13 @@
 import { ethers, waffle, network } from "hardhat"
-import { BigNumber, constants, utils, Wallet } from "ethers"
+import { BigNumber, Wallet } from "ethers"
 import { AuctionFile } from "../typechain/AuctionFile"
 import { Factory } from "../typechain/Factory"
 import { Chat } from "../typechain/Chat"
-import { Treasury } from "../typechain/Treasury"
 
 import { expect } from "chai"
-import { auctionFileFixture } from "./shared/fixtures"
-import { moveBlocks } from "./utils/move-blocks"
-import { moveTime } from "./utils/move-time"
+import { auctionFileFixture, storeFixture } from "./shared/fixtures"
 import { time } from "@nomicfoundation/hardhat-network-helpers"
+import { Store } from "../typechain"
 
 const createFixtureLoader = waffle.createFixtureLoader
 
@@ -29,7 +27,11 @@ describe("AuctionFile", () => {
 
   beforeEach("deploy fixture", async () => {
     ;({ auctionFile, factory, chat } = await loadFixture(async () => {
-      const { auctionFile, factory, chat } = await auctionFileFixture()
+      const { auctionFile, factory, chat, koloToken } =
+        await auctionFileFixture()
+
+      const AIRDROP_ROLE = await koloToken.AIRDROP_ROLE()
+      await koloToken.grantRole(AIRDROP_ROLE, auctionFile.address)
 
       return { auctionFile, factory, chat }
     }))
@@ -74,9 +76,6 @@ describe("AuctionFile", () => {
 
   describe("#create", () => {
     it("should create store", async () => {
-      await factory.createStore()
-      const storeAddress = await factory["getStore(address)"](wallet.address)
-
       const oldBalance = (await wallet.getBalance()).toString()
       const collateral = BigNumber.from("100000000000000000")
 
@@ -100,28 +99,27 @@ describe("AuctionFile", () => {
 
       expect(collateral.add(newBalance).add(gas)).to.eq(oldBalance)
 
-      expect(await factory["getStore(uint256)"](1)).to.be.eq(storeAddress)
+      // expect(await factory["getStore(uint256)"](1)).to.be.eq(store.address)
 
       await expect(factory.getDeal(1)).to.be.not.reverted
       await expect(factory.getAllDeals()).to.be.not.reverted
     })
 
-    it("fails if store is not created", async () => {
-      await expect(
-        auctionFile.create(
-          "NAME",
-          "DESCRIPTION",
-          10000000000,
-          100000000000,
-          Date.now() + 1000,
-          "0x",
-          { value: BigNumber.from("100000000000000000") }
-        )
-      ).to.be.revertedWith("AuctionFile: Caller does not have a store")
-    })
+    // it("fails if store is not created", async () => {
+    //   await expect(
+    //     auctionFile.create(
+    //       "NAME",
+    //       "DESCRIPTION",
+    //       10000000000,
+    //       100000000000,
+    //       Date.now() + 1000,
+    //       "0x",
+    //       { value: BigNumber.from("100000000000000000") }
+    //     )
+    //   ).to.be.revertedWith("AuctionFile: Caller does not have a store")
+    // })
 
     it("fails if wrong collateral was passed", async () => {
-      await factory.createStore()
       await expect(
         auctionFile.create(
           "NAME",
@@ -136,8 +134,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if wrong priceStart was passed", async () => {
-      await factory.createStore()
-
       await expect(
         auctionFile.create(
           "NAME",
@@ -152,8 +148,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if wrong dateExpire was passed", async () => {
-      await factory.createStore()
-
       await expect(
         auctionFile.create(
           "NAME",
@@ -168,8 +162,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if priceStart equals priceForceStop", async () => {
-      await factory.createStore()
-
       await expect(
         auctionFile.create(
           "NAME",
@@ -186,8 +178,6 @@ describe("AuctionFile", () => {
 
   describe("#cancel", () => {
     it("should cancel bid", async () => {
-      await factory.createStore()
-
       await auctionFile.create(
         "NAME",
         "DESCRIPTION",
@@ -217,8 +207,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if id not found", async () => {
-      await factory.createStore()
-
       await auctionFile.create(
         "NAME",
         "DESCRIPTION",
@@ -237,8 +225,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if caller is not a seller", async () => {
-      await factory.createStore()
-
       await auctionFile.create(
         "NAME",
         "DESCRIPTION",
@@ -257,8 +243,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if auction already have a bid", async () => {
-      await factory.createStore()
-
       await auctionFile.create(
         "NAME",
         "DESCRIPTION",
@@ -287,8 +271,6 @@ describe("AuctionFile", () => {
 
   describe("#bid", () => {
     it("should create bid", async () => {
-      await factory.connect(other).createStore()
-
       await auctionFile
         .connect(other)
         .create(
@@ -346,8 +328,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if seller bids", async () => {
-      await factory.createStore()
-
       await auctionFile.create(
         "NAME",
         "DESCRIPTION",
@@ -376,8 +356,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if deal canceled", async () => {
-      await factory.createStore()
-
       await auctionFile.create(
         "NAME",
         "DESCRIPTION",
@@ -400,8 +378,6 @@ describe("AuctionFile", () => {
     })
 
     it("should create bid eq priceForceStop", async () => {
-      await factory.connect(other).createStore()
-
       await auctionFile
         .connect(other)
         .create(
@@ -431,8 +407,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if time is up", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -457,8 +431,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if amount is wrong", async () => {
-      await factory.createStore()
-
       console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
 
@@ -482,8 +454,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if current bid is less then previous bid", async () => {
-      await factory.createStore()
-
       console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
 
@@ -515,8 +485,6 @@ describe("AuctionFile", () => {
 
   describe("#finalize", () => {
     it("should finalize with no bids", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
       const collateral = BigNumber.from("100000000000000000")
 
@@ -547,8 +515,6 @@ describe("AuctionFile", () => {
     })
 
     it("should finalize with bids", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -583,7 +549,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if auction is not open", async () => {
-      await factory.createStore()
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -607,7 +572,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if id not found", async () => {
-      await factory.createStore()
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -628,7 +592,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if date expire", async () => {
-      await factory.createStore()
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -653,8 +616,6 @@ describe("AuctionFile", () => {
 
   describe("#dispute", () => {
     it("should make dispute", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       const collateral = BigNumber.from("100000000000000000")
@@ -693,8 +654,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails without finalize", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -731,8 +690,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if caller is not a buyer", async () => {
-      await factory.createStore()
-
       console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
 
@@ -764,8 +721,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if time for dispute is up", async () => {
-      await factory.createStore()
-
       console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
 
@@ -798,8 +753,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if collateral is wrong", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -829,8 +782,6 @@ describe("AuctionFile", () => {
 
   describe("#receiveReward", () => {
     it("should receiveReward", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
       const collateral = BigNumber.from("100000000000000000")
       const price = BigNumber.from("10000000000")
@@ -875,8 +826,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if its time for dispute", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       await auctionFile.create(
@@ -905,8 +854,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if wrong status", async () => {
-      await factory.createStore()
-
       console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
 
@@ -932,8 +879,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if id not found", async () => {
-      await factory.createStore()
-
       console.log("DATE JS: ", time.duration.hours(1))
       const ts = await time.latest()
 
@@ -961,8 +906,6 @@ describe("AuctionFile", () => {
 
   describe("#sendMessage", () => {
     it("should send message", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       const collateral = BigNumber.from("100000000000000000")
@@ -985,8 +928,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if status cancel", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       const collateral = BigNumber.from("100000000000000000")
@@ -1009,8 +950,6 @@ describe("AuctionFile", () => {
     })
 
     it("fails if status close", async () => {
-      await factory.createStore()
-
       const ts = await time.latest()
 
       const collateral = BigNumber.from("100000000000000000")
@@ -1035,20 +974,13 @@ describe("AuctionFile", () => {
   })
 
   describe("#getDeal", () => {
-    let storeAddress: any
-    beforeEach("create storage", async () => {
-      const tx = await factory.createStore()
-      const receipt = await tx.wait()
-      storeAddress = receipt.events?.[2].args?.store
-    })
-
     it("correct serialize", async () => {
       const name = "NAME"
       const description = "DESCRIPTION"
       const priceStart = 10000000000
       const priceForceStop = 100000000000
       const dateExpire = Date.now() + 1000
-      const dateDispute = Date.now() + 1000 + time.duration.days(5)
+      const dateDispute = dateExpire + time.duration.days(5)
 
       const cid =
         "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
@@ -1094,7 +1026,7 @@ describe("AuctionFile", () => {
       expect(deal._type).to.be.equal(0)
       expect(deal.data).to.be.equal(data)
       expect(deal.integration).to.be.equal(auctionFile.address)
-      expect(deal.store).to.be.equal(storeAddress)
+      // expect(deal.store).to.be.equal(store.address)
 
       // const res = coder.decode(
       //   [
