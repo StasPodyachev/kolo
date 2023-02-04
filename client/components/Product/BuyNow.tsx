@@ -7,12 +7,14 @@ import { BIG_1E18 } from "@/helpers/misc";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import addresses from "@/contracts/addresses";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
+import { useTransactionManager } from "../../context/TransactionManageProvider";
+import { useEffect } from "react";
 
 const BuyNow = ({isDisabled, id, price}:{isDisabled: boolean,id: number, price: number}) => {
   console.log({
     id, price
   });
-  
+  const { onConfirm, onTransaction } = useTransactionManager()
   const priceValue = BigInt(new BigDecimal(price).mul(BIG_1E18 + "").toFixed(0)) + ""
   const { config } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
@@ -20,8 +22,20 @@ const BuyNow = ({isDisabled, id, price}:{isDisabled: boolean,id: number, price: 
     functionName: 'bid',
     args: [BigNumber.from(id), {value: priceValue}]
   })
+  const { write, isLoading, data, isSuccess } = useContractWrite(config)
 
-  const { write } = useContractWrite(config)
+  useEffect(() => {
+    if (isLoading) {
+      onConfirm()
+    }
+  }, [isLoading, onConfirm])
+
+  useEffect(() => {
+    if (data && isSuccess) {
+      onTransaction(data?.hash)
+      // push('/dashboard')
+    }
+  }, [data])
 
   return (
     <Button
