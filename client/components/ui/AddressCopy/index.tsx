@@ -25,7 +25,7 @@ const AddressCopy = ({ address, color, textStyle }: IProps) => {
           setTimeout(() => setHasCopied(false), 500);
         }}
       >
-        {addressTruncation(address)}
+        {addressTruncation(address)} :
       </Text>
     </Tooltip>
   );

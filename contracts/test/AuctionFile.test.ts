@@ -325,6 +325,11 @@ describe("AuctionFile", () => {
       expect(bids.length).to.eq(2)
       expect(bids[1].bid).to.eq(BigNumber.from(bid.add(1)))
       expect(bids[1].buyer).to.eq(buyer.address)
+
+      const param = await chat.getChat(1)
+      expect(param.length).eq(3)
+      // expect(param[1].message).eq("Hello!")
+      expect(param[1].sender).eq(wallet.address)
     })
 
     it("fails if seller bids", async () => {

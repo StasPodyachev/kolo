@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "../interfaces/integrations/IAuctionFile.sol";
 import "../interfaces/integrations/IIntegration.sol";
@@ -217,7 +218,12 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
 
         _chat.sendSystemMessage(
             dealId,
-            string(abi.encodePacked("Bid added by ", deal.buyer))
+            string(
+                abi.encodePacked(
+                    "Bid added by ",
+                    Strings.toHexString(uint256(uint160(deal.buyer)), 20)
+                )
+            )
         );
 
         emit BidCreated(dealId, deal.buyer, deal.price);
@@ -338,11 +344,18 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
             dealId,
             string(
                 abi.encodePacked(
-                    "Dispute closed",
-                    winner == IIntegration.DisputeWinner.Buyer
-                        ? deal.buyer
-                        : deal.seller,
-                    "wins."
+                    "Dispute closed, ",
+                    Strings.toHexString(
+                        uint256(
+                            uint160(
+                                winner == IIntegration.DisputeWinner.Buyer
+                                    ? deal.buyer
+                                    : deal.seller
+                            )
+                        ),
+                        20
+                    ),
+                    " wins."
                 )
             )
         );
