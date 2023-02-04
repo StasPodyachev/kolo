@@ -12,11 +12,10 @@ import {
 } from '@chakra-ui/react'
 
 import { FeedbackIcon } from '../../../icons/FeedbackIcon'
-import { useNetwork } from 'wagmi'
+import { useAccount } from 'wagmi'
 
 interface Props {
   title: string
-  address: string
   isOpen: boolean
   onClose: () => void
   onOpen: () => void
@@ -24,20 +23,19 @@ interface Props {
 
 export default function ErrorModal({
   title = 'Transaction is rejected.',
-  address = '',
   isOpen,
   onClose,
   onOpen,
 }: Props) {
   const modal = useDisclosure({ isOpen, onClose, onOpen })
-  const { chain } = useNetwork()
+  const { address } = useAccount();
   return (
     <>
       <Modal size="sm" isOpen={modal?.isOpen} onClose={modal?.onClose}>
         <ModalOverlay />
         <ModalContent textAlign="center">
           <ModalCloseButton />
-          <ModalBody py={4}>
+          <ModalBody py={4} display="flex" flexDir="column">
             <Box fontSize="lg" fontWeight={600} my={4}>
               Error
             </Box>
@@ -53,12 +51,12 @@ export default function ErrorModal({
                 <Link
                   p={4}
                   isExternal
-                  href={`https://hyperspace.filfox.info/en/message/${address}`}
+                  href={`https://hyperspace.filfox.info/en/address/${address}`}
                   fontSize="sm"
                   color="#00C097"
                   fontWeight={600}
                 >
-                  View on Explorer
+                  View on Filfox
                 </Link>
               </Box>
             )}

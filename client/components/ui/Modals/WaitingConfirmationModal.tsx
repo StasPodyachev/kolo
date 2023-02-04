@@ -14,9 +14,9 @@ export default function WaitingConfirmationModal({ isOpen, onClose, onOpen }: Pr
     <>
       <Modal size="sm" isCentered isOpen={modal?.isOpen} onClose={modal?.onClose}>
         <ModalOverlay />
-        <ModalContent textAlign="center">
+        <ModalContent textAlign="center" flexDir="column">
           <ModalCloseButton />
-          <ModalBody py={4}>
+          <ModalBody py={4} display="flex" flexDir="column">
             <Box fontSize="lg" fontWeight={600} my={4}>
               Waiting for confirmation ...
             </Box>
