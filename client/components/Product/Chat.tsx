@@ -45,6 +45,7 @@ const Chat = ({ id }: {id: number}) => {
       onTransaction(data?.hash)
       // push('/dashboard')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   useEffect(() => {

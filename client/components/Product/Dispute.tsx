@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
 import addresses from "@/contracts/addresses";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
@@ -15,7 +15,7 @@ const Dispute = ({ id }: IProps) => {
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: 'dispute',
-    args: [BigNumber.from(id)]
+    args: [id]
   });
 
   const { write, isLoading, isSuccess, data } = useContractWrite(disputeConfig);
@@ -31,6 +31,7 @@ const Dispute = ({ id }: IProps) => {
       onTransaction(data?.hash)
       // push('/dashboard')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
   return (
     <Button minW="170px" variant="blue" onClick={() => write?.()}>

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import addresses from "@/contracts/addresses";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import BigDecimal from "decimal.js-light";
