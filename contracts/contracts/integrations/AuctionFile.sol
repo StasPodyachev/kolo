@@ -32,6 +32,10 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     mapping(uint256 => BidParams[]) private bidHistory;
     mapping(uint256 => address[]) private bidBuyers;
 
+    constructor(IFactory factory) {
+        _factory = factory;
+    }
+
     modifier onlyNotary() {
         require(msg.sender == address(_notary), "AuctionFile: Only notary");
         _;
@@ -53,13 +57,12 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         _collateralPercent = value;
     }
 
-    function setFactory(address factory) external onlyOwner {
-        _factory = IFactory(factory);
-        _chat = IChat(_factory.chat());
+    function setChat(IChat chat) external onlyOwner {
+        _chat = chat;
     }
 
-    function setNotary(address notary) external onlyOwner {
-        _notary = INotary(notary);
+    function setNotary(INotary notary) external onlyOwner {
+        _notary = notary;
     }
 
     function getIntegrationInfo()

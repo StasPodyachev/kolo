@@ -9,7 +9,7 @@ import "./Store.sol";
 /**
  * @title Store deploying functionality
  **/
-contract StoreDeployer is IStoreDeployer {
+abstract contract StoreDeployer is IStoreDeployer {
     struct Parameters {
         address factory;
     }

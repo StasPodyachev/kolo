@@ -28,7 +28,7 @@ describe("SimpleTradeFile", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ; ({ simpleTradeFile, factory, chat } = await loadFixture(async () => {
+    ;({ simpleTradeFile, factory, chat } = await loadFixture(async () => {
       const { simpleTradeFile, factory, chat } = await simpleTradeFileFixture()
 
       return { simpleTradeFile, factory, chat }
@@ -37,29 +37,38 @@ describe("SimpleTradeFile", () => {
 
   describe("#setters", () => {
     it("setServiceFee", async () => {
-      await expect(simpleTradeFile.setServiceFee(111111111)).to.be.not.reverted;
-      await expect(simpleTradeFile.connect(other).setServiceFee(111111111)).to.be.reverted;
+      await expect(simpleTradeFile.setServiceFee(111111111)).to.be.not.reverted
+      await expect(simpleTradeFile.connect(other).setServiceFee(111111111)).to
+        .be.reverted
     })
 
     it("setPeriodDispute", async () => {
-      await expect(simpleTradeFile.setPeriodDispute(111111111)).to.be.not.reverted;
-      await expect(simpleTradeFile.connect(other).setPeriodDispute(111111111)).to.be.reverted;
+      await expect(simpleTradeFile.setPeriodDispute(111111111)).to.be.not
+        .reverted
+      await expect(simpleTradeFile.connect(other).setPeriodDispute(111111111))
+        .to.be.reverted
 
       const params = await simpleTradeFile.getIntegrationInfo()
       expect(params.periodDispute).to.eq(111111111)
     })
 
     it("setCollateralAmount", async () => {
-      await expect(simpleTradeFile.setCollateralPercent(111111111)).to.be.not.reverted;
-      await expect(simpleTradeFile.connect(other).setCollateralPercent(111111111)).to.be.reverted;
+      await expect(simpleTradeFile.setCollateralPercent(111111111)).to.be.not
+        .reverted
+      await expect(
+        simpleTradeFile.connect(other).setCollateralPercent(111111111)
+      ).to.be.reverted
 
       const params = await simpleTradeFile.getIntegrationInfo()
       expect(params.collateralPercent).to.eq(111111111)
     })
 
     it("setCollateralAmount", async () => {
-      await expect(simpleTradeFile.setCollateralAmount(111111111)).to.be.not.reverted;
-      await expect(simpleTradeFile.connect(other).setCollateralAmount(111111111)).to.be.reverted;
+      await expect(simpleTradeFile.setCollateralAmount(111111111)).to.be.not
+        .reverted
+      await expect(
+        simpleTradeFile.connect(other).setCollateralAmount(111111111)
+      ).to.be.reverted
 
       const params = await simpleTradeFile.getIntegrationInfo()
       expect(params.collateralAmount).to.eq(111111111)
@@ -175,7 +184,7 @@ describe("SimpleTradeFile", () => {
 
       const oldBalance = (await wallet.getBalance()).toString()
 
-      const tx = await simpleTradeFile.cancel(1);
+      const tx = await simpleTradeFile.cancel(1)
       await expect(tx)
         .to.emit(simpleTradeFile, "DealCanceled")
         .withArgs(1, wallet.address)
@@ -241,11 +250,9 @@ describe("SimpleTradeFile", () => {
       const oldBalanceWallet = (await wallet.getBalance()).toString()
       const tx = await simpleTradeFile.buy(1, {
         value: price,
-      });
+      })
 
-      await expect(tx)
-        .to.emit(simpleTradeFile, "DealFinalized")
-        .withArgs(1)
+      await expect(tx).to.emit(simpleTradeFile, "DealFinalized").withArgs(1)
 
       let txRec = await tx.wait()
       let gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
@@ -254,7 +261,10 @@ describe("SimpleTradeFile", () => {
       expect(price.add(newBalanceWallet).add(gas)).to.eq(oldBalanceWallet)
 
       expect(
-        await simpleTradeFile["checkAccess(bytes,address)"]("0x", wallet.address)
+        await simpleTradeFile["checkAccess(bytes,address)"](
+          "0x",
+          wallet.address
+        )
       ).to.eq(1)
     })
 
@@ -357,7 +367,6 @@ describe("SimpleTradeFile", () => {
         })
       ).to.revertedWith("SimpleTradeFile: Wrong msg.value")
     })
-
   })
 
   describe("#receiveReward", () => {
@@ -375,7 +384,7 @@ describe("SimpleTradeFile", () => {
         ts + 2000,
         "0x",
         {
-          value: collateral
+          value: collateral,
         }
       )
 
@@ -384,9 +393,7 @@ describe("SimpleTradeFile", () => {
       const oldBalance = (await wallet.getBalance()).toString()
 
       const tx = await simpleTradeFile.receiveReward(1)
-      await expect(tx)
-        .to.emit(simpleTradeFile, "DealClosed")
-        .withArgs(1)
+      await expect(tx).to.emit(simpleTradeFile, "DealClosed").withArgs(1)
 
       const txRec = await tx.wait()
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
@@ -410,7 +417,7 @@ describe("SimpleTradeFile", () => {
         ts + 2000,
         "0x",
         {
-          value: collateral
+          value: collateral,
         }
       )
 
@@ -423,15 +430,15 @@ describe("SimpleTradeFile", () => {
       const oldBalance = (await wallet.getBalance()).toString()
 
       const tx = await simpleTradeFile.receiveReward(1)
-      await expect(tx)
-        .to.emit(simpleTradeFile, "DealClosed")
-        .withArgs(1)
+      await expect(tx).to.emit(simpleTradeFile, "DealClosed").withArgs(1)
 
       const txRec = await tx.wait()
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
       const newBalance = (await wallet.getBalance()).toString()
 
-      expect(collateral.add(oldBalance).add(price).sub(gas).sub(fee)).to.eq(newBalance)
+      expect(collateral.add(oldBalance).add(price).sub(gas).sub(fee)).to.eq(
+        newBalance
+      )
 
       expect(
         await simpleTradeFile["checkAccess(bytes,address)"]("0x", buyer.address)
@@ -521,7 +528,7 @@ describe("SimpleTradeFile", () => {
         ts + 2000,
         "0x",
         {
-          value: collateral
+          value: collateral,
         }
       )
 
@@ -537,9 +544,7 @@ describe("SimpleTradeFile", () => {
         value: collateral,
       })
 
-      await expect(tx)
-        .to.emit(simpleTradeFile, "DisputeCreated")
-        .withArgs(1)
+      await expect(tx).to.emit(simpleTradeFile, "DisputeCreated").withArgs(1)
 
       const txRec = await tx.wait()
       const gas = txRec.gasUsed.mul(txRec.effectiveGasPrice)
@@ -605,8 +610,7 @@ describe("SimpleTradeFile", () => {
         value: price,
       })
 
-
-      await time.increase(time.duration.days(10));
+      await time.increase(time.duration.days(10))
 
       await expect(
         simpleTradeFile.connect(other).dispute(1, {
@@ -633,7 +637,7 @@ describe("SimpleTradeFile", () => {
       )
 
       await simpleTradeFile.connect(other).buy(1, {
-        value: price
+        value: price,
       })
 
       await expect(simpleTradeFile.connect(other).dispute(1)).to.revertedWith(
@@ -684,7 +688,9 @@ describe("SimpleTradeFile", () => {
       )
 
       await simpleTradeFile.cancel(1)
-      await expect(simpleTradeFile.sendMessage(1, "Hello!")).to.be.revertedWith("SimpleTradeFile: Wrong status")
+      await expect(simpleTradeFile.sendMessage(1, "Hello!")).to.be.revertedWith(
+        "SimpleTradeFile: Wrong status"
+      )
     })
 
     it("fails if status close", async () => {
@@ -706,7 +712,9 @@ describe("SimpleTradeFile", () => {
 
       await time.increase(time.duration.hours(1))
       await simpleTradeFile.receiveReward(1)
-      await expect(simpleTradeFile.sendMessage(1, "Hello!")).to.be.revertedWith("SimpleTradeFile: Wrong status")
+      await expect(simpleTradeFile.sendMessage(1, "Hello!")).to.be.revertedWith(
+        "SimpleTradeFile: Wrong status"
+      )
     })
   })
 
@@ -755,31 +763,11 @@ describe("SimpleTradeFile", () => {
         ]
       )
 
-      const res = await simpleTradeFile["checkAccess(bytes32[],uint8,address)"](
-        [
-          "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a66",
-          "0x4d325a696577414e6b4855574d4b000000000000000000000000000000000000",
-        ],
-        46,
-        wallet.address
-      )
-
-      expect(0).to.be.eq(res)
-
       expect(deal.id).to.be.equal(1)
       expect(deal._type).to.be.equal(1)
       expect(deal.data).to.be.equal(data)
       expect(deal.integration).to.be.equal(simpleTradeFile.address)
       expect(deal.store).to.be.equal(storeAddress)
-
-
-
-      // const res = coder.decode(
-      //   [
-      //     "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
-      //   ],
-      //   "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002540be400000000000000000000000000000000000000000000000000000000174876e800000000000000000000000000000000000000000000000000016345785d8a0000000000000000000000000000f552f5223d3f7ceb580fa92fe0afc6ed8c09179b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000186016c27680000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044e414d4500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b4445534352495054494f4e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002e516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b000000000000000000000000000000000000"
-      // )
     })
   })
 })

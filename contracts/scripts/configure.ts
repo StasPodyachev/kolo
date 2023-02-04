@@ -68,11 +68,13 @@ async function factory() {
     deployments[CHAIN_ID][deployNames.SIMPLE_TRADE_FILE]
   const chatDeployed = deployments[CHAIN_ID][deployNames.CHAT]
   const treasuryDeployed = deployments[CHAIN_ID][deployNames.TREASURY]
+  const koloTokenDeployed = deployNames[CHAIN_ID][deployNames.KOLO_TOKEN]
 
   const factory = (await getKnowContractAt(deployNames.FACTORY)) as Factory
 
   await factory.setChat(chatDeployed.address)
   await factory.setTreasury(treasuryDeployed.address)
+  await factory.setDaoToken(koloTokenDeployed.address)
   await factory.registerIntegration(0, auctionDeployed.address)
   await factory.registerIntegration(1, simpleTradeDeployed.address)
 

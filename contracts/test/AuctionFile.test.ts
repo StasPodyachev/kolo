@@ -158,7 +158,7 @@ describe("AuctionFile", () => {
         auctionFile.create(
           "NAME",
           "DESCRIPTION",
-          0,
+          100,
           100000000000,
           (Date.now() / 1000) | 0,
           "0x",

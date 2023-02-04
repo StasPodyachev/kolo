@@ -1,4 +1,5 @@
 {
+  "version": "0.0.6",
   "displayName": "kolo",
   "scripts": {
     "build-contracts": "sol-merger --export-plugin SPDXLicenseRemovePlugin \"./contracts/*.sol\" ./build",

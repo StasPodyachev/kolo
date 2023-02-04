@@ -13,7 +13,7 @@ import "./interfaces/dao/IKoloToken.sol";
 import "hardhat/console.sol";
 
 contract Notary is INotary, Ownable {
-    IFactory public _factory;
+    IFactory public immutable _factory;
 
     mapping(address => uint256) private deposits;
     mapping(uint256 => uint256) private penaltyByDeal;
@@ -33,8 +33,8 @@ contract Notary is INotary, Ownable {
 
     uint256 public _penalty = 1e18;
 
-    function setFactory(address factory) external onlyOwner {
-        _factory = IFactory(factory);
+    constructor(IFactory factory) {
+        _factory = factory;
     }
 
     function setPenalty(uint256 value) external onlyOwner {

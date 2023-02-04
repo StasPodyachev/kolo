@@ -16,7 +16,7 @@ import "./Store.sol";
  *
  */
 contract Chat is IChat, Ownable {
-    IFactory public _factory;
+    IFactory public immutable _factory;
 
     modifier integrationOnly() {
         require(
@@ -29,8 +29,8 @@ contract Chat is IChat, Ownable {
     /// @dev Holds a mapping of deals to chats.
     mapping(uint256 => ChatParams[]) private chats;
 
-    function setFactory(address factory) external onlyOwner {
-        _factory = IFactory(factory);
+    constructor(IFactory factory) {
+        _factory = factory;
     }
 
     /// @notice Get chat by `dealId`

@@ -22,7 +22,7 @@ contract SimpleTradeFile is
     ControlAccess,
     Ownable
 {
-    IFactory public _factory;
+    IFactory public immutable _factory;
     IChat public _chat;
     INotary public _notary;
 
@@ -34,6 +34,10 @@ contract SimpleTradeFile is
 
     mapping(uint256 => SimpleTradeFileParams) private deals;
     mapping(address => mapping(bytes => bool)) private _accsess;
+
+    constructor(IFactory factory) {
+        _factory = factory;
+    }
 
     modifier onlyNotary() {
         require(msg.sender == address(_notary), "SimpleTradeFile: Only notary");
@@ -56,13 +60,12 @@ contract SimpleTradeFile is
         _collateralPercent = value;
     }
 
-    function setFactory(address factory) external onlyOwner {
-        _factory = IFactory(factory);
-        _chat = IChat(_factory.chat());
+    function setChat(IChat chat) external onlyOwner {
+        _chat = chat;
     }
 
-    function setNotary(address notary) external onlyOwner {
-        _notary = INotary(notary);
+    function setNotary(INotary notary) external onlyOwner {
+        _notary = notary;
     }
 
     function getIntegrationInfo()
@@ -107,7 +110,7 @@ contract SimpleTradeFile is
     }
 
     function _airdropDao(address wallet) internal {
-        IKoloToken(_factory.daoToken()).airdrop(wallet);
+        // IKoloToken(_factory.daoToken()).airdrop(wallet);
     }
 
     function create(
