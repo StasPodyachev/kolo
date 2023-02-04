@@ -69,184 +69,184 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   }, [item, address])
 
   useEffect(() => {
+    if (item?.ownedBy === address) setIsSeller(true)
+  }, [item, address])
+
+  useEffect(() => {
     if (item?.cid) {
-      lighthouse.getAccessConditions(item?.cid).then(
-        (conditions) => console.log('conditions' ,{conditions})
-      )
+     
     }
   }, [item])
 
   return (
-    <>
-      <Flex flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
+    <Flex margin={"0 auto 0"} flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
+      <Flex
+        w={isDesktopHeader[0] ? "max-content" : "100%"}
+        height="240px"
+        flexDir={isDesktopHeader[0] ? "row" : "column"}
+        gap={isDesktopHeader[0] ? "56px" : 0}>
         <Flex
-          w={isDesktopHeader[0] ? "max-content" : "100%"}
-          height="240px"
-          flexDir={isDesktopHeader[0] ? "row" : "column"}
-          gap={isDesktopHeader[0] ? "56px" : 0}>
-          <Flex
-            flexDir="column"
-            alignItems={isDesktopHeader[0] ? "normal" : "center"}
-          >
-            {item?.image ? (
-              <Image
-                style={{ position: 'absolute' }}
-                src={item?.image}
-                alt="card image"
-                width={336}
-                height={240}
-              />
-            ) : (
-              <Flex
-                position="absolute"
-                justifyContent="center"
-                alignItems="center"
-                h="240px"
-                w="336px"
-                bg="gray.800"
-              >
-                <Image src={CardImage} alt="card image" />
-              </Flex>
-            )}
+          flexDir="column"
+          alignItems={isDesktopHeader[0] ? "normal" : "center"}
+        >
+          {item?.image ? (
+            <Image
+              style={{ position: 'absolute' }}
+              src={item?.image}
+              alt="card image"
+              width={336}
+              height={240}
+            />
+          ) : (
             <Flex
-              justifyContent="space-between"
-              px="16px"
-              position="relative"
-              top="208px"
+              position="absolute"
+              justifyContent="center"
+              alignItems="center"
+              h="240px"
+              w="336px"
+              bg="gray.800"
             >
-              <Flex justifyContent="space-between" minW="304px">
-                <Text textStyle="smallText" color="gray.300">
-                  Sale ends
-                </Text>
-                <Text textStyle="smallText" color="gray.300">
-                  {item?.saleEndDate}
-                </Text>
-              </Flex>
+              <Image src={CardImage} alt="card image" />
             </Flex>
-            <Box
-              position="relative"
-              px="16px"
-              w="max-content"
-              left={isDesktopHeader[0] ? "276px" : "142px"}
-            >
-              <FileIcon boxSize="32px" />
-            </Box>
+          )}
+          <Flex
+            justifyContent="space-between"
+            px="16px"
+            position="relative"
+            top="208px"
+          >
+            <Flex justifyContent="space-between" minW="304px">
+              <Text textStyle="smallText" color="gray.300">
+                Sale ends
+              </Text>
+              <Text textStyle="smallText" color="gray.300">
+                {item?.saleEndDate}
+              </Text>
+            </Flex>
+          </Flex>
+          <Box
+            position="relative"
+            px="16px"
+            w="max-content"
+            left={isDesktopHeader[0] ? "276px" : "142px"}
+          >
+            <FileIcon boxSize="32px" />
+          </Box>
+        </Flex>
+        <Flex
+          flexDir={isItemsInColumn[0] ? "column" : "row"}
+          gap={isDesktopHeader[0] ? "56px" : 0}
+          justifyContent={isDesktopHeader[0] ? "normal" : "space-between"}
+        >
+          <Flex flexDir="column" gap="6px" minW="380px" maxH="240px" justifyContent="space-between">
+            <Heading variant="h4" color="white" display="flex">
+              <div style={{"marginRight" : "12px"}}>{item?.title}</div>
+              <div style={{"color" : "gray"}}>#{item?.id}</div>
+            </Heading>
+            <HStack spacing="16px">
+              <Text textStyle="mediumText" color="gray.500">
+                Owned by:
+              </Text>
+              <AddressCopy address={item?.ownedBy!} color="gray.500" />
+            </HStack>
+            <Flex justifyContent="space-between">
+              <Heading variant="h6" color="gray.200">
+                Current price
+              </Heading>
+              <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
+                {item?.price}&nbsp;FIL
+              </Heading>
+            </Flex>
+            <Flex justifyContent="space-between">
+              <Heading variant="h6" color="gray.200">
+                Price end
+              </Heading>
+              <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
+                {item?.priceEnd}&nbsp;FIL
+              </Heading>
+            </Flex>
+
+              <Flex height={'48px'} justifyContent="space-between">
+                {
+                  item?.status?.title === "Open" ?
+                    <>
+                      <NumberInput
+                        value={bid}
+                        setValue={setBid}
+                        minValue={Number(bid)}
+                        width="200px"
+                      />
+                      <PlaceBid
+                        id={item?.id}
+                        price={bid}
+                        isDisabled={!signer || isBidError || item?.ownedBy === address}
+                      />
+                    </>
+                  : isBuyer && item?.id ?
+                  <Flex w="100%" justifyContent="space-between">
+                    <Dispute id={item?.id} collateral={item?.collateral} />
+
+                    {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
+                  </Flex> : null
+                }
+              </Flex>
           </Flex>
           <Flex
-            flexDir={isItemsInColumn[0] ? "column" : "row"}
-            gap={isDesktopHeader[0] ? "56px" : 0}
-            justifyContent={isDesktopHeader[0] ? "normal" : "space-between"}
+            mt={isItemsInColumn[0] ? "32px" : 0}
+            flexDir="column"
+            minW="252px"
+            maxW={isItemsInColumn[0] ? "100%" : "230px"}
+            gap="34px"
+            maxH="240px"
           >
-            <Flex flexDir="column" gap="6px" minW="380px" maxH="240px" justifyContent="space-between">
-              <Heading variant="h4" color="white" display="flex">
-                <div style={{"marginRight" : "12px"}}>{item?.title}</div>
-                <div style={{"color" : "gray"}}>#{item?.id}</div>
-              </Heading>
-              <HStack spacing="16px">
-                <Text textStyle="mediumText" color="gray.500">
-                  Owned by:
-                </Text>
-                <AddressCopy address={item?.ownedBy!} color="gray.500" />
-              </HStack>
-              <Flex justifyContent="space-between">
-                <Heading variant="h6" color="gray.200">
-                  Current price
-                </Heading>
-                <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
-                  {item?.price}&nbsp;FIL
-                </Heading>
-              </Flex>
-              <Flex justifyContent="space-between">
-                <Heading variant="h6" color="gray.200">
-                  Price end
-                </Heading>
-                <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
-                  {item?.priceEnd}&nbsp;FIL
-                </Heading>
-              </Flex>
-
-                <Flex height={'48px'} justifyContent="space-between">
-                  {
-                    item?.status?.title === "Open" ?
-                      <>
-                        <NumberInput
-                          value={bid}
-                          setValue={setBid}
-                          minValue={Number(bid)}
-                          width="200px"
-                        />
-                        <PlaceBid
-                          id={item?.id}
-                          price={bid}
-                          isDisabled={!signer || isBidError || item?.ownedBy === address}
-                        />
-                      </>
-                    : isBuyer && item?.id ?
-                    <Flex w="100%" justifyContent="space-between">
-                      <Dispute id={item?.id} collateral={item?.collateral} />
-
-                      {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
-                    </Flex> : null
-                  }
-                </Flex>
-            </Flex>
             <Flex
-              mt={isItemsInColumn[0] ? "32px" : 0}
-              flexDir="column"
-              minW="252px"
-              maxW={isItemsInColumn[0] ? "100%" : "230px"}
-              gap="34px"
-              maxH="240px"
+              alignSelf="flex-end"
+              gap="8px"
+              alignItems="center"
+              p="8px 18px"
+              bg="gray.800"
             >
-              <Flex
-                alignSelf="flex-end"
-                gap="8px"
-                alignItems="center"
-                p="8px 18px"
-                bg="gray.800"
-              >
-                <Box
-                  boxSize="10px"
-                  borderRadius="50%"
-                  bg={item?.status?.color}
-                />
-                <Text
-                  textStyle="smallText"
-                  color="white"
-                  textTransform="capitalize"
-                >
-                  {item?.status?.title}
-                </Text>
-              </Flex>
+              <Box
+                boxSize="10px"
+                borderRadius="50%"
+                bg={item?.status?.color}
+              />
               <Text
                 textStyle="smallText"
-                color="gray.300"
-                style={{
-                  display: '-webkit-box',
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: 5,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
+                color="white"
+                textTransform="capitalize"
               >
-                {item?.description}
+                {item?.status?.title}
               </Text>
-                {
-                  item?.status?.title == "Open" ?
-                  <BuyNow
-                    isDisabled={!signer || item?.ownedBy === address}
-                    id={item?.id}
-                    price={item?.priceEnd}
-                    /> : null
-                }
             </Flex>
+            <Text
+              textStyle="smallText"
+              color="gray.300"
+              style={{
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 5,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {item?.description}
+            </Text>
+              {
+                item?.status?.title == "Open" ?
+                <BuyNow
+                  isDisabled={!signer || item?.ownedBy === address}
+                  id={item?.id}
+                  price={item?.priceEnd}
+                  /> : null
+              }
           </Flex>
         </Flex>
-        <Bids isDesktopHeader={isDesktopHeader} bidsAmount={bidsAmount}
-          bidsTableData={bidsTableData} id={item?.id}
-         />
       </Flex>
-    </>
+      <Bids isDesktopHeader={isDesktopHeader} bidsAmount={bidsAmount}
+        bidsTableData={bidsTableData} id={item?.id}
+        />
+    </Flex>
   );
 };
 

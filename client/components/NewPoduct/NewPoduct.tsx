@@ -163,7 +163,6 @@ const NewPoduct = () => {
     const accesCondition = async () => {
       const { publicKey, signedMessage } : any = await encryptionSignature();
       const cidHex= web3.utils.asciiToHex(response?.data?.Hash).slice(2)
-      console.log(cidHex, 'cidHex');
       const arrStr = ["0x" + cidHex.slice(0, 64), "0x" + cidHex.slice(64) + "000000000000000000000000000000000000"]
       console.log({
         item1: arrStr[0],
@@ -199,7 +198,6 @@ const NewPoduct = () => {
         conditions,
         aggregator
       )
-      console.log(res, 'res')
     }
     accesCondition()
   };

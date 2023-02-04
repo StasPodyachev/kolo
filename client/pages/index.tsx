@@ -60,29 +60,20 @@ const Home: NextPage = () => {
           collateral 
         };
       });
-      setItems(decryptedData);
+      setItems(decryptedData?.reverse());
     }
   }, [data]);
 
-  const getMoreItems = () => {
-    setStartCount(startCount + 5);
-    setEndCount(endCount * 2);
-    setItems([...items, ...items.slice(startCount, endCount)]);
-  };
+
   return (
     <Layout pageTitle="Market">
-      {/* <InfiniteScroll
-        dataLength={items.length}
-        next={getMoreItems}
-        hasMore={hasMore}
-        loader={} > */}
         <Grid
           gap="32px"
           justifyContent="space-around"
           templateColumns="repeat(auto-fill, 304px)"
           templateRows="auto"
         >
-          {items.map((auctionItem) => (
+          {items?.map((auctionItem) => (
             <ItemCard
               key={auctionItem.id}
               to={auctionItem.id}
@@ -93,7 +84,6 @@ const Home: NextPage = () => {
             />
           ))}
         </Grid>
-      {/* </InfiniteScroll> */}
     </Layout>
   );
 };
