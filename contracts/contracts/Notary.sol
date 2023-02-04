@@ -24,6 +24,7 @@ contract Notary is INotary, Ownable {
     mapping(address => INotary.VoteParams[]) private _notaryDeal;
 
     address[] notariesArr;
+    address[] activeNotaries;
 
     uint256 public _minDeposit = 1e18;
     uint256 public _consensusCount = 2;
@@ -61,6 +62,7 @@ contract Notary is INotary, Ownable {
         deposits[msg.sender] += msg.value;
 
         if (currNotaries[msg.sender] == 0) {
+            activeNotaries.push(msg.sender);
             notariesArr.push(msg.sender);
             currNotaries[msg.sender] = notariesArr.length;
         }
