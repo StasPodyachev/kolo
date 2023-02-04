@@ -10,7 +10,7 @@ import { useAccount, useSigner } from "wagmi";
 import BidsTable from "../Products/BidsTable";
 import PlaceBid from "./PlaceBid";
 import BuyNow from "./BuyNow";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Chat from "./Chat";
 import Dispute from "./Dispute";
 import Finalize from "./Finalize";
@@ -61,6 +61,11 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const [ isSeller, setIsSeller ] = useState(false);
   const [ isBuyer, setIsBuyer ] = useState(false);
   const [ isNotary, setIsNotary ] = useState(false);
+
+
+  useEffect(() => {
+    if (item?.buyer === address) setIsBuyer(true)
+  }, [item, address])
 
   return (
     <>
@@ -167,7 +172,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           isDisabled={!signer || isBidError || item?.ownedBy === address}
                         />
                       </>
-                    : isBuyer ?
+                    : isBuyer && item?.id ?
                     <Flex w="100%" justifyContent="space-between">
                       <Dispute id={item?.id} />
 

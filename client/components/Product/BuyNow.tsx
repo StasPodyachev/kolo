@@ -37,6 +37,7 @@ const BuyNow = ({isDisabled, id, price}:{isDisabled: boolean,id: number, price: 
       onTransaction(data?.hash)
       push('/dashboard')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   return (
