@@ -170,7 +170,7 @@ const NewPoduct = () => {
         item1: arrStr[1],
         size: arrStr[1].length,
       }, {
-        size: cidHex.length
+        size: (cidHex.length)/2 
       });
       const conditions = [
         {
