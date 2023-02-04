@@ -84,11 +84,11 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const { write: finalizeWrite } = useContractWrite(finalizeConfig);
 
   useEffect(() => {
-    if (item) {
-      console.log({item});
-      
+    if (item?.buyer === address) {
+      setIsBuyer(true)
+      console.log(item?.buyer);
     }
-  }, [item])
+  }, [item, address])
 
   return (
     <>
