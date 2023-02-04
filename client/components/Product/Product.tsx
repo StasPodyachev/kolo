@@ -16,7 +16,7 @@ import addresses from "@/contracts/addresses";
 import { BigNumber } from "ethers";
 import BigDecimal from "decimal.js-light";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Chat from "./Chat";
 import Dispute from "./Dispute";
 import Finalize from "./Finalize";
@@ -59,6 +59,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     functionName: 'bid',
     args: [BigNumber.from(item?.id), {value: priceValue}]
   })
+
   const {
     write: buyKnowWrite,
     isLoading: isBuyKnowLoading,
@@ -220,13 +221,12 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           }}
                         />
                       </>
-                    : item?.ownedBy === address && item?.totalBids === 0 ? (
-                      <Button>Cancel</Button>
-                    ) :
-                    (<Flex w="100%" justifyContent="space-between">
+                    : isBuyer ?
+                    <Flex w="100%" justifyContent="space-between">
                       <Dispute onClick={() => disputeWrite?.()} />
-                      <Finalize onClick={() => finalizeWrite?.()} />
-                    </Flex>)
+
+                      {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
+                    </Flex> : null
                   }
                 </Flex>
             </Flex>

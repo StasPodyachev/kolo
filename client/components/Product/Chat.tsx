@@ -13,7 +13,7 @@ import Modal from "../ui/Modal/Modal";
 const Chat = ({ id }: {id: number}) => {
   const { isDesktopHeader } = useDevice();
   const [chatMessages, setChatMessages] = useState<IChatMessage[] | []>([]);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(" ");
   const [isOpenModal, setIsOpenModal] = useState(false);
   const { address } = useAccount();
 
@@ -34,18 +34,19 @@ const Chat = ({ id }: {id: number}) => {
   const { write, isLoading, isSuccess, isError } = useContractWrite(config);
 
   useEffect(() => {
+
+    let id = 1
     if (Array.isArray(chatData)) {
       const decryptedData = chatData?.map((item: any) => {
         const sender = item?.sender.toString();
         const message = item?.message.toString();
         const sendTime = parseInt(item?.timestamp?._hex, 16) * 1000;
-
         const formattedSendTime = new Date(+sendTime).toLocaleString();
-        console.log(formattedSendTime, message, sendTime)
         return {
           message,
           sender,
           time: formattedSendTime,
+          id: id++
         }
       })
       setChatMessages(decryptedData);
@@ -75,7 +76,7 @@ const Chat = ({ id }: {id: number}) => {
         <Heading variant="h6" color="white" textAlign="center">Chat</Heading>
         <Box overflowY="scroll" px="24px">
           {chatMessages.map((msg) => (
-              <Flex flexDir="column" gap="8px" mt="32px">
+              <Flex key={msg?.id} flexDir="column" gap="8px" mt="32px">
                 <HStack
                   spacing="8px"
                   h="max-content"

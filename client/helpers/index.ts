@@ -15,17 +15,13 @@ export function addressTruncation(address: string) {
 
 export function getTodaysDate() {
   const date = new Date();
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-  const fixedMonth = month < 10 ? `0${month}` : month;
-  const fixedDay = day < 10 ? `0${day}` : day;
-  const fixedHour = hour < 10 ? `0${hour}` : hour;
-  const fixedMinute = minute < 10 ? `0${minute}` : minute;
+  const utcDate = date.toLocaleDateString();
+  const time = date.toLocaleTimeString();
+  const splittedDate = utcDate.split('.');
+  const formattedDate = [splittedDate[2], splittedDate[1], splittedDate[0]].join('-')
+  const result = `${formattedDate}T${time}`;
 
-  return new Date(`${year}-${fixedMonth}-${fixedDay}T${fixedHour}:${fixedMinute}`);
+  return new Date(result);
 }
 
 export function getDateTimeLocal(date: Date) {
