@@ -9,6 +9,7 @@ import addresses from "@/contracts/addresses";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import { useTransactionManager } from "../../context/TransactionManageProvider";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 const BuyNow = ({isDisabled, id, price}:{isDisabled: boolean,id: number, price: number}) => {
   console.log({
@@ -23,6 +24,7 @@ const BuyNow = ({isDisabled, id, price}:{isDisabled: boolean,id: number, price: 
     args: [BigNumber.from(id), {value: priceValue}]
   })
   const { write, isLoading, data, isSuccess } = useContractWrite(config)
+  const { push } = useRouter()
 
   useEffect(() => {
     if (isLoading) {
@@ -33,7 +35,7 @@ const BuyNow = ({isDisabled, id, price}:{isDisabled: boolean,id: number, price: 
   useEffect(() => {
     if (data && isSuccess) {
       onTransaction(data?.hash)
-      // push('/dashboard')
+      push('/dashboard')
     }
   }, [data])
 
