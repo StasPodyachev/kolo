@@ -1,4 +1,3 @@
-import addresses from "@/contracts/addresses";
 import { getDateTimeLocal, getTodaysDate } from "@/helpers";
 import { SaleTypeMenuItems } from "@/constants/shared";
 import {
@@ -24,10 +23,8 @@ import lighthouse from "@lighthouse-web3/sdk";
 
 declare var window: any;
 
-import ABI_FACTORY from "../../contracts/abi/Factory.json";
 import useDevice from "@/hooks/useDevice";
 import { ISaleTypeMenuItem } from "@/types";
-import CreateStore from "./CreateStore";
 import web3 from "web3";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
@@ -114,16 +111,8 @@ const NewPoduct = () => {
   const [stopDate, setStopDate] = useState<Date>(getTodaysDate());
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
-  const [ isStore, setIsStore] = useState(false)
   const [fileName, setFileName] = useState("");
   const [thubnailName, setThubnailName] = useState("");
-
-  const { data: store } = useContractRead({
-    address: addresses[0].address as `0x${string}`,
-    abi: ABI_FACTORY,
-    functionName: 'getStore',
-    args: [address]
-  })
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
@@ -231,21 +220,6 @@ const NewPoduct = () => {
   const isForceStopPriceError = forceStopPrice === '0' || forceStopPrice === '';
   const isDateStopError = stopDate.toString().length === 0;
 
-  useEffect(() => {
-    if (store === '0x0000000000000000000000000000000000000000') {
-      setIsStore(false);
-
-    } if (store !== '0x0000000000000000000000000000000000000000') {
-      setIsStore(true)
-    } else {
-
-    }
-  }, [store])
-
-  useEffect(() => {
-    console.log(stopDate, 'stopDate',);
-  }, [stopDate])
-
   return (
     <Flex justifyContent="center">
       <Box maxW="70%" minW={isDesktop[0] ? 0 : "70%"}>
@@ -258,8 +232,7 @@ const NewPoduct = () => {
         {!address ? (
             <ConnectBtn isCentered isNeedMarginTop />
         ) : null}
-        {!isStore && address ? <CreateStore/>: null}
-        {isStore && address ? (
+        {address ? (
           <Box minW="100%">
           <Heading variant="h6" color="gray.200" mt="32px">
             Type of Sale
