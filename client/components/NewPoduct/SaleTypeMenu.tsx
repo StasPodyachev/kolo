@@ -44,7 +44,7 @@ const SaleTypeMenu = ({activeItem,setActiveItem} :
           />
         </Flex>
       </MenuButton>
-      <MenuList>
+      <MenuList bg="gray.700">
         <Flex flexDir="column" w="100%">
           {SaleTypeMenuItems.map((item) => (
             <MenuItem

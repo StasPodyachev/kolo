@@ -1,27 +1,13 @@
 import {
   Button
 } from "@chakra-ui/react";
-import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
-import addresses from "@/contracts/addresses";
-import BigDecimal from "decimal.js-light";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
-import { BIG_1E18 } from "@/helpers/misc";
-import { BigNumber } from "ethers";
 
-const BuyNow = ({isDisabled, price, id}:{isDisabled: boolean, price: number, id: number}) => {
-  const priceValue = BigInt(new BigDecimal(price).mul(BIG_1E18 + "").toFixed(0)) + ""
-  const { config } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: 'bid',
-    args: [BigNumber.from(id), {value: priceValue}]
-  })
-  const { write } = useContractWrite(config)
- 
+const BuyNow = ({isDisabled, onClick}:{isDisabled: boolean, onClick: () => void}) => {
   return (
     <Button
       mt="auto"
-      onClick={() => write?.()}
+      w="100%"
+      onClick={onClick}
       isDisabled={isDisabled}
       minH="48px"
       bg="green.primary"

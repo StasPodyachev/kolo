@@ -1,5 +1,5 @@
 import { NotaryTableData } from "@/constants/shared";
-import { addressTruncation, numberWithCommas } from "@/helpers";
+import { numberWithCommas } from "@/helpers";
 import { Table, TableContainer, Tbody, Td, Tr } from "@chakra-ui/react";
 import { NextPage } from "next";
 import AddressCopy from "../ui/AddressCopy";

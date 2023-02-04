@@ -1,9 +1,7 @@
 import { NextPage } from "next";
-import { Grid, Heading } from "@chakra-ui/react";
+import { Grid } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
-// import { auctionItems } from "@/constants/shared";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useState } from "react";
 import { IAuctionItem } from "@/types";
 import { useContractRead } from "wagmi";
@@ -16,10 +14,6 @@ const Home: NextPage = () => {
   const [ endCount, setEndCount ] = useState(5);
   const [ items, setItems ] = useState<IAuctionItem[] | []>([]);
   const [ hasMore, setHasMore ] = useState(true);
-
-  // useEffect(() => {
-  //   setHasMore(auctionItems.length > items.length ? true : false);
-  // }, [items]);
 
   useEffect(() => {
     setStartCount(5);
@@ -34,38 +28,21 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (Array.isArray(data)) {
-      console.log(data, "data");
-      
       const decryptedData = data?.map((item: any) => {
         const coder = ethers?.utils?.defaultAbiCoder;
         const result = coder?.decode([
-          "tuple(uint256,uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, bytes, uint256)",
+          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
         ], item?.data);
         const id = +result[0][0]?.toString();
         const title = result[0][1]
         const description = result[0][2]
         const price = +ethers?.utils?.formatEther(BigNumber?.from(result[0][4]));
         const ownedBy = result[0][7]
-        const saleEndDateNew = result[0][9]?._hex
-        // console.log('sale end', saleEndDateNew)
-        // const bidDate = new Date(result[0][9]._hex * 1000);
-        // const year = bidDate.getFullYear();
-        // console.log('year', year);
-        // const bidDateString = bidDate.toDateString();
-        // console.log('bid date', bidDate)
-        // const slicedDate = bidDateString.slice(4).split(' ');
-        // const saleEndDate = [slicedDate[1], slicedDate[0], slicedDate[2]]?.join(" ");
         const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
-        const status = result[0][11].toString()
-
-        let dateYear = new Date(saleEndDateNew * 1)
-        let date = new Date(saleEndDateNew * 1000)
-        const monthList = ["January","February","March","April","May","June","July","August","September","October","November","December"]
-        let month = monthList[date.getMonth()]
-        let days = date.getDay()
-        let year =  dateYear.getFullYear()
-        let saleEndDate = days + ' ' + month.slice(0, 3) + ' ' +  " " + year
+        const status = result[0][12].toString()
+        const saleEndDateNew = parseInt(result[0][9]?._hex, 16)
+        let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
 
         return {
           id,

@@ -10,6 +10,8 @@ interface IFactory {
 
     function chat() external view returns (address);
 
+    function daoToken() external view returns (address);
+
     function createStore() external returns (address storeAddress);
 
     function addDeal(address storeAddress) external returns (uint256);
