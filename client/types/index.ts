@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 export interface ISaleTypeMenuItem {
   id: number;
   title: string;
@@ -29,6 +31,8 @@ export interface IAuctionItem {
   status: IStatus;
   totalBids: number;
   buyer?: string
+  collateral: BigNumber
+  cid?: string
 };
 
 export interface IBidTableData {

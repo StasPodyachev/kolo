@@ -7,15 +7,16 @@ import { useTransactionManager } from "@/context/TransactionManageProvider";
 import { useEffect } from "react";
 interface IProps {
   id: number;
+  collateral: BigNumber
 }
 
-const Dispute = ({ id }: IProps) => {
+const Dispute = ({ id, collateral }: IProps) => {
   const { onConfirm, onTransaction } = useTransactionManager()
   const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: 'dispute',
-    args: [id]
+    args: [id, {value: collateral}]
   });
 
   const { write, isLoading, isSuccess, data } = useContractWrite(disputeConfig);

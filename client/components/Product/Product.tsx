@@ -67,6 +67,13 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     if (item?.buyer === address) setIsBuyer(true)
   }, [item, address])
 
+  useEffect(() => {
+    if (item?.collateral) {
+      console.log(item?.collateral, 'collateral');
+      
+    }
+  }, [item])
+
   return (
     <>
       <Flex flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
@@ -174,7 +181,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                       </>
                     : isBuyer && item?.id ?
                     <Flex w="100%" justifyContent="space-between">
-                      <Dispute id={item?.id} />
+                      <Dispute id={item?.id} collateral={item?.collateral} />
 
                       {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
                     </Flex> : null

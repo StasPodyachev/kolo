@@ -36,7 +36,7 @@ export default function ToastSuccess({
               color="#00C097"
               fontWeight={600}
             >
-              View on Erherscan
+              View on Filfox
             </Link>
           )}
         </Box>
