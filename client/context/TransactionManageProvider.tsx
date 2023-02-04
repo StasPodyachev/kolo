@@ -71,7 +71,7 @@ export const TransactionManageProvider = ({ children }: { children: ReactNode })
       duration: null,
       position: 'top-right',
       render: (props) => {
-        return <ToastSuccess {...props} title={data?.title} description={data?.description} />
+        return <ToastSuccess {...props} title={data?.title} description={data?.description} address={data?.transaction} />
       },
     })
   }
@@ -98,7 +98,7 @@ export const TransactionManageProvider = ({ children }: { children: ReactNode })
         }}
       >
         {children}
-        <ErrorModal {...errorModal} title={error} />
+        <ErrorModal {...errorModal} title={error} address={transaction} />
         <TransactionModal {...transactionModal} address={transaction} />
         <WaitingModal {...waitingModal} />
         <WaitingConfirmationModal {...confirmModal} />
