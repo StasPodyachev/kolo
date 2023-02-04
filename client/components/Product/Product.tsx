@@ -53,21 +53,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   
   const { write: placeBidWrite, isLoading: isPlaceBidLoading, isSuccess: isPlaceBidSuccess, isError: isPlaceBidError } = useContractWrite(config)
 
-  const priceValue = BigInt(new BigDecimal(item?.priceEnd).mul(BIG_1E18 + "").toFixed(0)) + ""
-  const { config: buyKnowconfig } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: 'bid',
-    args: [BigNumber.from(item?.id), {value: priceValue}]
-  })
-
-  const {
-    write: buyKnowWrite,
-    isLoading: isBuyKnowLoading,
-    isSuccess: isBuyKnowSuccess,
-    isError: isBuyKnowError,
-  } = useContractWrite(buyKnowconfig)
-
   const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
@@ -94,30 +79,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
   return (
     <>
-      {isBuyKnowLoading || isPlaceBidLoading ? (
-        <Modal
-          isLoading={isBuyKnowLoading || isPlaceBidLoading}
-          isSuccess={false}
-          isError={false}
-          isOpen={isOpenModal}
-          changeVisibility={setIsOpenModal}
-        />
-      ) : isBuyKnowSuccess || isPlaceBidSuccess ? (
-        <Modal
-          isLoading={false}
-          isSuccess={isBuyKnowSuccess || isPlaceBidSuccess}
-          isError={false}
-          isOpen={isOpenModal}
-          changeVisibility={setIsOpenModal}
-        />
-      ) : isPlaceBidError || isBuyKnowError ? (
-        <Modal
-          isLoading={false}
-          isSuccess={false}
-          isError={isPlaceBidError || isBuyKnowError}
-          isOpen={isOpenModal}
-          changeVisibility={setIsOpenModal}/>
-      ) : null}
       <Flex flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
         <Flex
           w={isDesktopHeader[0] ? "max-content" : "100%"}
@@ -277,10 +238,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                   item?.status?.title == "Open" ?
                   <BuyNow
                     isDisabled={!signer || item?.ownedBy === address}
-                    onClick={() => {
-                      setIsOpenModal(true);
-                      buyKnowWrite?.();
-                    }}/> : null
+                    id={item?.id}
+                    price={item?.priceEnd}
+                    /> : null
                 }
             </Flex>
           </Flex>

@@ -3,6 +3,9 @@ import {
 } from "@chakra-ui/react";
 
 const PlaceBid = ({isDisabled, onClick}:{isDisabled: boolean, onClick: () => void}) => {
+
+  
+
   return (
     <Button
       minW="170px"
