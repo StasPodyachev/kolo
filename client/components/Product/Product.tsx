@@ -1,6 +1,6 @@
 import useDevice from "@/hooks/useDevice";
 import { IAuctionItem, IBidTableData, IChatMessage } from "@/types";
-import { Box, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
 import { FileIcon, UserIcon } from "@/icons";
@@ -78,6 +78,13 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
   const { write: finalizeWrite } = useContractWrite(finalizeConfig);
 
+  const { config: cancelConfig } = usePrepareContractWrite({
+    address: addresses[1].address as `0x${string}`,
+    abi: ABI_AUCTION_FILE,
+    functionName: 'cancel',
+  });
+
+  const { write: cancelWrite } = useContractWrite(cancelConfig);
   return (
     <>
       {isBuyKnowLoading || isPlaceBidLoading ? (
@@ -209,11 +216,13 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                           }}
                         />
                       </>
-                    :
-                    <Flex w="100%" justifyContent="space-between">
+                    : item?.ownedBy === address && item?.totalBids === 0 ? (
+                      <Button>Cancel</Button>
+                    ) :
+                    (<Flex w="100%" justifyContent="space-between">
                       <Dispute onClick={() => disputeWrite?.()} />
                       <Finalize onClick={() => finalizeWrite?.()} />
-                    </Flex>
+                    </Flex>)
                   }
                 </Flex>
             </Flex>

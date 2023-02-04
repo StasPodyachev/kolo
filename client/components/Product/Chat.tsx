@@ -1,7 +1,7 @@
 import addresses from "@/contracts/addresses";
 import useDevice from "@/hooks/useDevice";
 import { IChatMessage } from "@/types";
-import { Box, Button, Flex, HStack, Input, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, HStack, Input, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite } from "wagmi";
 import AddressCopy from "../ui/AddressCopy";
@@ -72,6 +72,7 @@ const Chat = ({ id }: {id: number}) => {
         p="32px 0 0 0"
         position="relative"
       >
+        <Heading variant="h6" color="white" textAlign="center">Chat</Heading>
         <Box overflowY="scroll" px="24px">
           {chatMessages.map((msg) => (
               <Flex flexDir="column" gap="8px" mt="32px">
