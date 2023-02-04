@@ -3,15 +3,16 @@ const modal = {
   baseStyle: {
     dialog: {
       bg: 'gray.700',
-      borderRadius: 'md',
       p: "66px 32px",
       h: "300px",
+      borderRadius: 0,
       textAlign: "center",
       alignItems: "center",
     },
     closeButton: {
       p: "32px",
-      transition: "all .3s"
+      transition: "all .3s",
+      cursor: "pointer",
     },
     body: {
       display: "flex",

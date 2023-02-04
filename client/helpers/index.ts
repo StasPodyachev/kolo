@@ -25,7 +25,11 @@ export function getTodaysDate() {
   const fixedHour = hour < 10 ? `0${hour}` : hour;
   const fixedMinute = minute < 10 ? `0${minute}` : minute;
 
-  return `${year}-${fixedMonth}-${fixedDay}T${fixedHour}:${fixedMinute}`;
+  return new Date(`${year}-${fixedMonth}-${fixedDay}T${fixedHour}:${fixedMinute}`);
+}
+
+export function getDateTimeLocal(date: Date) {
+  return date.toISOString().slice(0, 16);
 }
 
 export function convertExpNumberToNormal(expId: number) {

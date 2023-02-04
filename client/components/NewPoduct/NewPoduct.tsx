@@ -1,5 +1,5 @@
 import addresses from "@/contracts/addresses";
-import { getTodaysDate } from "@/helpers";
+import { getDateTimeLocal, getTodaysDate } from "@/helpers";
 import { SaleTypeMenuItems } from "@/constants/shared";
 import {
   Box,
@@ -111,7 +111,7 @@ const NewPoduct = () => {
   const [startPrice, setStartPrice] = useState<string>("1");
   const [forceStopPrice, setForceStopPrice] = useState<string>("10");
   const [myCollateral, setMyCollateral] = useState("1");
-  const [stopDate, setStopDate] = useState(getTodaysDate());
+  const [stopDate, setStopDate] = useState<Date>(getTodaysDate());
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
   const [ isStore, setIsStore] = useState(false)
@@ -159,7 +159,7 @@ const NewPoduct = () => {
       signedMessage,
       progressCallback
     );
- 
+
     if (response?.data && isFile) {
       setFileName(response?.data?.Name);
     } else {
@@ -171,13 +171,13 @@ const NewPoduct = () => {
     const accesCondition = async () => {
       const { publicKey, signedMessage } : any = await encryptionSignature();
 
-      // cid: QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK 
+      // cid: QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
 
       // const cidHex = "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
-            
+
       const cidHex= web3.utils.asciiToHex(response?.data?.Hash).slice(2)
       console.log(cidHex, 'cidHex');
-      
+
       const arrStr = ["0x" + cidHex.slice(0, 64), "0x" + cidHex.slice(64) + "000000000000000000000000000000000000"]
       console.log({
         item1: arrStr[0],
@@ -189,7 +189,7 @@ const NewPoduct = () => {
         size: arrStr[1].length,
 
       },);
-      
+
 
       // const cidArr =  [
       //   "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a66",
@@ -229,7 +229,7 @@ const NewPoduct = () => {
   const isItemDescriptionError = itemDescription === '';
   const isStartPriceError = startPrice === '0' || startPrice === '';
   const isForceStopPriceError = forceStopPrice === '0' || forceStopPrice === '';
-  const isDateStopError = stopDate === '';
+  const isDateStopError = stopDate.toString().length === 0;
 
   useEffect(() => {
     if (store === '0x0000000000000000000000000000000000000000') {
@@ -241,6 +241,10 @@ const NewPoduct = () => {
 
     }
   }, [store])
+
+  useEffect(() => {
+    console.log(stopDate, 'stopDate',);
+  }, [stopDate])
 
   return (
     <Flex justifyContent="center">
@@ -339,10 +343,9 @@ const NewPoduct = () => {
                 <CustomInput
                   type="datetime-local"
                   min={getTodaysDate()}
-                  value={stopDate}
+                  value={getDateTimeLocal(stopDate)}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    // const start = Date.now() - event.target.value
-                    setStopDate(event.target.value);
+                    setStopDate(new Date(event.target.value));
                   }}
                   px="16px"
                   minW="100%"
