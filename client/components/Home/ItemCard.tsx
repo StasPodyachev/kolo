@@ -46,7 +46,7 @@ const ItemCard = ({
           <Flex flexDir="column" gap="6px">
             <Flex justifyContent="space-between">
               <Text textStyle="bigText" color="gray.900">
-                {title}
+                {title.length > 17 ? `${title.slice(0,17)}...` : title}
               </Text>
               <Text
                 fontFamily="Roboto Mono"

@@ -8,7 +8,6 @@ import {
  Link,
  useDisclosure,
 } from '@chakra-ui/react'
-import { useAccount } from 'wagmi'
 
 interface Props {
  address?: string
@@ -17,9 +16,8 @@ interface Props {
  onOpen: () => void
 }
 
-export default function TransactionModal({ isOpen, onClose, onOpen }: Props) {
+export default function TransactionModal({ address, isOpen, onClose, onOpen }: Props) {
  const modal = useDisclosure({ isOpen, onClose, onOpen })
- const { address } = useAccount();
  return (
    <>
      <Modal size="sm" isOpen={modal?.isOpen} onClose={modal?.onClose}>
@@ -33,7 +31,7 @@ export default function TransactionModal({ isOpen, onClose, onOpen }: Props) {
            {address && (
              <Link
                isExternal
-               href={`https://hyperspace.filfox.info/en/address/${address}`}
+               href={`https://hyperspace.filfox.info/en/message/${address}`}
                fontSize="sm"
                color="#00C097"
                fontWeight={600}

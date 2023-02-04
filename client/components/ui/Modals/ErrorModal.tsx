@@ -12,13 +12,13 @@ import {
 } from '@chakra-ui/react'
 
 import { FeedbackIcon } from '../../../icons/FeedbackIcon'
-import { useAccount } from 'wagmi'
 
 interface Props {
   title: string
   isOpen: boolean
   onClose: () => void
   onOpen: () => void
+  address: string,
 }
 
 export default function ErrorModal({
@@ -26,9 +26,9 @@ export default function ErrorModal({
   isOpen,
   onClose,
   onOpen,
+  address,
 }: Props) {
   const modal = useDisclosure({ isOpen, onClose, onOpen })
-  const { address } = useAccount();
   return (
     <>
       <Modal size="sm" isOpen={modal?.isOpen} onClose={modal?.onClose}>
@@ -51,7 +51,7 @@ export default function ErrorModal({
                 <Link
                   p={4}
                   isExternal
-                  href={`https://hyperspace.filfox.info/en/address/${address}`}
+                  href={`https://hyperspace.filfox.info/en/message/${address}`}
                   fontSize="sm"
                   color="#00C097"
                   fontWeight={600}
