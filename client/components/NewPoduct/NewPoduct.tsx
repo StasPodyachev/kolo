@@ -114,8 +114,7 @@ const NewPoduct = () => {
   const [access, setAcces] = useState(false);
   const [fileName, setFileName] = useState("");
   const [thubnailName, setThubnailName] = useState("");
-  const [isFileLoading, setIsFileLoading] = useState(false);
-  const { onConfirm, onSuccess } = useTransactionManager()
+  const [isShownStartSell, setIsShownStartSell] = useState(false);
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
@@ -159,7 +158,7 @@ const NewPoduct = () => {
     }
     setCid(response?.data?.Hash);
     setAcces(true);
-    
+
     const accesCondition = async () => {
       const { publicKey, signedMessage } : any = await encryptionSignature();
       const cidHex= web3.utils.asciiToHex(response?.data?.Hash).slice(2)
@@ -198,6 +197,9 @@ const NewPoduct = () => {
         aggregator
       )
       console.log(res, 'res')
+      if (res.data.status === 'Success') {
+        setIsShownStartSell(true);
+      }
     }
     accesCondition()
   };
@@ -207,19 +209,6 @@ const NewPoduct = () => {
   const isStartPriceError = startPrice === '0' || startPrice === '';
   const isForceStopPriceError = forceStopPrice === '0' || forceStopPrice === '';
   const isDateStopError = stopDate.toString().length === 0;
-
-  useEffect(() => {
-    if (isFileLoading) {
-      onConfirm()
-    }
-  }, [isFileLoading, onConfirm])
-
-  useEffect(() => {
-    if (fileName) {
-      // onSuccess()
-      // push('/dashboard')
-    }
-  }, [fileName, onSuccess])
 
   return (
     <Flex justifyContent="center">
@@ -376,9 +365,7 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
-                    setIsFileLoading(true);
                     deployEncrypted(e, true);
-                    setIsFileLoading(false);
                   }}
                 />
                 {fileName ? (
@@ -436,7 +423,7 @@ const NewPoduct = () => {
               </Box>
             </Flex>
           ) : null}
-          {isConnected && access ? (
+          {isConnected && access && isShownStartSell ? (
             <ButtonContractWrite
               address={activeItem.address}
               abi={activeItem.abi}
