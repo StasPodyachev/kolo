@@ -163,7 +163,7 @@ const NewPoduct = () => {
     if (response?.data && isFile) {
       setFileName(response?.data?.Name);
     } else {
-      setThubnailName(response?.data.Name);
+      setThubnailName(response?.data?.Name);
     }
     setCid(response?.data?.Hash);
     setAcces(true);
@@ -271,11 +271,13 @@ const NewPoduct = () => {
             </CustomFormLabel>
             <CustomInput
               minW="100%"
+              borderRadius={0}
               maxLength={70}
               value={itemName}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setItemName(event?.target?.value)
               }
+              _invalid={{borderColor: 'inherit', boxShadow: 'none'}}
               w="100%"
               placeholder="Item name (up to 70 characters)"
             />
@@ -287,11 +289,13 @@ const NewPoduct = () => {
             </CustomFormLabel>
             <CustomInput
               minW="100%"
+              borderRadius={0}
               maxLength={256}
               value={itemDescription}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setItemDescription(event.target.value)
               }
+              _invalid={{borderColor: 'inherit', boxShadow: 'none'}}
               w="100%"
               placeholder="Description (up to 256 characters)"
             />
@@ -341,6 +345,7 @@ const NewPoduct = () => {
                   Date Stop Auction
                 </CustomFormLabel>
                 <CustomInput
+                  borderRadius={0}
                   type="datetime-local"
                   min={getTodaysDate()}
                   value={getDateTimeLocal(stopDate)}
@@ -390,7 +395,7 @@ const NewPoduct = () => {
                   }}
                   htmlFor="fileDownload"
                 >
-                  download file
+                  {fileName ? "file downloaded" : "download file"}
                 </label>
                 <Input
                   id="fileDownload"

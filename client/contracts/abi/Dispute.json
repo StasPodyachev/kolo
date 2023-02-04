@@ -1,14 +1,29 @@
 [
   {
+    "anonymous": false,
     "inputs": [
       {
-        "internalType": "contract IFactory",
-        "name": "factory",
-        "type": "address"
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    "name": "DisputeClosed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "DisputeCreated",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -30,54 +45,59 @@
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "_exchange",
-    "outputs": [
-      {
-        "internalType": "contract MockExchange",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "_factory",
-    "outputs": [
-      {
-        "internalType": "contract IFactory",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "burnReward",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "dealId",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "collateralAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "dateExpire",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IFactory",
+        "name": "factory",
+        "type": "address"
+      },
+      {
+        "internalType": "contract INotary",
+        "name": "notary",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IChat",
+        "name": "chat",
+        "type": "address"
+      }
+    ],
+    "name": "_dispute",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_periodDispute",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "giveGrandToTeam",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -103,38 +123,12 @@
   {
     "inputs": [
       {
-        "internalType": "contract MockExchange",
-        "name": "exchange",
-        "type": "address"
-      }
-    ],
-    "name": "setExchange",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "value",
         "type": "uint256"
       }
     ],
-    "name": "setRewardBurnCoef",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "setRewardBurnPeriod",
+    "name": "setPeriodDispute",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -151,9 +145,5 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

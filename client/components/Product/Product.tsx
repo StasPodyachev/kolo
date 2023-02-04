@@ -124,7 +124,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               />
             ) : (
               <Flex
-                position="fixed"
+                position="absolute"
                 justifyContent="center"
                 alignItems="center"
                 h="240px"
