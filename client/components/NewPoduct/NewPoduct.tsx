@@ -102,15 +102,14 @@ const GetIntegrationInfo = ({
 };
 
 const NewPoduct = () => {
-  const date = new Date().getTime()
   const { isConnected, address } = useAccount();
   const [activeItem, setActiveItem] = useState(SaleTypeMenuItems[0]);
   const [itemName, setItemName] = useState("");
   const [itemDescription, setItemDescription] = useState("");
-  const [startPrice, setStartPrice] = useState<string>("1");
-  const [forceStopPrice, setForceStopPrice] = useState<string>("10");
+  const [startPrice, setStartPrice] = useState<string>("0.1");
+  const [forceStopPrice, setForceStopPrice] = useState<string>("0.5");
   const [myCollateral, setMyCollateral] = useState("1");
-  const [stopDate, setStopDate] = useState(date);
+  const [ stopDate, setStopDate ] = useState<any>();
   const [ nowDate, setNowDate] = useState<string>("")
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
@@ -222,12 +221,14 @@ const NewPoduct = () => {
     let yyyy = today.getFullYear() as any;
     //
     let hh = today.getHours();
-    let m = today.getMinutes();
+    let m = today.getMinutes() <= 9 ? "0" + today.getMinutes() : today.getMinutes();
     if (dd < 10) { dd = '0' + dd;}
     if (mm < 10) { mm = '0' + mm}
     today = yyyy + "-" + mm + "-" + dd + "T" + hh + ":" + m
     setNowDate(today)
     setStopDate(today)
+    console.log(m, 'today');
+    
   }, [])
 
   return (
@@ -328,7 +329,7 @@ const NewPoduct = () => {
                   Date Stop Auction
                 </CustomFormLabel>
                 {
-                  nowDate ?
+                  nowDate && stopDate ?
                   <CustomInput
                     borderRadius={0}
                     type="datetime-local"

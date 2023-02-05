@@ -29,7 +29,9 @@ const getArgs = () => [
 export async function main() {
   const factory = (await getKnowContractAt(deployNames.FACTORY)) as Factory
 
-  const res = await factory.getDeal(9)
+  const res = await factory.getDeal(35)
+
+  //console.log(res)
 
   const item = utils.defaultAbiCoder.decode(
     [
@@ -38,26 +40,41 @@ export async function main() {
     res.data
   )[0]
 
-  const cid: string = item[11]
+
+  // console.log(item)
+  console.log(item[3].toString())
+  console.log(item[4].toString())
+  console.log(item[5].toString())
+  console.log(item[6].toString())
+  console.log(item[7].toString())
+  console.log(item[8].toString())
+  console.log(item[9].toString())
+
+  console.log(item[10].toString())
+
+  // const cid: string = item[6].toString
+  // console.log(utils.formatEther(cid))
 
   const auction = (await getKnowContractAt(
     deployNames.AUCTION_FILE
   )) as AuctionFile
 
-  const cidArr = [
-    "0x" + cid.substring(2, 66),
-    "0x" + cid.substring(66) + "000000000000000000000000000000000000",
-  ]
+  // const cidArr = [
+  //   "0x" + cid.substring(2, 66),
+  //   "0x" + cid.substring(66) + "000000000000000000000000000000000000",
+  // ]
 
-  console.log(cidArr, cid)
+  //console.log(cidArr, cid)
 
-  const check = await auction["checkAccess(bytes32[],uint8,address)"](
-    cidArr,
-    46,
-    "0xF552f5223D3f7cEB580fA92Fe0AFc6ED8c09179b"
-  )
+  // const check = await auction["checkAccess(bytes32[],uint8,address)"](
+  //   cidArr,
+  //   46,
+  //   "0xF552f5223D3f7cEB580fA92Fe0AFc6ED8c09179b"
+  // )
 
-  console.log(check)
+  //await auction.finalize(30)
+
+  //console.log(check)
 }
 
 async function getContractAt(name: string, address: string) {

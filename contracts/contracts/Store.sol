@@ -11,7 +11,12 @@ import "hardhat/console.sol";
 
 /**
  * @title Store
- */
+ *
+ * This contract keeps all the money of sellers and buyers.
+ * It also allows to get deal information, transfer money
+ * to winner, refund money and send calculated fee to the treasury
+ *
+ **/
 contract Store is IStore {
     /// @dev Holds a mapping of deals to integration addresses.
     mapping(uint256 => address) private deals;
@@ -34,6 +39,7 @@ contract Store is IStore {
         _factory = IFactory(factory);
     }
 
+    /// @dev Gets integration address by `dealId`
     function getIntegration(uint256 dealId) external view returns (address) {
         return deals[dealId];
     }
@@ -156,6 +162,10 @@ contract Store is IStore {
      * @param buyer Buyer address
      * @param seller Seller address
      * @param serviceFee Service fee
+     * @dev This function is used:
+     * - to return the winnings to the seller after the dispute
+     * - send the seller a collateral
+     * - send the purchase amount without dispute
      *
      */
     function transferWinToSeller(
@@ -176,9 +186,13 @@ contract Store is IStore {
             uint256 serviceFee_ = (buyers[dealId][buyer] * serviceFee) / 1e18;
             uint256 storageFee_ = (buyers[dealId][buyer] * storageFee) / 1e18;
 
-            payable(_factory.treasury()).transfer(serviceFee_ + storageFee_);
+            uint256 fees = buyers[dealId][buyer] > serviceFee_ + storageFee_
+                ? serviceFee_ + storageFee_
+                : buyers[dealId][buyer];
 
-            amount += buyers[dealId][buyer] - serviceFee_ - storageFee_;
+            payable(_factory.treasury()).transfer(fees);
+
+            amount += buyers[dealId][buyer] - fees;
             buyers[dealId][buyer] = 0;
         }
 

@@ -17,6 +17,14 @@ import "../ControlAccess.sol";
 
 import "hardhat/console.sol";
 
+/**
+ * @title AuctionFile
+ *
+ * This contract stores all deals of AuctionFile type. It also allows
+ * to create a deal, to bid, to cancel a deal, to create a dispute and
+ * to receive rewards. Sending messages is also available.
+ *
+ **/
 contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     IFactory public _factory;
     IChat public _chat;
@@ -27,11 +35,19 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;
     uint256 public _serviceFee = 2e16;
-    uint256 public _storageFee = 2e16;
+    uint256 public _storageFee = 1e14;
+    uint256 public _extraStoragePeriod = 30 days;
 
+    /// @dev Holds a mapping of deal IDs to deals.
     mapping(uint256 => AuctionFileParams) private deals;
+
+    /// @dev Holds a mapping of deal IDs to buyers to bids.
     mapping(uint256 => mapping(address => uint256)) private bids;
+
+    /// @dev Holds a mapping of deal IDs to bids history.
     mapping(uint256 => BidParams[]) private bidHistory;
+
+    /// @dev Holds a mapping of deal IDs to all buyers.
     mapping(uint256 => address[]) private bidBuyers;
 
     constructor(IFactory factory) {
@@ -61,6 +77,10 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
 
     function setCollateralPercent(uint256 value) external onlyOwner {
         _collateralPercent = value;
+    }
+
+    function setExtraStoragePeriod(uint256 value) external onlyOwner {
+        _extraStoragePeriod = value;
     }
 
     function setChat(IChat chat) external onlyOwner {
@@ -550,6 +570,12 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         _sendWin(deal, IIntegration.DisputeWinner.Seller);
     }
 
+    /**
+     * @notice Sending win to winner
+     *
+     * @param deal deal structure
+     * @dev This function transfers money to the winner and closes a deal
+     */
     function _sendWin(
         AuctionFileParams storage deal,
         IIntegration.DisputeWinner winner
@@ -575,10 +601,22 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         emit DealClosed(deal.id);
     }
 
+    /// @dev Give an access to `wallet` by `dealId`.
     function addAccess(uint256 dealId, address wallet) external onlyNotary {
         _addAccess(wallet, deals[dealId].cid);
     }
 
+    /**
+     * @notice Sending message
+     *
+     * @param dealId ID of a deal
+     * @param message Text of the message
+     *
+     * Requirements:
+     *
+     * - Deal status must be OPEN, DISPUT or FINALIZE,
+     *
+     */
     function sendMessage(uint256 dealId, string calldata message) external {
         AuctionFileParams memory deal = deals[dealId];
 

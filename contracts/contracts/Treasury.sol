@@ -12,7 +12,10 @@ import "./MockExchange.sol";
 /**
  * @title Kolo treasury
  *
- * This contract contains the main profit of the service that can be used to
+ * This contract contains the main profit of the service.
+ * It also allows to call function burnReward() once per
+ * _rewardBurnPeriod and exchange some FILs from balance
+ * to KoloToken.
  *
  **/
 contract Treasury is ITreasury, Ownable {
@@ -43,6 +46,17 @@ contract Treasury is ITreasury, Ownable {
         _rewardBurnPeriod = value;
     }
 
+    /**
+     * @notice Burn reward
+     *
+     * @dev This function exchanges `_rewardBurnCoef` from treasury
+     * balance FILs to KoloToken and then burns it.
+     *
+     * Requirements:
+     *
+     * - Date now cannot be less then `_dateTx` + `_rewardBurnPeriod`
+     *
+     */
     function burnReward() external onlyOwner {
         require(
             block.timestamp >= _dateTx + _rewardBurnPeriod,
@@ -56,6 +70,17 @@ contract Treasury is ITreasury, Ownable {
         _dateTx = block.timestamp;
     }
 
+    /**
+     * @notice Give grand to team
+     *
+     * @param to address to transfer
+     * @param amount FIL amount
+     *
+     * Requirements:
+     *
+     * - Only owner can call this function
+     *
+     */
     function giveGrandToTeam(address to, uint256 amount) external onlyOwner {
         payable(to).transfer(amount);
     }

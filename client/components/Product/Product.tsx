@@ -60,24 +60,19 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const signer = useSigner();
   const isBidError = +bid <= +currentBid;
   const { address } = useAccount();
-
   const [ isSeller, setIsSeller ] = useState(false);
   const [ isBuyer, setIsBuyer ] = useState(false);
   const [ isNotary, setIsNotary ] = useState(true);
 
   useEffect(() => {
-    if (item?.buyer === address) setIsBuyer(true)
+    if (item?.buyer === address) {
+      setIsBuyer(true)
+    } else setIsBuyer(false)
+
+    if (item?.ownedBy === address) {
+      setIsSeller(true)
+    }  else setIsSeller(false)
   }, [item, address])
-
-  useEffect(() => {
-    if (item?.ownedBy === address) setIsSeller(true)
-  }, [item, address])
-
-  useEffect(() => {
-    if (item?.cid) {
-
-    }
-  }, [item])
 
   return (
     <Flex margin={"0 auto 0"} flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>

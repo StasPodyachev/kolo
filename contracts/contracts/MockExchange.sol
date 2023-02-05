@@ -5,6 +5,12 @@ pragma abicoder v2;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
 
+/**
+ * @title MockExchange
+ *
+ * This contract simulates an exchange
+ *
+ */
 contract MockExchange {
     uint256 num = 1;
     uint256 den = 1;

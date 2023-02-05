@@ -14,7 +14,9 @@ import "hardhat/console.sol";
 /**
  * @title Kolo chat storage
  *
- * This contract stores all messages of all deals
+ * This contract stores all messages of all deals.
+ * It also allows to send a message, to send a
+ * system message and to get chat by deal.
  *
  */
 contract Chat is IChat, Ownable {

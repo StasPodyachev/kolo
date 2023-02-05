@@ -17,6 +17,8 @@ abstract contract StoreDeployer is IStoreDeployer {
     Parameters public override parameters;
 
     /**
+     * @notice Deploying a new store
+     *
      * @dev Deploys a store with the given parameters by transiently setting
      * the parameters storage slot and then clearing it after deploying the store.
      * @param factory The contract address of the factory

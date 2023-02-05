@@ -12,6 +12,16 @@ import "./interfaces/dao/IKoloToken.sol";
 
 import "hardhat/console.sol";
 
+/**
+ * @title Notary
+ *
+ * This contract stores all notaries on the service. Also it
+ * keeps all the money of notaries. It also allows to become
+ * a notary, to withdraw all money and to vote. When a dispute
+ * starts, the integration contract should call isDisputePossible()
+ * function and if it is possible chooseNotaries() must be called
+ *
+ **/
 contract Notary is INotary, Ownable {
     IFactory public immutable _factory;
 
@@ -59,6 +69,15 @@ contract Notary is INotary, Ownable {
         IKoloToken(_factory.daoToken()).airdrop(wallet);
     }
 
+    /**
+     * @notice Become a notary
+     * @dev To become a notary, you must make a deposit of at least
+     *
+     * Requirements:
+     *
+     * - Notary balance cannot be less then `_minDeposit`
+     *
+     */
     function deposit() external payable {
         require(
             deposits[msg.sender] + msg.value >= _minDeposit,
@@ -69,6 +88,14 @@ contract Notary is INotary, Ownable {
         _addNotary(msg.sender);
     }
 
+    /**
+     * @notice Withdraw
+     *
+     * Requirements:
+     *
+     * - `amount`must be less then notary`s balance
+     *
+     */
     function withdraw(uint256 amount) external {
         require(deposits[msg.sender] >= amount, "Notary: Not enough balance");
 
@@ -78,6 +105,8 @@ contract Notary is INotary, Ownable {
         _removeNotary(msg.sender);
     }
 
+    /// @notice Removing notary from active notaries storage
+    /// if his balance is less then `_minDeposit`
     function _removeNotary(address addr) internal {
         if (deposits[addr] < _minDeposit) {
             uint256 index = activeNotariesMap[addr] - 1;
@@ -91,6 +120,8 @@ contract Notary is INotary, Ownable {
         }
     }
 
+    /// @notice Adding notary to active notaries storage
+    /// if his balance is not less then `_minDeposit`
     function _addNotary(address addr) internal {
         if (deposits[addr] >= _minDeposit && activeNotariesMap[addr] == 0) {
             activeNotaries.push(addr);
@@ -99,7 +130,16 @@ contract Notary is INotary, Ownable {
     }
 
     /**
+     * @notice Voting
+     *
+     * @param dealId ID of a deal
      * @param mark True is vote for buyer, False - for seller
+     * @dev
+     *
+     * Requirements:
+     *
+     * - Notary must have access to vote
+     *
      */
     function vote(uint256 dealId, bool mark) external {
         require(notaries[dealId][msg.sender], "Notary: No accsess");
@@ -111,9 +151,6 @@ contract Notary is INotary, Ownable {
         );
 
         notaries[dealId][msg.sender] = false;
-
-        // deposits[msg.sender] -= penaltyByDeal[dealId];
-        // _removeNotary(msg.sender);
 
         if (mark) {
             votesForBuyer[dealId].push(msg.sender);
@@ -193,6 +230,17 @@ contract Notary is INotary, Ownable {
         return _notaryDeal[notary];
     }
 
+    /**
+     * @notice Сhoose Notaries
+     *
+     * @param dealId ID of a deal
+     * @dev This function generates random notaries
+     *
+     * Requirements:
+     *
+     * - Integration contract only can call this function
+     *
+     */
     function chooseNotaries(uint256 dealId) external {
         require(
             _factory.integrationExist(msg.sender),
@@ -204,6 +252,7 @@ contract Notary is INotary, Ownable {
         _generateRandomNotaries(dealId, _countInvaitedNotary);
     }
 
+    /// @notice Get array of notaries by `dealId`
     function getNotaries(uint256 dealId)
         public
         view
@@ -212,6 +261,14 @@ contract Notary is INotary, Ownable {
         return dealNotaries[dealId];
     }
 
+    /**
+     * @notice Checking is dispute possible
+     *
+     * @param dealId ID of a deal
+     * @return bool True - possible, False - not possible
+     * @dev Number of voted notaries and free active notaries
+     * cannot be less then `_countInvaitedNotary`
+     */
     function isDisputePossible(uint256 dealId) public view returns (bool) {
         uint256 repeat = 0;
 
@@ -230,10 +287,23 @@ contract Notary is INotary, Ownable {
                 repeat) >= _countInvaitedNotary;
     }
 
+    /// @notice Get array of deals by `notary` address
     function getDeals(address notary) external view returns (uint256[] memory) {
         return notaryDeals[notary];
     }
 
+    /**
+     * @notice Restart generating notaries
+     *
+     * @param dealId ID of a deal
+     * @dev This function removes old notaries who didn't vote
+     * and generates new random notaries
+     *
+     * Requirements:
+     *
+     * - Integration contract only can call this function
+     *
+     */
     function restart(uint256 dealId) external {
         require(
             _factory.integrationExist(msg.sender),
@@ -253,6 +323,18 @@ contract Notary is INotary, Ownable {
         _generateRandomNotaries(dealId, _countInvaitedNotary - arr.length);
     }
 
+    /**
+     * @notice Refunding penalty
+     *
+     * @param dealId ID of a deal
+     * @dev When dispute is imposible this function refunds
+     * a penalty to notaries who voted
+     *
+     * Requirements:
+     *
+     * - Integration contract only can call this function
+     *
+     */
     function refundPenalty(uint256 dealId) external {
         require(
             _factory.integrationExist(msg.sender),
@@ -268,6 +350,17 @@ contract Notary is INotary, Ownable {
         }
     }
 
+    /**
+     * @notice Generating random notaries
+     *
+     * @param dealId ID of a deal
+     * @param countIvitedNotary Number of notaries to be generated
+     * @dev This function generates array of random notaries with
+     * `countIvitedNotary` length, gives permission and takes the
+     * amount of the penalty. This amount will be refund if notary
+     * votes correctly or if despute will be impossible.
+     *
+     */
     function _generateRandomNotaries(uint256 dealId, uint256 countIvitedNotary)
         internal
     {
@@ -296,6 +389,7 @@ contract Notary is INotary, Ownable {
         }
     }
 
+    /// @notice Get random number using keccak256
     function _random(uint256 max, uint256 salt)
         internal
         view
