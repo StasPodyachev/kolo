@@ -20,7 +20,7 @@ contract Notary is INotary, Ownable {
     mapping(uint256 => mapping(address => bool)) private notaries;
     mapping(uint256 => address[]) private dealNotaries;
     mapping(address => uint256[]) private notaryDeals;
-    mapping(uint256 => mapping(address => bool)) private votes;
+    // mapping(uint256 => mapping(address => bool)) private votes;
 
     mapping(uint256 => address[]) private votesForBuyer;
     mapping(uint256 => address[]) private votesForSeller;
@@ -41,11 +41,12 @@ contract Notary is INotary, Ownable {
     }
 
     function setPenalty(uint256 value) external onlyOwner {
-        require(_penalty <= _minDeposit, "Notary: Wrong amount");
+        require(value <= _minDeposit, "Notary: Wrong amount");
         _penalty = value;
     }
 
     function setMinDeposit(uint256 value) external onlyOwner {
+        require(_penalty <= value, "Notary: Wrong amount");
         _minDeposit = value;
     }
 
@@ -113,7 +114,7 @@ contract Notary is INotary, Ownable {
             "Notary: Enough votes"
         );
 
-        votes[dealId][msg.sender] = true;
+        notaries[dealId][msg.sender] = false;
 
         // deposits[msg.sender] -= penaltyByDeal[dealId];
         // _removeNotary(msg.sender);
@@ -174,8 +175,9 @@ contract Notary is INotary, Ownable {
             address[] memory arr = getNotaries(dealId);
 
             for (uint256 i = 0; i < arr.length; i++) {
-                if (votes[dealId][arr[i]]) continue;
-                deposits[arr[i]] += penaltyByDeal[dealId];
+                if (notaries[dealId][arr[i]]) {
+                    deposits[arr[i]] += penaltyByDeal[dealId];
+                }
             }
 
             payable(_factory.treasury()).transfer(serviceFee);
@@ -203,7 +205,7 @@ contract Notary is INotary, Ownable {
 
         penaltyByDeal[dealId] = _penalty;
 
-        _generateRandomNotaries(dealId);
+        _generateRandomNotaries(dealId, _countInvaitedNotary);
     }
 
     function getNotaries(uint256 dealId)
@@ -214,8 +216,11 @@ contract Notary is INotary, Ownable {
         return dealNotaries[dealId];
     }
 
-    function isDisputePossible() public view returns (bool) {
-        return activeNotaries.length >= _countInvaitedNotary;
+    function isDisputePossible(uint256 dealId) public view returns (bool) {
+        return
+            (votesForBuyer[dealId].length +
+                votesForSeller[dealId].length +
+                activeNotaries.length) >= _countInvaitedNotary;
     }
 
     function getDeals(address notary) external view returns (uint256[] memory) {
@@ -228,19 +233,17 @@ contract Notary is INotary, Ownable {
             "Notary: Only integration"
         );
 
-        address[] memory arr = getNotaries(dealId);
-        delete dealNotaries[dealId];
+        address[] storage arr = dealNotaries[dealId];
 
         for (uint256 i = 0; i < arr.length; i++) {
-            if (votes[dealId][arr[i]]) {
-                dealNotaries[dealId].push(arr[i]);
-                continue;
+            if (notaries[dealId][arr[i]]) {
+                notaries[dealId][arr[i]] = false;
+                arr[i] = arr[arr.length - 1];
+                arr.pop();
             }
-
-            notaries[dealId][arr[i]] = false;
         }
 
-        _generateRandomNotaries(dealId);
+        _generateRandomNotaries(dealId, _countInvaitedNotary - arr.length);
     }
 
     function refundPenalty(uint256 dealId) external {
@@ -252,19 +255,15 @@ contract Notary is INotary, Ownable {
         address[] memory arr = getNotaries(dealId);
 
         for (uint256 i = 0; i < arr.length; i++) {
-            if (votes[dealId][arr[i]]) {
+            if (!notaries[dealId][arr[i]]) {
                 deposits[arr[i]] += penaltyByDeal[dealId];
             }
         }
-
-        _generateRandomNotaries(dealId);
     }
 
-    function _generateRandomNotaries(uint256 dealId) internal {
-        uint256 min = _countInvaitedNotary < activeNotaries.length
-            ? _countInvaitedNotary
-            : activeNotaries.length;
-
+    function _generateRandomNotaries(uint256 dealId, uint256 countIvitedNotary)
+        internal
+    {
         address storeAddress = _factory.getStore(dealId);
         IStore store = IStore(storeAddress);
         IIntegration integration = IIntegration(store.getIntegration(dealId));
@@ -272,9 +271,7 @@ contract Notary is INotary, Ownable {
         uint256 i;
         uint256 count;
 
-        while (
-            count < min || activeNotaries.length == dealNotaries[dealId].length
-        ) {
+        while (count < countIvitedNotary) {
             uint256 rnd = _random(activeNotaries.length, i++);
 
             if (notaries[dealId][activeNotaries[rnd]]) continue;

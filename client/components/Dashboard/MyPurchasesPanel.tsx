@@ -1,4 +1,3 @@
-import { MyPurchasesBlocks } from "@/constants/shared";
 import { IAuctionItem, IBlock } from "@/types";
 import { Heading, TabPanel, Text } from "@chakra-ui/react";
 import AuctionItemAccordion from "../ui/AuctionItemsAccordion";
@@ -14,7 +13,7 @@ interface IProps {
 const MyPurchasesPanel = ({ purchases, bids, blocks }: IProps) => {
   return (
     <TabPanel p={0}>
-      <Blocks items={MyPurchasesBlocks} />
+      <Blocks items={blocks} />
       <Heading mt="28px" variant="h3" color="white">
         My Bids
       </Heading>

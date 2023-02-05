@@ -342,12 +342,16 @@ contract SimpleTradeFile is
         address storeAddress = _factory.getStore(deal.seller);
         IStore(storeAddress).depositBuyerCollateral{value: msg.value}(dealId);
 
-        deal.status = SimpleTradeFileStatus.DISPUTE;
+        if (_notary.isDisputePossible(dealId)) {
+            _notary.chooseNotaries(dealId);
+            _chat.sendSystemMessage(dealId, "Dispute started.");
+            deal.status = SimpleTradeFileStatus.DISPUTE;
 
-        _notary.chooseNotaries(dealId);
-        _chat.sendSystemMessage(dealId, "Dispute started.");
-
-        emit DisputeCreated(dealId);
+            emit DisputeCreated(dealId);
+        } else {
+            _chat.sendSystemMessage(dealId, "Dispute is not possible.");
+            _sendWin(deal, IIntegration.DisputeWinner.Seller);
+        }
     }
 
     /**
@@ -375,7 +379,7 @@ contract SimpleTradeFile is
             "AuctionFile: Time for dispute"
         );
 
-        if (_notary.isDisputePossible()) {
+        if (_notary.isDisputePossible(dealId)) {
             _chat.sendSystemMessage(dealId, "Dispute restarted.");
 
             _notary.restart(dealId);

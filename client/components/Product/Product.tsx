@@ -60,7 +60,6 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const isItemsInColumn = useMediaQuery("(max-width: 899px)");
   const signer = useSigner();
   const isBidError = +bid <= +currentBid;
-  const [isOpenModal, setIsOpenModal] = useState(false);
   const { address } = useAccount();
 
   const [ isSeller, setIsSeller ] = useState(false);
@@ -256,7 +255,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                       variant="darkBlue"
                       title="vote for buyer"
                       isNeededMarginTop
-                    /> 
+                    />
                   ) : null
               }
           </Flex>

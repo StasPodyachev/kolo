@@ -25,7 +25,7 @@ export function getTodaysDate() {
 }
 
 export function getDateTimeLocal(date: Date) {
-  return date.toISOString().slice(0, 16);
+  return date?.toISOString()?.slice(0, 16);
 }
 
 export function convertExpNumberToNormal(expId: number) {

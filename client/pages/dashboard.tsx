@@ -4,7 +4,7 @@ import { DashboardTabs } from "@/constants/shared";
 import Tabs from "@/components/ui/Tabs";
 import MyPurchasesPanel from "@/components/Dashboard/MyPurchasesPanel";
 import MyStorePanel from "@/components/Dashboard/MyStorePanel";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContractRead, useSigner } from "wagmi";
 import Plug from "@/components/ui/Plug";
 import addresses from "@/contracts/addresses";
 import ABI_FACTORY from "../contracts/abi/Factory.json";
@@ -16,14 +16,17 @@ import { convertStatus } from "@/helpers";
 
 const Dashboard: NextPage = () => {
   const [dealsBySeller, setDealsBySeller] = useState<IAuctionItem[] | []>([]);
-  const [dealsByBuyer, setDealsByBuyer] = useState<IAuctionItem[] | []>([]);
   const [sellerActiveItemsCount, setSellerActiveItemsCount] = useState(0);
   const [sellerWaitForPaymentCount, setSellerWaitForPaymentCount] = useState(0);
   const [sellerDisputCount, setSellerDisputCount] = useState(0);
   const [buyerActiveItemsCount, setBuyerActiveItemsCount] = useState(0);
   const [buyerWaitForPaymentCount, setBuyerWaitForPaymentCount] = useState(0);
   const [buyerDisputCount, setBuyerDisputCount] = useState(0);
-  const { isConnected } = useAccount();
+  const [purchases, setPurchases] = useState<IAuctionItem[] | []>([]);
+  const [bids, setBids] = useState<IAuctionItem[] | []>([]);
+  const [lockedInBids, setLockedInBids] = useState(0);
+  const [sellerRevenue, setSellerRevenue] = useState(0);
+  const signer = useSigner();
   const { address } = useAccount();
   const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
@@ -61,27 +64,32 @@ const Dashboard: NextPage = () => {
           priceEnd,
           description,
           status,
-          totalBids: 20,
           collateral,
         };
       });
-      const filteredDealsBySeller = decryptedData.filter((item: any) => item.ownedBy === address);
-      const filteredDealsByBuyer = decryptedData.filter((item: any) => item.buyerAddress === address);
-      const activeItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status.title === "Open").length;
+      const filteredDealsBySeller = decryptedData.filter((item: IAuctionItem) => item?.ownedBy === address);
+      const filteredDealsByBuyer = decryptedData.filter((item: IAuctionItem) => item?.buyerAddress === address);
+      const activeItemsCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Open").length;
       setSellerActiveItemsCount(activeItemsCountSeller);
-      const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status.title === "Wait finalize").length;
+      const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize").length;
       setSellerWaitForPaymentCount(waitForPaymentItemsCountSeller);
-      const itemsInDisputCountSeller = filteredDealsBySeller.filter((item: any) => item.status.title === "Dispute").length;
+      const itemsInDisputCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Dispute").length;
       setSellerDisputCount(itemsInDisputCountSeller);
-      const activeItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status.title === "Open").length;
+      const activeItemsCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Open").length;
       setBuyerActiveItemsCount(activeItemsCountBuyer);
-      const waitForPaymentItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status.title === "Wait finalize").length;
+      const waitForPaymentItemsCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize").length;
       setBuyerWaitForPaymentCount(waitForPaymentItemsCountBuyer);
-      const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status.title === "Dispute").length;
+      const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Dispute").length;
       setBuyerDisputCount(itemsInDisputCountBuyer);
-
+      const buyerPurchases = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize");
+      setPurchases(buyerPurchases);
+      const buyerBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Open");
+      setBids(buyerBids);
+      const lockedMoneyInBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status.title !== "Wait finalize").reduce((a, b) => a + b.price, 0);
+      setLockedInBids(lockedMoneyInBids);
+      const totalRevenue = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize").reduce((a, b) => a + b.price, 0);
+      setSellerRevenue(totalRevenue);
       setDealsBySeller(filteredDealsBySeller);
-      setDealsByBuyer(filteredDealsByBuyer);
     }
   }, [data, address]);
 
@@ -100,7 +108,7 @@ const Dashboard: NextPage = () => {
     },
     {
       title: "Total revenue",
-      value: 54.317,
+      value: sellerRevenue,
     }
   ];
 
@@ -119,16 +127,16 @@ const Dashboard: NextPage = () => {
     },
     {
       title: "Locked in bids",
-      value: 21.317,
+      value: lockedInBids,
     }
   ];
 
   return (
-    <Layout pageTitle="Dashboard" isCenteredBlock={isConnected ? false : true}>
-      {isConnected ? (
+    <Layout pageTitle="Dashboard" isCenteredBlock={signer ? false : true}>
+      {signer ? (
         <Tabs tabs={DashboardTabs}>
           <MyStorePanel deals={dealsBySeller} blocks={storeBlocks} />
-          <MyPurchasesPanel purchases={dealsByBuyer} bids={dealsByBuyer} blocks={purchasesBlocks} />
+          <MyPurchasesPanel purchases={purchases} bids={bids} blocks={purchasesBlocks} />
         </Tabs>
       ) : (
         <Plug title="to see your info" isNeedConnectBtn  />

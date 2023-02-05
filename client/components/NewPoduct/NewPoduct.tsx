@@ -163,6 +163,16 @@ const NewPoduct = () => {
       const { publicKey, signedMessage } : any = await encryptionSignature();
       const cidHex= web3.utils.asciiToHex(response?.data?.Hash).slice(2)
       const arrStr = ["0x" + cidHex.slice(0, 64), "0x" + cidHex.slice(64) + "000000000000000000000000000000000000"]
+      console.log({
+        item1: arrStr[0],
+        size: arrStr[0].length,
+      },
+      {
+        item1: arrStr[1],
+        size: arrStr[1].length,
+      }, {
+        size: (cidHex.length)/2
+      });
 
       const conditions = [
         {
@@ -301,7 +311,7 @@ const NewPoduct = () => {
                 <CustomInput
                   borderRadius={0}
                   type="datetime-local"
-                  min={getTodaysDate()}
+                  min={getDateTimeLocal(getTodaysDate())}
                   value={getDateTimeLocal(stopDate)}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
                     setStopDate(new Date(event.target.value));
