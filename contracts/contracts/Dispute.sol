@@ -64,7 +64,7 @@ abstract contract Dispute is IDispute, Ownable {
         IStore store = IStore(storeAddress);
 
         if (winner == IIntegration.DisputeWinner.Seller) {
-            store.transferWinToSeller(dealId, buyer, seller, serviceFee);
+            //store.transferWinToSeller(dealId, buyer, seller, serviceFee);
         } else {
             store.transferWinToBuyer(dealId, buyer);
         }

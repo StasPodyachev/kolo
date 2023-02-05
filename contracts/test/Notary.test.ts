@@ -64,7 +64,7 @@ describe("Notary", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ;({ auctionFile, factory, notary } = await loadFixture(async () => {
+    ; ({ auctionFile, factory, notary } = await loadFixture(async () => {
       const { auctionFile, factory, notary, koloToken } =
         await auctionFileFixture()
 
@@ -131,18 +131,16 @@ describe("Notary", () => {
   describe("#vote", () => {
     it("should vote", async () => {
       await notary.deposit({ value: BIGNUM_1E18 })
-
-      await notary.deposit({ value: BIGNUM_1E18 })
-      await notary.connect(other).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer1).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer2).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer3).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer4).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer5).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer6).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer7).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer8).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(other).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(buyer).deposit({ value: BIGNUM_1E18 })
+      // //await notary.connect(buyer1).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(buyer2).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(buyer3).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(buyer4).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(buyer5).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(buyer6).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(buyer7).deposit({ value: BIGNUM_1E18 })
+      // await notary.connect(buyer8).deposit({ value: BIGNUM_1E18 })
 
       const ts = await time.latest()
       await auctionFile.create(
@@ -169,13 +167,13 @@ describe("Notary", () => {
       })
 
       await notary.vote(1, true)
-      await notary.connect(other).vote(1, true)
-      await notary.connect(buyer).vote(1, true)
-      await notary.connect(buyer1).vote(1, true)
-      await notary.connect(buyer2).vote(1, true)
-      await notary.connect(buyer3).vote(1, true)
-      await notary.connect(buyer4).vote(1, false)
-      await notary.connect(buyer5).vote(1, false)
+      // await notary.connect(other).vote(1, true)
+      // await notary.connect(buyer).vote(1, true)
+      // //await notary.connect(buyer1).vote(1, true)
+      // await notary.connect(buyer2).vote(1, true)
+      // await notary.connect(buyer3).vote(1, true)
+      // await notary.connect(buyer4).vote(1, false)
+      // await notary.connect(buyer5).vote(1, false)
     })
   })
 

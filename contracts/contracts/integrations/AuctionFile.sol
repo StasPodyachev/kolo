@@ -27,6 +27,7 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;
     uint256 public _serviceFee = 2e16;
+    uint256 public _storageFee = 1e16;
 
     mapping(uint256 => AuctionFileParams) private deals;
     mapping(uint256 => mapping(address => uint256)) private bids;
@@ -40,6 +41,10 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     modifier onlyNotary() {
         require(msg.sender == address(_notary), "AuctionFile: Only notary");
         _;
+    }
+
+    function setStorageFee(uint256 value) external onlyOwner {
+        _storageFee = value;
     }
 
     function setServiceFee(uint256 value) external onlyOwner {
@@ -66,6 +71,12 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         _notary = notary;
     }
 
+    /**
+     * @notice Get integration info
+     *
+     * @return param This function returns periodDispute,
+     * collateralPercent and collateralAmount
+     */
     function getIntegrationInfo()
         external
         view
@@ -79,6 +90,14 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
             });
     }
 
+    /**
+     * @notice Get deal by `dealId`
+     *
+     * @param dealId ID of a deal
+     * @return deal This function returns deal ID, deal params,
+     * integration type, store address and integration address
+     * @dev Deal params stores in data in bytes.
+     */
     function getDeal(uint256 dealId)
         external
         view
@@ -96,6 +115,13 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         });
     }
 
+    /**
+     * @notice Get bid history by `dealId`
+     *
+     * @param dealId ID of a deal
+     * @return bids This function returns timestamp, buyer address
+     * and bid amount.
+     */
     function getBidHistory(uint256 dealId)
         external
         view
@@ -104,6 +130,7 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         return bidHistory[dealId];
     }
 
+    ///  @notice Get deal by `dealId`. Deal status must be equal `status`
     function _checkStatusAndGetDeal(uint256 dealId, AuctionStatus status)
         internal
         view
@@ -120,6 +147,28 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         IKoloToken(_factory.daoToken()).airdrop(wallet);
     }
 
+    /**
+     * @notice Creating a new deal
+     *
+     * @param name Name of a deal
+     * @param description Description of a deal
+     * @param priceStart Price at which bids start
+     * @param priceForceStop Price for force purchase
+     * @param dateExpire Date the deal expires
+     * @param cid File bytes
+     * @return id ID of a deal
+     * @dev This function creates store if it does not exist.
+     * File must be uploaded first
+     *
+     * Requirements:
+     *
+     * - Сollateral cannot be less then `_collateralAmount`
+     * - Сollateral cannot be less then `_collateralPercent` of `priceStart`
+     * - `priceStart` cannot be 0
+     * - `priceStart` cannot be less then `priceStart`
+     * - `dateExpire` cannot be less then now
+     *
+     */
     function create(
         string calldata name,
         string calldata description,
@@ -167,6 +216,7 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
         _chat.sendSystemMessage(id, "Deal created.");
+        _addAccess(msg.sender, deals[id].cid);
 
         emit DealCreated(id, msg.sender);
 
@@ -175,6 +225,22 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         return id;
     }
 
+    /**
+     * @notice Bid in a deal
+     *
+     * @param dealId ID of a deal
+     * @dev if msg.value is greater than or equal to deal.priceForceStop,
+     * then the deal is closed
+     *
+     * Requirements:
+     *
+     * - Deal status must be OPEN
+     * - Cannot be called by seller
+     * -  msg.value cannot be less then `priceStart`
+     * - `dateExpire` cannot be less then now
+     * - Current bid cannot be less then previous bid
+     *
+     */
     function bid(uint256 dealId) external payable {
         AuctionFileParams storage deal = _checkStatusAndGetDeal(
             dealId,
@@ -235,6 +301,19 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         }
     }
 
+    /**
+     * @notice Cancel a deal
+     *
+     * @param dealId ID of a deal
+     * @dev Collateral amount will be refund
+     *
+     * Requirements:
+     *
+     * - Deal status must be OPEN
+     * - Can only be called by seller
+     * - There must be no bids in the deal
+     *
+     */
     function cancel(uint256 dealId) external {
         AuctionFileParams storage deal = _checkStatusAndGetDeal(
             dealId,
@@ -266,10 +345,25 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
             dealId,
             address(0),
             seller,
-            _serviceFee
+            _serviceFee,
+            _storageFee
         );
     }
 
+    /**
+     * @notice Start a dispute
+     *
+     * @param dealId ID of a deal
+     * @dev If there are not enough notaries, then the dispute is impossible
+     *
+     * Requirements:
+     *
+     * - Deal status must be FINALIZE
+     * - Can only be called by buyer
+     * - The current date cannot be grater then `dateExpire` + `_periodDispute`
+     * - The buyer must pass the same collateral amount as the seller
+     *
+     */
     function dispute(uint256 dealId) external payable {
         AuctionFileParams storage deal = _checkStatusAndGetDeal(
             dealId,
@@ -292,12 +386,69 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
 
         deal.status = AuctionStatus.DISPUTE;
 
-        _notary.chooseNotaries(dealId);
-        _chat.sendSystemMessage(dealId, "Dispute started.");
+        if (_notary.isDisputePossible()) {
+            _notary.chooseNotaries(dealId);
+            _chat.sendSystemMessage(dealId, "Dispute started.");
 
-        emit DisputeCreated(dealId);
+            emit DisputeCreated(dealId);
+        } else {
+            _chat.sendSystemMessage(dealId, "Dispute is not possible.");
+            _sendWin(deal, IIntegration.DisputeWinner.Seller);
+        }
     }
 
+    /**
+     * @notice Restart a dispute
+     *
+     * @param dealId ID of a deal
+     * @dev If there are not enough notaries, then the dispute is impossible
+     *
+     * Requirements:
+     *
+     * - Deal status must be DISPUTE
+     * - Can only be called by buyer
+     * - The current date cannot be grater then `dateExpire` + `_periodDispute`
+     *
+     */
+    function restartDispute(uint256 dealId) external payable {
+        AuctionFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            AuctionStatus.DISPUTE
+        );
+
+        require(deal.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
+        require(
+            block.timestamp > deal.dateExpire + _periodDispute,
+            "AuctionFile: Time for dispute"
+        );
+
+        if (_notary.isDisputePossible()) {
+            _chat.sendSystemMessage(dealId, "Dispute restarted.");
+
+            _notary.restart(dealId);
+            deal.dateExpire = block.timestamp;
+
+            emit DisputeRestarted(dealId);
+        } else {
+            _notary.refundPenalty(dealId);
+            _chat.sendSystemMessage(dealId, "Dispute is not possible.");
+            _sendWin(deal, IIntegration.DisputeWinner.Seller);
+        }
+    }
+
+    /**
+     * @notice Finalize a deal
+     *
+     * @param dealId ID of a deal
+     * @dev If there are no bids then the deal will be closed
+     * and collateral will refund
+     *
+     * Requirements:
+     *
+     * - Deal status must be OPEN
+     * - The current date cannot be less then `dateExpire`
+     *
+     */
     function finalize(uint256 dealId) external {
         AuctionFileParams storage deal = _checkStatusAndGetDeal(
             dealId,
@@ -329,6 +480,18 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         emit DealFinalized(deal.id);
     }
 
+    /**
+     * @notice Finalize a dispute
+     *
+     * @param dealId ID of a deal
+     * @param winner Seller or Buyer
+     *
+     * Requirements:
+     *
+     * - Deal status must be DISPUTE
+     * - Can only be called by Notary contract
+     *
+     */
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
         onlyNotary
@@ -361,6 +524,18 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         );
     }
 
+    /**
+     * @notice Receive reward
+     *
+     * @param dealId ID of a deal
+     * @dev This function transfers money to the seller and closes a deal
+     *
+     * Requirements:
+     *
+     * - Deal status must be FINALIZE
+     * - The current date cannot be less then `dateExpire` + _periodDispute
+     *
+     */
     function receiveReward(uint256 dealId) external {
         AuctionFileParams storage deal = _checkStatusAndGetDeal(
             dealId,
@@ -387,11 +562,13 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
                 deal.id,
                 deal.buyer,
                 deal.seller,
-                _serviceFee
+                _serviceFee,
+                _storageFee
             );
         } else {
             store.transferWinToBuyer(deal.id, deal.buyer);
         }
+
         _chat.sendSystemMessage(deal.id, "Deal closed.");
 
         deal.status = AuctionStatus.CLOSE;
