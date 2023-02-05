@@ -1,4 +1,5 @@
-import { getDateTimeLocal, getTodaysDate } from "@/helpers";
+// import { getDateTimeLocal, getTodaysDate } from "@/helpers";
+import { getTodaysDate } from "@/helpers";
 import { SaleTypeMenuItems } from "@/constants/shared";
 import {
   Box,
@@ -117,9 +118,9 @@ const NewPoduct = () => {
   const [isShownStartSell, setIsShownStartSell] = useState(false);
 
   useEffect(() => {
-    console.log(getDateTimeLocal(getTodaysDate()), 'getDateTimeLocal(getTodaysDate())');
+    // console.log(getDateTimeLocal(getTodaysDate()), 'getDateTimeLocal(getTodaysDate())');
     
-    setStopDate(getDateTimeLocal(getTodaysDate()))
+    // setStopDate(getDateTimeLocal(getTodaysDate()))
   }, [])
 
   const encryptionSignature = async () => {
@@ -317,7 +318,7 @@ const NewPoduct = () => {
                 <CustomInput
                   borderRadius={0}
                   type="datetime-local"
-                  min={getDateTimeLocal(getTodaysDate())}
+                  // min={getDateTimeLocal(getTodaysDate())}
                   value={stopDate}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
                     setStopDate(event.target.value);
