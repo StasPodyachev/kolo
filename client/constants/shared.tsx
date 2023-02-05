@@ -276,14 +276,30 @@ export const SaleTypeMenuItems: ISaleTypeMenuItem[] = [
 
 export const FaqAccodionItems: FaqAccordionItem[] = [
   {
-    title: "Who are we?",
+    title: "What is Kolo?",
     description:
-      "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illo voluptate facilis error vel molestias quasi modi cumque laboriosam architecto totam! Recusandae commodi veniam, nesciunt vitae expedita quasi. Aspernatur, reprehenderit suscipit. Nisi enim vel rerum libero asperiores voluptatum saepe, ea consequatur dolorem! Aliquid molestias quo veniam dicta ducimus soluta atque commodi id, sapiente distinctio, saepe asperiores adipisci maiores eaque itaque ratione. Nesciunt repudiandae fugit vel deleniti error sapiente suscipit debitis, similique quidem illum quo porro perferendis eligendi sequi quasi nam modi pariatur! Nostrum asperiores similique aliquam, animi nemo accusamus impedit aliquid?",
+      "Kolo is a cutting-edge project being developed by the defx team for the FVM Space Warp. It aims to create a fair and censorship-resistant platform for trading sensitive information, leveraging the power of the Filecoin network and governed by the DAO.",
   },
   {
-    title: "Why should you choose exactly KOLO?",
+    title: "What types of files and resources can be bought and sold on Kolo? ",
     description:
-      "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illo voluptate facilis error vel molestias quasi modi cumque laboriosam architecto totam! Recusandae commodi veniam, nesciunt vitae expedita quasi. Aspernatur, reprehenderit suscipit. Nisi enim vel rerum libero asperiores voluptatum saepe, ea consequatur dolorem! Aliquid molestias quo veniam dicta ducimus soluta atque commodi id, sapiente distinctio, saepe asperiores adipisci maiores eaque itaque ratione. Nesciunt repudiandae fugit vel deleniti error sapiente suscipit debitis, similique quidem illum quo porro perferendis eligendi sequi quasi nam modi pariatur! Nostrum asperiores similique aliquam, animi nemo accusamus impedit aliquid?",
+      "Users can buy and sell a wide variety of files, storage, and computing resources on Kolo, as well as gain access to exclusive content and online meetings. This includes everything from sensitive business documents and information of public interest to unique and valuable data sets.",
+  },
+  {
+    title: "How does Kolo ensure fairness and censorship resistance?",
+    description: "Kolo is powered by transparent notary mechanics, which means that buyers can start disputes if they believe a seller has cheated them with a file description. Notaries are chosen randomly from a list of DAO participants who have deposited a notary collateral, and sellers can also offer a guarantee deposit. Additionally, Kolo has an open reputation system that allows everyone to see a participant's actions and reviews.",
+  },
+  {
+    title: "How does the dispute process work on Kolo?",
+    description: "If the seller is confident about his lot according to the description he has written, he offers a guarantee deposit, which will be used as a payment to notaries if the seller cheated. If a buyer on Kolo believes that a seller has cheated him with a file description, he can initiate a dispute depositing a collateral, equal to the seller's collateral. Notaries are chosen randomly from a list of DAO participants who have deposited a notary collateral, and they will review the dispute. If the seller is right, the buyer's collateral is paid to notaries and the seller gets buyer's funds and his collateral back. If the buyer is right, the seller's collateral is paid to notaries and the buyer gets his funds and the collateral back. "
+  },
+  {
+    title: "Can Kolo be used for charity and science projects?",
+    description: "Yes, Kolo can be used as a tender platform to easily start and run charity and science projects.",
+  },
+  {
+    title: "I want to sell a unique file, how can I start?",
+    description: "First of all you have to install Metamask and add Filecoin as a network. Then you have to buy some FILs - native tokens of Filecoin blockchain. Now you can go to the Kolo mainpage and push the “Connect Wallet” button. After that you can choose the category, set a starting price, duration, add a description and download your file or link to IPFS, set a collateral. Sign the transaction in Metamask. All done! Share the link in social networks. Just wait for bids.",
   },
 ];
 
