@@ -33,6 +33,7 @@ export interface IAuctionItem {
   buyer?: string
   collateral: BigNumber
   cid?: string
+  pastTime?: boolean
 };
 
 export interface IBidTableData {

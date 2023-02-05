@@ -43,6 +43,11 @@ export const navLinks: INavlink[] = [
     icon: <NotaryIcon boxSize="24px" color="white" />,
   },
   {
+    url: "/dao",
+    title: "DAO",
+    icon: <NotaryIcon boxSize="24px" color="white" />,
+  },
+  {
     url: "https://deforex-docs.gitbook.io/kolo-fevm-hackathon/welcome/project-intro",
     title: "Docs",
     icon: <DocsIcon boxSize="24px" color="white" />,
@@ -276,5 +281,26 @@ export const FaqAccodionItems: FaqAccordionItem[] = [
     title: "Why should you choose exactly KOLO?",
     description:
       "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illo voluptate facilis error vel molestias quasi modi cumque laboriosam architecto totam! Recusandae commodi veniam, nesciunt vitae expedita quasi. Aspernatur, reprehenderit suscipit. Nisi enim vel rerum libero asperiores voluptatum saepe, ea consequatur dolorem! Aliquid molestias quo veniam dicta ducimus soluta atque commodi id, sapiente distinctio, saepe asperiores adipisci maiores eaque itaque ratione. Nesciunt repudiandae fugit vel deleniti error sapiente suscipit debitis, similique quidem illum quo porro perferendis eligendi sequi quasi nam modi pariatur! Nostrum asperiores similique aliquam, animi nemo accusamus impedit aliquid?",
+  },
+];
+
+export const DaoTabs = ["proposals", "create", "ABOUT DAO KOLO"];
+
+export const ProposalsBlocks = [
+  {
+    title: "Active Proposals",
+    value: 3,
+  },
+  {
+    title: "Total Proposals",
+    value: 36,
+  },
+  {
+    title: "Total minted",
+    value: 11321200,
+  },
+  {
+    title: "Treasury balance",
+    value: 1969314,
   },
 ];
