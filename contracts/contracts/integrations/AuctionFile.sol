@@ -261,7 +261,6 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         );
 
         address storeAddress = _factory.getStore(deal.seller);
-        // IStore(storeAddress).depositBuyer{value: msg.value}(dealId, msg.sender);
 
         if (deal.price != 0) {
             IStore(storeAddress).withdrawBuyer(dealId, deal.buyer);

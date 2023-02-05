@@ -1,10 +1,9 @@
 import {
-  DepositAndWithdrawButtons,
   DepositOrWithdrawBlocks,
 } from "@/constants/shared";
-import { Button, Flex, HStack, TabPanel } from "@chakra-ui/react";
+import { Flex, HStack, TabPanel } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Blocks from "../ui/Blocks";
 import NumberInput from "../ui/NumberInput/NumberInput";
 import Deposit from "./Deposit";

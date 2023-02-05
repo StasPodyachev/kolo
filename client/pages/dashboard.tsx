@@ -4,7 +4,7 @@ import { DashboardTabs } from "@/constants/shared";
 import Tabs from "@/components/ui/Tabs";
 import MyPurchasesPanel from "@/components/Dashboard/MyPurchasesPanel";
 import MyStorePanel from "@/components/Dashboard/MyStorePanel";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContractRead, useSigner } from "wagmi";
 import Plug from "@/components/ui/Plug";
 import addresses from "@/contracts/addresses";
 import ABI_FACTORY from "../contracts/abi/Factory.json";
@@ -26,7 +26,7 @@ const Dashboard: NextPage = () => {
   const [bids, setBids] = useState<IAuctionItem[] | []>([]);
   const [lockedInBids, setLockedInBids] = useState(0);
   const [sellerRevenue, setSellerRevenue] = useState(0);
-  const { isConnected } = useAccount();
+  const signer = useSigner();
   const { address } = useAccount();
   const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
@@ -132,8 +132,8 @@ const Dashboard: NextPage = () => {
   ];
 
   return (
-    <Layout pageTitle="Dashboard" isCenteredBlock={isConnected ? false : true}>
-      {isConnected ? (
+    <Layout pageTitle="Dashboard" isCenteredBlock={signer ? false : true}>
+      {signer ? (
         <Tabs tabs={DashboardTabs}>
           <MyStorePanel deals={dealsBySeller} blocks={storeBlocks} />
           <MyPurchasesPanel purchases={purchases} bids={bids} blocks={purchasesBlocks} />

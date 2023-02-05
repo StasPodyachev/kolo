@@ -12,7 +12,7 @@ export interface INavlink {
   icon: JSX.Element;
 };
 
-interface IStatus {
+export interface IStatus {
   title: string;
   color: string;
 }
@@ -33,6 +33,7 @@ export interface IAuctionItem {
   buyer?: string
   collateral: BigNumber
   cid?: string
+  pastTime?: boolean
 };
 
 export interface IBidTableData {
