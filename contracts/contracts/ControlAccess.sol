@@ -7,18 +7,19 @@ import "./interfaces/IControlAccess.sol";
 /**
  * @title Kolo control access
  *
- * This contract stores all messages of all deals
+ * This contract can check and give access to cids.
  *
  */
 abstract contract ControlAccess {
     /// @dev Holds a mapping of wallet to cids.
     mapping(address => mapping(bytes => bool)) private _accsess;
 
-    /// @dev Adds an access a mapping of wallet to cids.
+    /// @dev Give an access by `wallet` and `cid`.
     function _addAccess(address wallet, bytes storage cid) internal {
         _accsess[wallet][cid] = true;
     }
 
+    /// @dev Check access by `cid` and `wallet`
     function checkAccess(bytes calldata cid, address wallet)
         external
         view
@@ -27,6 +28,7 @@ abstract contract ControlAccess {
         return _accsess[wallet][cid] ? 1 : 0;
     }
 
+    /// @dev Check access by `cid` array, `size` and `wallet`
     function checkAccess(
         bytes32[] calldata cid,
         uint8 size,

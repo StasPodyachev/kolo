@@ -17,6 +17,14 @@ import "../ControlAccess.sol";
 
 import "hardhat/console.sol";
 
+/**
+ * @title SimpleTradeFile
+ *
+ * This contract stores all deals of SimpleTradeFile type. It also allows
+ * to create a deal, to buy an item, to cancel a deal, to create a
+ * dispute and to receive rewards. Sending messages is also available.
+ *
+ **/
 contract SimpleTradeFile is
     ISimpleTradeFile,
     IIntegration,
@@ -32,7 +40,7 @@ contract SimpleTradeFile is
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;
     uint256 public _serviceFee = 2e16;
-    uint256 public _storageFee = 1e16;
+    uint256 public _storageFee = 2e16;
 
     mapping(uint256 => SimpleTradeFileParams) private deals;
     mapping(address => mapping(bytes => bool)) private _accsess;
@@ -438,21 +446,54 @@ contract SimpleTradeFile is
     }
 
     /**
+     * @notice Finalize a deal
+     *
+     * @param dealId ID of a deal
+     * @dev If there are no bids then the deal will be closed
+     * and collateral will refund
+     *
+     * Requirements:
+     *
+     * - Deal status must be OPEN
+     * - The current date cannot be less then `dateExpire`
+     *
+     */
+    function finalize(uint256 dealId) external {
+        SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            SimpleTradeFileStatus.OPEN
+        );
+
+        require(
+            block.timestamp > deal.dateExpire,
+            "SimpleTradeFile: Date is not expire"
+        );
+
+        require(deal.buyer == address(0), "SimpleTradeFile: Buyer exists");
+
+        _sendWin(deal, IIntegration.DisputeWinner.Seller);
+    }
+
+    /**
      * @notice Receive reward
      *
      * @param dealId ID of a deal
      * @dev This function transfers money to the seller and closes a deal
      *
+     * Requirements:
+     *
+     * - Deal status must be FINALIZE
+     * - The current date cannot be less then `dateExpire` + `_periodDispute`
+     *
      */
     function receiveReward(uint256 dealId) external {
-        SimpleTradeFileParams storage deal = deals[dealId];
-        require(deal.price != 0, "SimpleTradeFile: Id not found");
+        SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            SimpleTradeFileStatus.FINALIZE
+        );
 
         require(
-            (block.timestamp > deal.dateExpire &&
-                deal.status == SimpleTradeFileStatus.OPEN) ||
-                (block.timestamp > deal.dateExpire + _periodDispute &&
-                    deal.status == SimpleTradeFileStatus.FINALIZE),
+            block.timestamp > deal.dateExpire + _periodDispute,
             "SimpleTradeFile: Error"
         );
 
@@ -484,10 +525,22 @@ contract SimpleTradeFile is
         emit DealClosed(deal.id);
     }
 
+    /// @dev Give an access to `wallet` by `dealId`.
     function addAccess(uint256 dealId, address wallet) external onlyNotary {
         _addAccess(wallet, deals[dealId].cid);
     }
 
+    /**
+     * @notice Sending message
+     *
+     * @param dealId ID of a deal
+     * @param message Text of the message
+     *
+     * Requirements:
+     *
+     * - Deal status must be OPEN, DISPUT or FINALIZE,
+     *
+     */
     function sendMessage(uint256 dealId, string calldata message) external {
         SimpleTradeFileParams memory deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
