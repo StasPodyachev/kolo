@@ -22,11 +22,11 @@ const Block = ({ title, value }: IProps) => {
       <Heading
         fontFamily={typeof value === "number" ? "Roboto Mono" : "inherit"}
         color={
-          title === "My Status"
+          title === "My Status" && value === "Active"
             ? "green.secondaryDark"
             : greenPrimaryColor
             ? "green.primary"
-            : "white"
+            : title === "My Status" && value === "Not Active" ? "red.primary" : "white"
         }
         variant="h5"
       >
