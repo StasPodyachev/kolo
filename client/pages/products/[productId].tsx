@@ -86,7 +86,8 @@ const ProductPage: NextPage = () => {
         setBidsAmount(decryptedBidData.length);
       }
       const respStatus = Number(result[0][12]) 
-
+      console.log(respStatus, 'respStatus');
+      
       const active =
         respStatus === 0 && !pastTime ? 0 : // Open
         respStatus === 0 && pastTime ? 4 : // Wait finalaze
