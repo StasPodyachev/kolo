@@ -17,7 +17,7 @@ import Clouds from "@/icons/cardImages/clouds.svg";
 import Mountain from "@/icons/cardImages/mountain.svg";
 import Plant from "@/icons/cardImages/plant.svg";
 import Recycle from "@/icons/cardImages/recycle.svg";
-import Sheet from "@/icons/cardImages/Sheet.svg";
+import Sheet from "@/icons/cardImages/sheet.svg";
 
 const imagesArray = [Sheet, Lamp, Clouds, Mountain, Plant, Recycle];
 
