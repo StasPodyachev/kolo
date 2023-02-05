@@ -9,12 +9,12 @@ interface IProps {
   id: number
 }
 
-const Cancel = ({ id }: IProps) => {
+const Reward = ({ id }: IProps) => {
   const { onConfirm, onTransaction } = useTransactionManager()
   const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
-    functionName: 'cancel',
+    functionName: 'reciveReward',
     args: [id]
   });
 
@@ -35,9 +35,9 @@ const Cancel = ({ id }: IProps) => {
   }, [data])
   return (
     <Button minW="170px" variant="blue" onClick={() => write?.()}>
-      Cancel
+      Recive Reward
     </Button>
   );
 };
 
-export default Cancel;
+export default Reward;
