@@ -35,6 +35,7 @@ export interface IAuctionItem {
   cid?: string
   pastTime?: boolean
   isDispute?: boolean
+  icon?: ISvg;
 };
 
 export interface IBidTableData {
@@ -90,3 +91,9 @@ export interface IAboutKolo {
   title: string;
   subtitle: string;
 }
+
+export interface ISvg {
+  src: string;
+  height: number;
+  width: number;
+};

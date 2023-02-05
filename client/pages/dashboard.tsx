@@ -12,7 +12,14 @@ import { useEffect, useState } from "react";
 import { BigNumber, ethers } from "ethers";
 import { IAuctionItem } from "@/types";
 import { convertStatus } from "@/helpers";
+import Lamp from "@/icons/cardImages/lamp.svg";
+import Clouds from "@/icons/cardImages/clouds.svg";
+import Mountain from "@/icons/cardImages/mountain.svg";
+import Plant from "@/icons/cardImages/plant.svg";
+import Recycle from "@/icons/cardImages/recycle.svg";
+import Sheet from "@/icons/cardImages/sheet.svg";
 
+const imagesArray = [Sheet, Lamp, Clouds, Mountain, Plant, Recycle];
 
 const Dashboard: NextPage = () => {
   const [dealsBySeller, setDealsBySeller] = useState<IAuctionItem[] | []>([]);
@@ -26,6 +33,7 @@ const Dashboard: NextPage = () => {
   const [bids, setBids] = useState<IAuctionItem[] | []>([]);
   const [lockedInBids, setLockedInBids] = useState(0);
   const [sellerRevenue, setSellerRevenue] = useState(0);
+  const randomImage = Math.floor(Math.random() * (imagesArray.length));
   const signer = useSigner();
   const { address } = useAccount();
   const { data } = useContractRead({
@@ -52,6 +60,8 @@ const Dashboard: NextPage = () => {
         const status = result[0][12] && convertStatus(Number(result[0][12]));
         const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
         let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
+        const randomIndex = Math.floor(Math.random() * (imagesArray.length))
+        const icon = imagesArray[randomIndex]
 
         return {
           id,
@@ -65,6 +75,7 @@ const Dashboard: NextPage = () => {
           description,
           status,
           collateral,
+          icon,
         };
       });
       const filteredDealsBySeller = decryptedData.filter((item: IAuctionItem) => item?.ownedBy === address);
@@ -133,7 +144,7 @@ const Dashboard: NextPage = () => {
     <Layout pageTitle="Dashboard" isCenteredBlock={signer ? false : true}>
       {signer ? (
         <Tabs tabs={DashboardTabs}>
-          <MyStorePanel deals={dealsBySeller} blocks={storeBlocks} />
+          <MyStorePanel deals={dealsBySeller} blocks={storeBlocks} image={imagesArray[randomImage]} />
           <MyPurchasesPanel purchases={purchases} bids={bids} blocks={purchasesBlocks} />
         </Tabs>
       ) : (
