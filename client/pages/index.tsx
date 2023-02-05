@@ -11,8 +11,7 @@ import { BigNumber, ethers } from "ethers";
 import { convertStatus } from "@/helpers";
 
 const Home: NextPage = () => {
-  const [ items, setItems ] = useState<IAuctionItem[] | []>([]);
-
+  const [ items, setItems ] = useState<IAuctionItem[]|[]>([]);
   const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
@@ -35,7 +34,7 @@ const Home: NextPage = () => {
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const collateral = result[0][6]
         const status = result[0][12] && convertStatus(Number(result[0][12]));
-        const saleEndDateNew = status?.title == "Open" ? parseInt(result[0][9]?._hex, 16) : parseInt(result[0][9]?._hex, 16) * 1000
+        const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
         const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
         let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
         return {
@@ -61,16 +60,15 @@ const Home: NextPage = () => {
     }
   }, [data]);
 
-
   return (
     <Layout pageTitle="Market">
         <Grid
           gap="32px"
           justifyContent="space-around"
           templateColumns="repeat(auto-fill, 304px)"
-          templateRows="auto"
-        >
-          {items?.map((auctionItem) => (
+          templateRows="auto">
+          {
+            items?.map((auctionItem) => (
             <ItemCard
               key={auctionItem.id}
               to={auctionItem.id}

@@ -10,7 +10,7 @@ interface IProps {
   collateral: BigNumber
 }
 
-const Dispute = ({ id, collateral }: IProps) => {
+const Dispute = ({ id, collateral }: IProps) => {  
   const { onConfirm, onTransaction } = useTransactionManager()
   const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,

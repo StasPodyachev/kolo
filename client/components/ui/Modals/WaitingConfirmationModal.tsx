@@ -17,7 +17,7 @@ export default function WaitingConfirmationModal({ isOpen, onClose, onOpen }: Pr
         <ModalContent textAlign="center" flexDir="column">
           <ModalCloseButton />
           <ModalBody py={4} display="flex" flexDir="column">
-            <Box fontSize="lg" fontWeight={600} my={4}>
+            <Box fontSize="lg" fontWeight={600} my={4} color="white">
               Waiting for confirmation ...
             </Box>
             <PulseLoader
@@ -26,7 +26,7 @@ export default function WaitingConfirmationModal({ isOpen, onClose, onOpen }: Pr
               aria-label="Loading Spinner"
               data-testid="loader"
             />
-            <Box my={4} fontWeight={600} color="#6E7C8C">
+            <Box my={4} fontWeight={600} color="white">
               Confirm this transaction in your wallet
             </Box>
           </ModalBody>

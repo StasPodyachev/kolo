@@ -13,7 +13,6 @@ import BuyNow from "./BuyNow";
 import { useEffect, useState } from "react";
 import Chat from "./Chat";
 import Dispute from "./Dispute";
-import lighthouse from "@lighthouse-web3/sdk";
 import Finalize from "./Finalize";
 import Vote from "./Vote";
 import Cancel from "./Cancel";
@@ -61,24 +60,19 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const signer = useSigner();
   const isBidError = +bid <= +currentBid;
   const { address } = useAccount();
-
   const [ isSeller, setIsSeller ] = useState(false);
   const [ isBuyer, setIsBuyer ] = useState(false);
   const [ isNotary, setIsNotary ] = useState(true);
 
   useEffect(() => {
-    if (item?.buyer === address) setIsBuyer(true)
+    if (item?.buyer === address) {
+      setIsBuyer(true)
+    } else setIsBuyer(false)
+
+    if (item?.ownedBy === address) {
+      setIsSeller(true)
+    }  else setIsSeller(false)
   }, [item, address])
-
-  useEffect(() => {
-    if (item?.ownedBy === address) setIsSeller(true)
-  }, [item, address])
-
-  useEffect(() => {
-    if (item?.cid) {
-
-    }
-  }, [item])
 
   return (
     <Flex margin={"0 auto 0"} flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
@@ -170,6 +164,8 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
               <Flex height={'48px'} justifyContent="space-between">
                 {
+                  item?.pastTime ?
+                  <Finalize id={item?.id} collateral={item?.collateral} /> :
                   item?.status?.title === "Open" && !isSeller ?
                     <>
                       <NumberInput
@@ -185,12 +181,10 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                       />
                     </>
                   : isBuyer && item?.id ?
-                  <Flex w="100%" justifyContent="space-between">
-                    <Dispute id={item?.id} collateral={item?.collateral} />
-
-                    {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
-                    </Flex> : isSeller && item?.status?.title === "Open" ?
-                  <Cancel id={item?.id} />  : isNotary && item?.status?.title === "Dispute" ? (
+                  <Dispute id={item?.id} collateral={item?.collateral} />
+                  : isSeller && item?.status?.title === "Open" ?
+                  <Cancel id={item?.id} /> 
+                  : isNotary && item?.status?.title === "Dispute" ? (
                     <Vote
                       id={item?.id}
                       mark={false}
@@ -242,13 +236,14 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
             >
               {item?.description}
             </Text>
-              {
-                item?.status?.title == "Open" ?
+              { item?.pastTime ? null :
+                item?.status?.title == "Open" && !isSeller ?
                 <BuyNow
                   isDisabled={!signer || item?.ownedBy === address}
                   id={item?.id}
                   price={item?.priceEnd}
-                  /> :  isNotary && item?.status?.title === "Dispute" ? (
+                  />
+                :  isNotary && item?.status?.title === "Dispute" ? (
                     <Vote
                       id={item?.id}
                       mark

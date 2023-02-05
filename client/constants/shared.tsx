@@ -1,5 +1,6 @@
 import addresses from "@/contracts/addresses";
 import {
+  DaoIcon,
   DashboardIcon,
   DocsIcon,
   FaqIcon,
@@ -17,6 +18,8 @@ import {
   IDepositAndWithdrawButton,
   FaqAccordionItem,
   ISaleTypeMenuItem,
+  IProposalItem,
+  IAboutKolo,
 } from "@/types";
 
 import ABI_FILE from "../contracts/abi/AuctionFile.json";
@@ -45,7 +48,7 @@ export const navLinks: INavlink[] = [
   {
     url: "/dao",
     title: "DAO",
-    icon: <NotaryIcon boxSize="24px" color="white" />,
+    icon: <DaoIcon boxSize="24px" color="white" />,
   },
   {
     url: "https://deforex-docs.gitbook.io/kolo-fevm-hackathon/welcome/project-intro",
@@ -304,3 +307,47 @@ export const ProposalsBlocks = [
     value: 1969314,
   },
 ];
+
+export const ProposalsItems: IProposalItem[] = [
+  {
+    title: "Proposal #36  Change parameter _countInvaitedNotary",
+    id: "ID 37827523216.....4212",
+    buttonText: "vote",
+    status: {
+      title: "open for vote",
+      color: "#1DA1F2",
+    }
+  },
+  {
+    title: "Proposal #35  Change parameter _minDeposit in Notary",
+    id: "ID 37827523216.....4218",
+    buttonText: "execute",
+    status: {
+      title: "queued",
+      color: "#FBBC05",
+    }
+  },
+  {
+    title: "Proposal #34  Change parameter _minDeposit in Notary",
+    id: "ID 37827523216.....4218",
+    status: {
+      title: "executed",
+      color: "#34A853",
+    }
+  },
+];
+
+export const AboutKoloData: IAboutKolo[] = [
+  {
+    title: "Simple Summary",
+    subtitle: "Increase the count of invited notaries from 20 to 30",
+  },
+  {
+    title: "Motivation",
+    subtitle: "It makes process of dispute voting more stable.",
+  },
+  {
+    title: "Specification",
+    subtitle: "Proposal will change const _countInvitedNotary in Notary.sol contract",
+  },
+]

@@ -25,7 +25,7 @@ export default function TransactionModal({ address, isOpen, onClose, onOpen }: P
        <ModalContent textAlign="center">
          <ModalCloseButton />
          <ModalBody py={4} display="flex" flexDir="column">
-           <Box fontSize="lg" fontWeight={600} my={4}>
+           <Box fontSize="lg" fontWeight={600} my={4} color="white">
              Your contract is submitted!
            </Box>
            {address && (
@@ -40,7 +40,7 @@ export default function TransactionModal({ address, isOpen, onClose, onOpen }: P
              </Link>
            )}
 
-           <Box mt={4} fontWeight={600} color="#6E7C8C">
+           <Box mt={4} fontWeight={600} color="white">
              Once the transaction is completed, your contract will appear in the market
            </Box>
          </ModalBody>
