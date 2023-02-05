@@ -34,4 +34,11 @@ interface INotary {
     function isDisputePossible() external view returns (bool);
 
     function refundPenalty(uint256 dealId) external;
+
+    function getDeals(address notary) external view returns (uint256[] memory);
+
+    function getNotaries(uint256 dealId)
+        external
+        view
+        returns (address[] memory);
 }
