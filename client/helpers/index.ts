@@ -29,9 +29,8 @@ export function getDateTimeLocal(date: Date) {
 }
 
 export function convertExpNumberToNormal(expId: number) {
-  const numberId = expId.toFixed(18);
-  const bigIntId = BigInt(new BigDecimal(numberId).mul(BIG_1E18 + "").toFixed(0)) + "";
-
+  const numberId = expId.toFixed(18)
+  const bigIntId = BigInt(new BigDecimal(numberId).mul(BIG_1E18 + "").toFixed(0)) + ""
   return bigIntId;
 }
 

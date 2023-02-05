@@ -27,7 +27,6 @@ declare var window: any;
 import useDevice from "@/hooks/useDevice";
 import { ISaleTypeMenuItem } from "@/types";
 import web3 from "web3";
-import { useTransactionManager } from "@/context/TransactionManageProvider";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
 const CustomInput = chakra(Input, {
@@ -103,6 +102,7 @@ const GetIntegrationInfo = ({
 };
 
 const NewPoduct = () => {
+  const date = new Date().getTime()
   const { isConnected, address } = useAccount();
   const [activeItem, setActiveItem] = useState(SaleTypeMenuItems[0]);
   const [itemName, setItemName] = useState("");
@@ -110,20 +110,15 @@ const NewPoduct = () => {
   const [startPrice, setStartPrice] = useState<string>("1");
   const [forceStopPrice, setForceStopPrice] = useState<string>("10");
   const [myCollateral, setMyCollateral] = useState("1");
-  const [stopDate, setStopDate] = useState<string>();
+  const [stopDate, setStopDate] = useState(date);
+  const [ nowDate, setNowDate] = useState<string>("")
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
   const [fileName, setFileName] = useState("");
   const [thubnailName, setThubnailName] = useState("");
   const [isShownStartSell, setIsShownStartSell] = useState(false);
 
-  useEffect(() => {
-    // console.log(getDateTimeLocal(getTodaysDate()), 'getDateTimeLocal(getTodaysDate())');
-    
-    // setStopDate(getDateTimeLocal(getTodaysDate()))
-    console.log(getTodaysDate(), 'getTodaysDate');
-    
-  }, [])
+
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
@@ -219,6 +214,21 @@ const NewPoduct = () => {
   const isStartPriceError = startPrice === '0' || startPrice === '';
   const isForceStopPriceError = forceStopPrice === '0' || forceStopPrice === '';
   const isDateStopError = stopDate?.toString().length === 0;
+
+  useEffect(() => {
+    let today = new Date() as any;
+    let dd = today.getDate() as any;
+    let mm = today.getMonth() + 1 as any;
+    let yyyy = today.getFullYear() as any;
+    //
+    let hh = today.getHours();
+    let m = today.getMinutes();
+    if (dd < 10) { dd = '0' + dd;}
+    if (mm < 10) { mm = '0' + mm}
+    today = yyyy + "-" + mm + "-" + dd + "T" + hh + ":" + m
+    setNowDate(today)
+    setStopDate(today)
+  }, [])
 
   return (
     <Flex justifyContent="center">
@@ -317,17 +327,20 @@ const NewPoduct = () => {
                 <CustomFormLabel>
                   Date Stop Auction
                 </CustomFormLabel>
-                <CustomInput
-                  borderRadius={0}
-                  type="datetime-local"
-                  // min={getDateTimeLocal(getTodaysDate())}
-                  value={stopDate}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    setStopDate(event.target.value);
-                  }}
-                  px="16px"
-                  minW="100%"
-                />
+                {
+                  nowDate ?
+                  <CustomInput
+                    borderRadius={0}
+                    type="datetime-local"
+                    min={nowDate}
+                    value={stopDate}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                    setStopDate(event?.target?.value as any);
+                    }}
+                    px="16px"
+                    minW="100%"
+                  /> : null
+                }
                 <FormErrorMessage>Date Stop Auction is required</FormErrorMessage>
               </FormControl>
             </Box>
