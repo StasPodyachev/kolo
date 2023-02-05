@@ -398,7 +398,7 @@ const NewPoduct = () => {
                     textAlign="center"
                     mt="16px"
                   >
-                    {fileName}
+                    {fileName.slice(0, 20)}
                   </Text>
                 ) : null}
               </Box>

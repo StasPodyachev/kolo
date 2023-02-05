@@ -13,15 +13,11 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import CardImage from "@/icons/cardImage.svg";
-import {
-  // auctionItems,
-  VotesBlockchain,
-  VotesParameters,
-} from "@/constants/shared";
 import AddressCopy from "../AddressCopy";
 import Link from "next/link";
 import { useState } from "react";
 import { IAuctionItem } from "@/types";
+import AuctionItemPanel from "./AuctionItemPanel";
 
 interface IProps {
   deals: IAuctionItem[];
@@ -169,80 +165,7 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                   </Flex>
                 </Flex>
               </Link>
-              <AccordionPanel bg="inherit" p="16px 20px 18px 36px">
-                <Text textStyle="smallText" color="white">
-                  Description:&nbsp;{item.description}
-                </Text>
-                <Flex
-                  mt="20px"
-                  flexDir={isChangedAccordion ? "column" : "row"}
-                  justifyContent="space-between"
-                >
-                  <Flex flexDir="column" gap="20px">
-                    <Text textStyle="bigText" color="white">
-                      Parameters
-                    </Text>
-                    <Flex flexDir="column" gap="7px" minW="225px">
-                      {VotesParameters.map((param) => (
-                        <Flex
-                          key={param.title}
-                          justifyContent="space-between"
-                          w="100%"
-                        >
-                          <Text textStyle="smallText" color="white">
-                            {param.title}
-                          </Text>
-                          <Text
-                            fontFamily="Roboto Mono"
-                            textStyle="smallText"
-                            color="white"
-                          >
-                            {param.value}
-                          </Text>
-                        </Flex>
-                      ))}
-                    </Flex>
-                  </Flex>
-                  <Flex
-                    flexDir="column"
-                    gap="20px"
-                    mt="20px"
-                  >
-                    <Text textStyle="bigText" color="white">
-                      Blockchain
-                    </Text>
-                    <Flex flexDir="column" gap="7px" minW="225px">
-                      {VotesBlockchain.map((block) => (
-                        <Flex
-                          key={block.title}
-                          justifyContent="space-between"
-                          w="100%"
-                        >
-                          <Text textStyle="smallText" color="white">
-                            {block.title}
-                          </Text>
-                          <AddressCopy
-                            address={block.value}
-                            textStyle="smallText"
-                          />
-                        </Flex>
-                      ))}
-                    </Flex>
-                  </Flex>
-                  <Button
-                    mt={isChangedAccordion[0] ? "36px" : 0}
-                    bg="blue.primary"
-                    color="white"
-                    textStyle="button"
-                    minW="272px"
-                    alignSelf={isChangedAccordion ? "center" : "flex-end"}
-                    transition="all .3s"
-                    _hover={{ bg: "blue.hover" }}
-                  >
-                    vote
-                  </Button>
-                </Flex>
-              </AccordionPanel>
+              <AuctionItemPanel item={item} isChangedAccordion={isChangedAccordion[0]} />
             </AccordionItem>
           </Flex>
         )
