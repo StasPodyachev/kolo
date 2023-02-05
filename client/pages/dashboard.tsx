@@ -69,14 +69,12 @@ const Dashboard: NextPage = () => {
       });
       const filteredDealsBySeller = decryptedData.filter((item: IAuctionItem) => item?.ownedBy === address);
       const filteredDealsByBuyer = decryptedData.filter((item: IAuctionItem) => item?.buyerAddress === address);
-      const activeItemsCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Open").length;
-      setSellerActiveItemsCount(activeItemsCountSeller);
+      setSellerActiveItemsCount(filteredDealsBySeller.length);
       const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize").length;
       setSellerWaitForPaymentCount(waitForPaymentItemsCountSeller);
       const itemsInDisputCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Dispute").length;
       setSellerDisputCount(itemsInDisputCountSeller);
-      const activeItemsCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Open").length;
-      setBuyerActiveItemsCount(activeItemsCountBuyer);
+      setBuyerActiveItemsCount(filteredDealsByBuyer.length);
       const waitForPaymentItemsCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize").length;
       setBuyerWaitForPaymentCount(waitForPaymentItemsCountBuyer);
       const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Dispute").length;
@@ -123,7 +121,7 @@ const Dashboard: NextPage = () => {
     },
     {
       title: "In dispute",
-      value: buyerWaitForPaymentCount,
+      value: buyerDisputCount,
     },
     {
       title: "Locked in bids",

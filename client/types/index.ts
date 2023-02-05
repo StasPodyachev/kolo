@@ -75,5 +75,17 @@ export interface IChatMessage {
   message: string;
   sender: string;
   time: string;
-  id: number
+  id: number;
+}
+
+export interface IProposalItem {
+  title: string;
+  id: string;
+  buttonText?: string;
+  status: IStatus;
+}
+
+export interface IAboutKolo {
+  title: string;
+  subtitle: string;
 }
