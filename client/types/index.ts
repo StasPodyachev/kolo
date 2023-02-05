@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 export interface ISaleTypeMenuItem {
   id: number;
   title: string;
@@ -28,6 +30,9 @@ export interface IAuctionItem {
   description: string;
   status: IStatus;
   totalBids: number;
+  buyer?: string
+  collateral: BigNumber
+  cid?: string
 };
 
 export interface IBidTableData {
@@ -69,4 +74,5 @@ export interface IChatMessage {
   message: string;
   sender: string;
   time: string;
+  id: number
 }

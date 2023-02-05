@@ -162,7 +162,8 @@ contract Store is IStore {
         uint256 dealId,
         address buyer,
         address seller,
-        uint256 serviceFee
+        uint256 serviceFee,
+        uint256 storageFee
     ) external {
         require(
             _factory.integrationExist(msg.sender),
@@ -172,11 +173,12 @@ contract Store is IStore {
         uint256 amount = sellerCollaterals[dealId];
 
         if (buyers[dealId][buyer] != 0) {
-            uint256 fee = (buyers[dealId][buyer] * serviceFee) / 1e18;
+            uint256 serviceFee_ = (buyers[dealId][buyer] * serviceFee) / 1e18;
+            uint256 storageFee_ = (buyers[dealId][buyer] * storageFee) / 1e18;
 
-            payable(_factory.treasury()).transfer(fee);
+            payable(_factory.treasury()).transfer(serviceFee_ + storageFee_);
 
-            amount += buyers[dealId][buyer] - fee;
+            amount += buyers[dealId][buyer] - serviceFee_ - storageFee_;
             buyers[dealId][buyer] = 0;
         }
 

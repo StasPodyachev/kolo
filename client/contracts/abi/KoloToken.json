@@ -5,16 +5,6 @@
     "type": "constructor"
   },
   {
-    "inputs": [],
-    "name": "ExceedsBalance",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "LockPeriodOngoing",
-    "type": "error"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -210,6 +200,32 @@
   },
   {
     "inputs": [],
+    "name": "AIRDROP_FACTOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "AIRDROP_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "BURNABLE_ROLE",
     "outputs": [
       {
@@ -249,12 +265,44 @@
   },
   {
     "inputs": [],
-    "name": "MINTABLE_ROLE",
+    "name": "FIRST_MINT_SUPPLY",
     "outputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "uint256",
         "name": "",
-        "type": "bytes32"
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "HALF_YEAR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "PERIOD_UNLOCKED",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -275,7 +323,20 @@
   },
   {
     "inputs": [],
-    "name": "_depositDeadline",
+    "name": "WITHDRAW_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "YEAR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -288,7 +349,7 @@
   },
   {
     "inputs": [],
-    "name": "_lockDuration",
+    "name": "_dateStart",
     "outputs": [
       {
         "internalType": "uint256",
@@ -297,6 +358,32 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_nextUnlockTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      }
+    ],
+    "name": "airdrop",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -415,6 +502,19 @@
         "internalType": "struct ERC20Votes.Checkpoint",
         "name": "",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "currentAirdropFactor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "val",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -825,19 +925,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "s_maxSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "bytes4",
@@ -867,19 +954,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "wallet",
-        "type": "address"
-      }
-    ],
-    "name": "test",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -967,11 +1041,6 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "wallet",
-        "type": "address"
       }
     ],
     "name": "withdraw",

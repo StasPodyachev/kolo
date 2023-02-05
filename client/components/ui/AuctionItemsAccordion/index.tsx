@@ -148,7 +148,6 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                   <AccordionButton
                     cursor="pointer"
                     onClick={(event) => {
-                      console.log('id', item.id, typeof item.id);
                       event.preventDefault();
                       setNumberOfClicks(1);
                       setAccordionIndex(index);

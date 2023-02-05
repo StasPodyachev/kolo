@@ -1,5 +1,16 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "contract IFactory",
+        "name": "factory",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -24,6 +35,19 @@
     "outputs": [
       {
         "internalType": "contract MockExchange",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_factory",
+    "outputs": [
+      {
+        "internalType": "contract IFactory",
         "name": "",
         "type": "address"
       }
@@ -85,19 +109,6 @@
       }
     ],
     "name": "setExchange",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      }
-    ],
-    "name": "setKoloToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

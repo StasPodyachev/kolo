@@ -34,7 +34,9 @@ interface ISimpleTradeFile {
         uint256 collateralPercent;
     }
 
+    event DisputeRestarted(uint256 id);
     event DisputeCreated(uint256 id);
+
     event DealCreated(uint256 dealId, address sender);
     event DealCanceled(uint256 dealId, address sender);
     event DealFinalized(uint256 dealId);

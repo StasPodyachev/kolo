@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { BigNumber, ethers } from "ethers";
 import { IAuctionItem, IBidTableData } from "@/types";
 import { convertExpNumberToNormal, convertStatus } from "@/helpers";
+import web3 from "web3";
 
 const ProductPage: NextPage = () => {
   const [item, setItem] = useState<IAuctionItem>({} as IAuctionItem);
@@ -65,16 +66,16 @@ const ProductPage: NextPage = () => {
       const title = result[0][1];
       const description = result[0][2]
       const ownedBy = result[0][7]
+      const buyer = result[0][8]
      
       const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
       const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
       const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
       const status = result[0][12] && convertStatus(Number(result[0][12]));
-    
+      const collateral = result[0][6]
+      const cid = web3?.utils?.hexToAscii(result[0][11])
       
       const saleEndDateNew = status?.title == "Open" ? parseInt(result[0][9]?._hex, 16) : parseInt(result[0][9]?._hex, 16) * 1000
-      // const saleEndDateNew = parseInt(result[0][9]?._hex, 16)
-      console.log(status?.title == "Open", 'saleEndDateNew');
       let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
       if (bidsData && Array.isArray(bidsData)) {
         const decryptedBidData = bidsData.map((item) => {
@@ -94,6 +95,9 @@ const ProductPage: NextPage = () => {
         description,
         status,
         totalBids: bidsAmount,
+        buyer,
+        collateral,
+        cid
       }
       const newBid = (price < priceStart ? priceStart + minStep : price + minStep).toFixed(2)
       setBid(newBid + '')

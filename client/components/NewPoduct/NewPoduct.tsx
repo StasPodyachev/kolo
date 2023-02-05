@@ -1,4 +1,3 @@
-import addresses from "@/contracts/addresses";
 import { getDateTimeLocal, getTodaysDate } from "@/helpers";
 import { SaleTypeMenuItems } from "@/constants/shared";
 import {
@@ -24,11 +23,10 @@ import lighthouse from "@lighthouse-web3/sdk";
 
 declare var window: any;
 
-import ABI_FACTORY from "../../contracts/abi/Factory.json";
 import useDevice from "@/hooks/useDevice";
 import { ISaleTypeMenuItem } from "@/types";
-import CreateStore from "./CreateStore";
 import web3 from "web3";
+import { useTransactionManager } from "@/context/TransactionManageProvider";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
 const CustomInput = chakra(Input, {
@@ -114,16 +112,9 @@ const NewPoduct = () => {
   const [stopDate, setStopDate] = useState<Date>(getTodaysDate());
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
-  const [ isStore, setIsStore] = useState(false)
   const [fileName, setFileName] = useState("");
   const [thubnailName, setThubnailName] = useState("");
-
-  const { data: store } = useContractRead({
-    address: addresses[0].address as `0x${string}`,
-    abi: ABI_FACTORY,
-    functionName: 'getStore',
-    args: [address]
-  })
+  const [isShownStartSell, setIsShownStartSell] = useState(false);
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
@@ -163,39 +154,25 @@ const NewPoduct = () => {
     if (response?.data && isFile) {
       setFileName(response?.data?.Name);
     } else {
-      setThubnailName(response?.data.Name);
+      setThubnailName(response?.data?.Name);
     }
     setCid(response?.data?.Hash);
     setAcces(true);
 
     const accesCondition = async () => {
       const { publicKey, signedMessage } : any = await encryptionSignature();
-
-      // cid: QmbdEmFu3AK3gKcRPNjWo9qdktqGrvjfM2ZiewANkHUWMK
-
-      // const cidHex = "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
-
       const cidHex= web3.utils.asciiToHex(response?.data?.Hash).slice(2)
-      console.log(cidHex, 'cidHex');
-
       const arrStr = ["0x" + cidHex.slice(0, 64), "0x" + cidHex.slice(64) + "000000000000000000000000000000000000"]
       console.log({
         item1: arrStr[0],
         size: arrStr[0].length,
-
       },
       {
         item1: arrStr[1],
         size: arrStr[1].length,
-
-      },);
-
-
-      // const cidArr =  [
-      //   "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a66",
-      //   "0x4d325a696577414e6b4855574d4b000000000000000000000000000000000000",
-      // ]
-
+      }, {
+        size: (cidHex.length)/2 
+      });
       const conditions = [
         {
           id: 1,
@@ -207,7 +184,7 @@ const NewPoduct = () => {
           comparator: "==",
           value: "1"
           },
-          parameters: [ arrStr, '64' ,':userAddress'],
+          parameters: [ arrStr, (cidHex.length)/2 ,':userAddress'],
           inputArrayType: [ 'bytes32[]', 'uint8', 'address' ],
           outputType: "uint8"
       }
@@ -220,7 +197,9 @@ const NewPoduct = () => {
         conditions,
         aggregator
       )
-      console.log(res, 'res')
+      if (res.data.status === 'Success') {
+        setIsShownStartSell(true);
+      }
     }
     accesCondition()
   };
@@ -230,21 +209,6 @@ const NewPoduct = () => {
   const isStartPriceError = startPrice === '0' || startPrice === '';
   const isForceStopPriceError = forceStopPrice === '0' || forceStopPrice === '';
   const isDateStopError = stopDate.toString().length === 0;
-
-  useEffect(() => {
-    if (store === '0x0000000000000000000000000000000000000000') {
-      setIsStore(false);
-
-    } if (store !== '0x0000000000000000000000000000000000000000') {
-      setIsStore(true)
-    } else {
-
-    }
-  }, [store])
-
-  useEffect(() => {
-    console.log(stopDate, 'stopDate',);
-  }, [stopDate])
 
   return (
     <Flex justifyContent="center">
@@ -258,8 +222,7 @@ const NewPoduct = () => {
         {!address ? (
             <ConnectBtn isCentered isNeedMarginTop />
         ) : null}
-        {!isStore && address ? <CreateStore/>: null}
-        {isStore && address ? (
+        {address ? (
           <Box minW="100%">
           <Heading variant="h6" color="gray.200" mt="32px">
             Type of Sale
@@ -271,11 +234,13 @@ const NewPoduct = () => {
             </CustomFormLabel>
             <CustomInput
               minW="100%"
+              borderRadius={0}
               maxLength={70}
               value={itemName}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setItemName(event?.target?.value)
               }
+              _invalid={{borderColor: 'inherit', boxShadow: 'none'}}
               w="100%"
               placeholder="Item name (up to 70 characters)"
             />
@@ -287,11 +252,13 @@ const NewPoduct = () => {
             </CustomFormLabel>
             <CustomInput
               minW="100%"
+              borderRadius={0}
               maxLength={256}
               value={itemDescription}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setItemDescription(event.target.value)
               }
+              _invalid={{borderColor: 'inherit', boxShadow: 'none'}}
               w="100%"
               placeholder="Description (up to 256 characters)"
             />
@@ -341,6 +308,7 @@ const NewPoduct = () => {
                   Date Stop Auction
                 </CustomFormLabel>
                 <CustomInput
+                  borderRadius={0}
                   type="datetime-local"
                   min={getTodaysDate()}
                   value={getDateTimeLocal(stopDate)}
@@ -390,7 +358,7 @@ const NewPoduct = () => {
                   }}
                   htmlFor="fileDownload"
                 >
-                  download file
+                  {fileName ? "file downloaded" : "download file"}
                 </label>
                 <Input
                   id="fileDownload"
@@ -455,7 +423,7 @@ const NewPoduct = () => {
               </Box>
             </Flex>
           ) : null}
-          {isConnected && access ? (
+          {isConnected && access && isShownStartSell ? (
             <ButtonContractWrite
               address={activeItem.address}
               abi={activeItem.abi}

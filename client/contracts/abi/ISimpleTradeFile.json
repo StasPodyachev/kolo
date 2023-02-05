@@ -155,19 +155,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "dealId",
-        "type": "uint256"
-      }
-    ],
-    "name": "finalize",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "getIntegrationInfo",
     "outputs": [
@@ -203,6 +190,19 @@
         "internalType": "uint256",
         "name": "dealId",
         "type": "uint256"
+      }
+    ],
+    "name": "receiveReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "dealId",
+        "type": "uint256"
       },
       {
         "internalType": "string",
@@ -211,6 +211,19 @@
       }
     ],
     "name": "sendMessage",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IChat",
+        "name": "chat",
+        "type": "address"
+      }
+    ],
+    "name": "setChat",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -231,12 +244,12 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "factory",
+        "internalType": "contract INotary",
+        "name": "chat",
         "type": "address"
       }
     ],
-    "name": "setFactory",
+    "name": "setNotary",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

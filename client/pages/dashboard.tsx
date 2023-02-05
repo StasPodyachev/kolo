@@ -33,23 +33,21 @@ const Dashboard: NextPage = () => {
   useEffect(() => {
     if (Array.isArray(data)) {
       const decryptedData = data?.map((item: any) => {
-        const coder = ethers.utils.defaultAbiCoder;
-        const result = coder.decode([
-          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)"
-        ], item.data);
-
-        const id = +result[0][0].toString();
-        const title = result[0][1];
+        const coder = ethers?.utils?.defaultAbiCoder;
+        const result = coder?.decode([
+          "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
+        ], item?.data);
+        const id = +result[0][0]?.toString();
+        const title = result[0][1]
         const description = result[0][2]
+        const price = +ethers?.utils?.formatEther(BigNumber?.from(result[0][4]));
         const ownedBy = result[0][7]
-        const buyerAddress = result[0][8];
-        const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
         const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
-
+        const collateral = result[0][6]
+        const buyerAddress = result[0][8]
         const status = result[0][12] && convertStatus(Number(result[0][12]));
-
-        const saleEndDateNew = parseInt(result[0][9]?._hex, 16)
+        const saleEndDateNew = status?.title == "Open" ? parseInt(result[0][9]?._hex, 16) : parseInt(result[0][9]?._hex, 16) * 1000
         let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
 
         return {
@@ -64,21 +62,22 @@ const Dashboard: NextPage = () => {
           description,
           status,
           totalBids: 20,
+          collateral,
         };
       });
       const filteredDealsBySeller = decryptedData.filter((item: any) => item.ownedBy === address);
       const filteredDealsByBuyer = decryptedData.filter((item: any) => item.buyerAddress === address);
-      const activeItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status === "Open").length;
+      const activeItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status.title === "Open").length;
       setSellerActiveItemsCount(activeItemsCountSeller);
-      const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status === "Wait finalize").length;
+      const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: any) => item.status.title === "Wait finalize").length;
       setSellerWaitForPaymentCount(waitForPaymentItemsCountSeller);
-      const itemsInDisputCountSeller = filteredDealsBySeller.filter((item: any) => item.status === "Dispute").length;
+      const itemsInDisputCountSeller = filteredDealsBySeller.filter((item: any) => item.status.title === "Dispute").length;
       setSellerDisputCount(itemsInDisputCountSeller);
-      const activeItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status === "Open").length;
+      const activeItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status.title === "Open").length;
       setBuyerActiveItemsCount(activeItemsCountBuyer);
-      const waitForPaymentItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status === "Wait finalize").length;
+      const waitForPaymentItemsCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status.title === "Wait finalize").length;
       setBuyerWaitForPaymentCount(waitForPaymentItemsCountBuyer);
-      const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status === "Dispute").length;
+      const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: any) => item.status.title === "Dispute").length;
       setBuyerDisputCount(itemsInDisputCountBuyer);
 
       setDealsBySeller(filteredDealsBySeller);

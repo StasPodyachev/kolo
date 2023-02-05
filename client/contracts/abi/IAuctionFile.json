@@ -284,6 +284,19 @@
   {
     "inputs": [
       {
+        "internalType": "contract IChat",
+        "name": "chat",
+        "type": "address"
+      }
+    ],
+    "name": "setChat",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "value",
         "type": "uint256"
@@ -297,12 +310,12 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "factory",
+        "internalType": "contract INotary",
+        "name": "chat",
         "type": "address"
       }
     ],
-    "name": "setFactory",
+    "name": "setNotary",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
