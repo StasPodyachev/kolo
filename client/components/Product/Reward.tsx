@@ -14,7 +14,7 @@ const Reward = ({ id }: IProps) => {
   const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
-    functionName: 'reciveReward',
+    functionName: 'receiveReward',
     args: [id]
   });
 
