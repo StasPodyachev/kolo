@@ -33,7 +33,6 @@ const NotaryCommunityPanel = ({ blocks, notaryData }: IProps) => {
             ) : (
               1/1
             )}
-            {/* 10/{Array.isArray(notaryData) ? notaryData?.length : 1} */}
           </Heading>
         </Flex>
         <NotaryTable data={notaryData} />
