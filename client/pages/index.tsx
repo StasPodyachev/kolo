@@ -11,8 +11,7 @@ import { BigNumber, ethers } from "ethers";
 import { convertStatus } from "@/helpers";
 
 const Home: NextPage = () => {
-  const [ items, setItems ] = useState<IAuctionItem[] | []>([]);
-
+  const [ items, setItems ] = useState<IAuctionItem[]|[]>([]);
   const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
@@ -61,16 +60,15 @@ const Home: NextPage = () => {
     }
   }, [data]);
 
-
   return (
     <Layout pageTitle="Market">
         <Grid
           gap="32px"
           justifyContent="space-around"
           templateColumns="repeat(auto-fill, 304px)"
-          templateRows="auto"
-        >
-          {items?.map((auctionItem) => (
+          templateRows="auto">
+          {
+            items?.map((auctionItem) => (
             <ItemCard
               key={auctionItem.id}
               to={auctionItem.id}

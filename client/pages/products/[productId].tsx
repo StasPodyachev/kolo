@@ -76,6 +76,9 @@ const ProductPage: NextPage = () => {
       const cid = web3?.utils?.hexToAscii(result[0][11])
       
       const saleEndDateNew = status?.title == "Open" ? parseInt(result[0][9]?._hex, 16) : parseInt(result[0][9]?._hex, 16) * 1000
+      const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
+      console.log(pastTime, 'pastTime');
+      
       let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
       if (bidsData && Array.isArray(bidsData)) {
         const decryptedBidData = bidsData.map((item) => {
@@ -97,7 +100,8 @@ const ProductPage: NextPage = () => {
         totalBids: bidsAmount,
         buyer,
         collateral,
-        cid
+        cid,
+        pastTime
       }
       const newBid = (price < priceStart ? priceStart + minStep : price + minStep).toFixed(2)
       setBid(newBid + '')
