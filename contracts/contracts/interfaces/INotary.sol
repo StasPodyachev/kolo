@@ -10,8 +10,8 @@ interface INotary {
 
     struct NotaryParams {
         address wallet;
-        uint256 balance; // 0 - no mark, 1 - yes, 2 - no
-        bool isActive; // 0 - no status, 1 - win, 2 - lose
+        uint256 balance;
+        bool isActive;
     }
 
     function setPenalty(uint256 value) external;
