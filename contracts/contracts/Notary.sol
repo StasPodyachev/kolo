@@ -18,15 +18,17 @@ contract Notary is INotary, Ownable {
     mapping(address => uint256) private deposits;
     mapping(uint256 => uint256) private penaltyByDeal;
     mapping(uint256 => mapping(address => bool)) private notaries;
-    mapping(address => uint256) private currNotaries;
+    mapping(uint256 => address[]) private dealNotaries;
+    mapping(address => uint256[]) private notaryDeals;
+    mapping(uint256 => mapping(address => bool)) private votes;
 
     mapping(uint256 => address[]) private votesForBuyer;
     mapping(uint256 => address[]) private votesForSeller;
 
     mapping(address => INotary.VoteParams[]) private _notaryDeal;
 
-    address[] notariesArr;
     address[] activeNotaries;
+    mapping(address => uint256) private activeNotariesMap;
 
     uint256 public _minDeposit = 1e18;
     uint256 public _consensusCount = 2;
@@ -66,12 +68,8 @@ contract Notary is INotary, Ownable {
         );
 
         deposits[msg.sender] += msg.value;
-
-        if (currNotaries[msg.sender] == 0) {
-            activeNotaries.push(msg.sender);
-            notariesArr.push(msg.sender);
-            currNotaries[msg.sender] = notariesArr.length;
-        }
+        console.log("deposit", deposits[msg.sender], msg.sender);
+        _addNotary(msg.sender);
     }
 
     function withdraw(uint256 amount) external {
@@ -80,9 +78,26 @@ contract Notary is INotary, Ownable {
         payable(msg.sender).transfer(amount);
         deposits[msg.sender] -= amount;
 
-        if (deposits[msg.sender] == 0) {
-            delete notariesArr[currNotaries[msg.sender] - 1];
-            currNotaries[msg.sender] = 0;
+        _removeNotary(msg.sender);
+    }
+
+    function _removeNotary(address addr) internal {
+        if (deposits[addr] < _minDeposit) {
+            uint256 index = activeNotariesMap[addr] - 1;
+            address last = activeNotaries[activeNotaries.length - 1];
+
+            activeNotariesMap[last] = index + 1;
+            activeNotaries[index] = last;
+            activeNotaries.pop();
+
+            activeNotariesMap[addr] = 0;
+        }
+    }
+
+    function _addNotary(address addr) internal {
+        if (deposits[addr] >= _minDeposit && activeNotariesMap[addr] == 0) {
+            activeNotaries.push(addr);
+            activeNotariesMap[addr] = activeNotaries.length;
         }
     }
 
@@ -98,7 +113,10 @@ contract Notary is INotary, Ownable {
             "Notary: Enough votes"
         );
 
-        deposits[msg.sender] -= penaltyByDeal[dealId];
+        votes[dealId][msg.sender] = true;
+
+        // deposits[msg.sender] -= penaltyByDeal[dealId];
+        // _removeNotary(msg.sender);
 
         if (mark) {
             votesForBuyer[dealId].push(msg.sender);
@@ -123,6 +141,8 @@ contract Notary is INotary, Ownable {
                     deposits[votesForBuyer[dealId][i]] +=
                         penaltyByDeal[dealId] +
                         reward;
+
+                    _addNotary(votesForBuyer[dealId][i]);
                 }
 
                 serviceFee =
@@ -139,6 +159,8 @@ contract Notary is INotary, Ownable {
                     deposits[votesForSeller[dealId][i]] +=
                         penaltyByDeal[dealId] +
                         reward;
+
+                    _addNotary(votesForSeller[dealId][i]);
                 }
 
                 serviceFee =
@@ -147,6 +169,13 @@ contract Notary is INotary, Ownable {
                     (collateral - reward * votesForSeller[dealId].length);
 
                 winner = IIntegration.DisputeWinner.Seller;
+            }
+
+            address[] memory arr = getNotaries(dealId);
+
+            for (uint256 i = 0; i < arr.length; i++) {
+                if (votes[dealId][arr[i]]) continue;
+                deposits[arr[i]] += penaltyByDeal[dealId];
             }
 
             payable(_factory.treasury()).transfer(serviceFee);
@@ -177,11 +206,64 @@ contract Notary is INotary, Ownable {
         _generateRandomNotaries(dealId);
     }
 
+    function getNotaries(uint256 dealId)
+        public
+        view
+        returns (address[] memory)
+    {
+        return dealNotaries[dealId];
+    }
+
+    function isDisputePossible() public view returns (bool) {
+        return activeNotaries.length >= _countInvaitedNotary;
+    }
+
+    function getDeals(address notary) external view returns (uint256[] memory) {
+        return notaryDeals[notary];
+    }
+
+    function restart(uint256 dealId) external {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Notary: Only integration"
+        );
+
+        address[] memory arr = getNotaries(dealId);
+        delete dealNotaries[dealId];
+
+        for (uint256 i = 0; i < arr.length; i++) {
+            if (votes[dealId][arr[i]]) {
+                dealNotaries[dealId].push(arr[i]);
+                continue;
+            }
+
+            notaries[dealId][arr[i]] = false;
+        }
+
+        _generateRandomNotaries(dealId);
+    }
+
+    function refundPenalty(uint256 dealId) external {
+        require(
+            _factory.integrationExist(msg.sender),
+            "Notary: Only integration"
+        );
+
+        address[] memory arr = getNotaries(dealId);
+
+        for (uint256 i = 0; i < arr.length; i++) {
+            if (votes[dealId][arr[i]]) {
+                deposits[arr[i]] += penaltyByDeal[dealId];
+            }
+        }
+
+        _generateRandomNotaries(dealId);
+    }
+
     function _generateRandomNotaries(uint256 dealId) internal {
-        uint256 min = _countInvaitedNotary < notariesArr.length
+        uint256 min = _countInvaitedNotary < activeNotaries.length
             ? _countInvaitedNotary
-            : notariesArr.length;
-        uint256 max = notariesArr.length;
+            : activeNotaries.length;
 
         address storeAddress = _factory.getStore(dealId);
         IStore store = IStore(storeAddress);
@@ -190,16 +272,22 @@ contract Notary is INotary, Ownable {
         uint256 i;
         uint256 count;
 
-        while (count < min) {
-            uint256 rnd = _random(max, i++);
+        while (
+            count < min || activeNotaries.length == dealNotaries[dealId].length
+        ) {
+            uint256 rnd = _random(activeNotaries.length, i++);
 
-            if (
-                notaries[dealId][notariesArr[rnd]] ||
-                deposits[notariesArr[rnd]] < _minDeposit
-            ) continue;
+            if (notaries[dealId][activeNotaries[rnd]]) continue;
 
-            notaries[dealId][notariesArr[rnd]] = true;
-            IIntegration(integration).addAccess(dealId, notariesArr[rnd]);
+            deposits[activeNotaries[rnd]] -= penaltyByDeal[dealId];
+            notaries[dealId][activeNotaries[rnd]] = true;
+
+            dealNotaries[dealId].push(activeNotaries[rnd]);
+            notaryDeals[activeNotaries[rnd]].push(dealId);
+
+            IIntegration(integration).addAccess(dealId, activeNotaries[rnd]);
+            _removeNotary(activeNotaries[rnd]);
+
             count++;
         }
     }

@@ -5,8 +5,7 @@ import "hardhat-deploy"
 import "hardhat-deploy-ethers"
 
 import { deployNames } from "./constants"
-import { writeDeployData } from "./utils"
-import { Chat, Factory } from "../typechain"
+import { AuctionFile, Chat, Factory } from "../typechain"
 import { utils } from "ethers"
 
 const CHAIN_ID: string = network.config.chainId
@@ -34,28 +33,31 @@ export async function main() {
 
   const item = utils.defaultAbiCoder.decode(
     [
-      "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256,bytes, uint256)",
+      "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
     ],
     res.data
   )[0]
 
-  console.log(item[9].toString(), item[10].toString())
+  const cid: string = item[11]
 
-  const chat = (await getKnowContractAt(deployNames.CHAT)) as Chat
+  const auction = (await getKnowContractAt(
+    deployNames.AUCTION_FILE
+  )) as AuctionFile
 
-  const msgs = await chat.getChat(1)
+  const cidArr = [
+    "0x" + cid.substring(2, 66),
+    "0x" + cid.substring(66) + "000000000000000000000000000000000000",
+  ]
 
-  console.log(msgs[1])
+  console.log(cidArr, cid)
 
-  // 1675443780000
-  // 1675443780000
-  // 1675434510
+  const check = await auction["checkAccess(bytes32[],uint8,address)"](
+    cidArr,
+    46,
+    "0xF552f5223D3f7cEB580fA92Fe0AFc6ED8c09179b"
+  )
 
-  // for (let i = 0; i < msgs.length; i++) {
-  //   // console.log(msgs[i].timestamp.toString())
-  //   console.log(msgs[i][2])
-  //   // console.log(msgs[i])
-  // }
+  console.log(check)
 }
 
 async function getContractAt(name: string, address: string) {
@@ -77,3 +79,11 @@ main()
     console.error(error)
     process.exit(1)
   })
+
+// 0x516d65664270773777366768566250333839595338684a4e6d4a653355737142
+// 0x516d65664270773777366768566250333839595338684a4e6d4a653355737142
+
+// 0x516d65664270773777366768566250333839595338684a4e6d4a65335573714261696d3168527674484376645233
+
+// 0x516d63763639435347766453376f556835315769384474487a7972584273484a
+// 0x4739426175503362334343425769000000000000000000000000000000000000
