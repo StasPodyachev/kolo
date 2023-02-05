@@ -18,6 +18,7 @@ import Vote from "./Vote";
 import Cancel from "./Cancel";
 import Link from "next/link";
 import { LinkIcon } from "@chakra-ui/icons";
+import Reward from "./Reward";
 interface IProps {
   item: IAuctionItem,
   bid: string,
@@ -172,6 +173,8 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                 {
                   item?.status?.title === "Wait finalize" ?
                   <Finalize id={item?.id} collateral={item?.collateral} /> :
+                  item?.status?.title === "Wait Reward" && isSeller ?
+                  <Reward id={item?.id} /> :
                   item?.status?.title === "Open" && !isSeller ?
                     <>
                       <NumberInput
