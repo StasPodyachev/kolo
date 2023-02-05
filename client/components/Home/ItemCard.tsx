@@ -1,7 +1,11 @@
 import { Box, Flex, Text, Button } from "@chakra-ui/react";
-import { NextPage } from "next";
 import Image from "next/image";
-import CardImage from "@/icons/cardImage.svg";
+import Sheet from "@/icons/cardImages/sheet.svg";
+import Lamp from "@/icons/cardImages/lamp.svg";
+import Clouds from "@/icons/cardImages/clouds.svg";
+import Mountain from "@/icons/cardImages/mountain.svg";
+import Plant from "@/icons/cardImages/plant.svg";
+import Recycle from "@/icons/cardImages/recycle.svg";
 import { FileIcon } from "@/icons";
 import Link from "next/link";
 import AddressCopy from "../ui/AddressCopy";
@@ -14,6 +18,8 @@ interface IProps {
   image?: string;
 }
 
+const imagesArray = [Sheet, Lamp, Clouds, Mountain, Plant, Recycle];
+
 const ItemCard = ({
   to,
   title,
@@ -22,6 +28,7 @@ const ItemCard = ({
   saleEndDate,
   image,
 }: IProps) => {
+  const randomImage = Math.floor(Math.random() * (imagesArray.length));
   return (
     <Link href={`products/${to.toString()}`}>
       <Box minW="304px" minH="435px" bg="white">
@@ -34,7 +41,7 @@ const ItemCard = ({
             h="240px"
             bg="gray.800"
           >
-            <Image src={CardImage} alt="card image" />
+            <Image src={imagesArray[randomImage]} alt="card image" />
           </Flex>
         )}
         <Flex

@@ -30,10 +30,11 @@ export interface IAuctionItem {
   description: string;
   status: IStatus;
   totalBids?: number;
-  buyer?: string
-  collateral: BigNumber
-  cid?: string
-  pastTime?: boolean
+  buyer?: string;
+  collateral: BigNumber;
+  cid?: string;
+  pastTime?: boolean;
+  icon?: ISvg;
 };
 
 export interface IBidTableData {
@@ -89,3 +90,9 @@ export interface IAboutKolo {
   title: string;
   subtitle: string;
 }
+
+export interface ISvg {
+  src: string;
+  height: number;
+  width: number;
+};
