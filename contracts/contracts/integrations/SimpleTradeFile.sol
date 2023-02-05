@@ -32,6 +32,7 @@ contract SimpleTradeFile is
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;
     uint256 public _serviceFee = 2e16;
+    uint256 public _storageFee = 1e16;
 
     mapping(uint256 => SimpleTradeFileParams) private deals;
     mapping(address => mapping(bytes => bool)) private _accsess;
@@ -43,6 +44,10 @@ contract SimpleTradeFile is
     modifier onlyNotary() {
         require(msg.sender == address(_notary), "SimpleTradeFile: Only notary");
         _;
+    }
+
+    function setStorageFee(uint256 value) external onlyOwner {
+        _storageFee = value;
     }
 
     function setServiceFee(uint256 value) external onlyOwner {
@@ -69,6 +74,12 @@ contract SimpleTradeFile is
         _notary = notary;
     }
 
+    /**
+     * @notice Get integration info
+     *
+     * @return param This function returns periodDispute,
+     * collateralPercent and collateralAmount
+     */
     function getIntegrationInfo()
         external
         view
@@ -82,6 +93,14 @@ contract SimpleTradeFile is
             });
     }
 
+    /**
+     * @notice Get deal by `dealId`
+     *
+     * @param dealId ID of a deal
+     * @return deal This function returns deal ID, deal params,
+     * integration type, store address and integration address
+     * @dev Deal params stores in data in bytes.
+     */
     function getDeal(uint256 dealId)
         external
         view
@@ -99,6 +118,7 @@ contract SimpleTradeFile is
         });
     }
 
+    ///  @notice Get deal by `dealId`. Deal status must be equal `status`
     function _checkStatusAndGetDeal(
         uint256 dealId,
         SimpleTradeFileStatus status
@@ -114,6 +134,26 @@ contract SimpleTradeFile is
         IKoloToken(_factory.daoToken()).airdrop(wallet);
     }
 
+    /**
+     * @notice Creating a new deal
+     *
+     * @param name Name of a deal
+     * @param description Description of a deal
+     * @param price Price of a deal
+     * @param dateExpire Date the deal expires
+     * @param cid File bytes
+     * @return id ID of a deal
+     * @dev This function creates store if it does not exist.
+     * File must be uploaded first
+     *
+     * Requirements:
+     *
+     * - Сollateral cannot be less then `_collateralAmount`
+     * - Сollateral cannot be less then `_collateralPercent` of `priceStart`
+     * - `price` cannot be 0
+     * - `dateExpire` cannot be less then now
+     *
+     */
     function create(
         string calldata name,
         string calldata description,
@@ -156,6 +196,7 @@ contract SimpleTradeFile is
 
         IStore(storeAddress).createDeal{value: msg.value}(id);
         _chat.sendSystemMessage(id, "Deal created.");
+        _addAccess(msg.sender, deals[id].cid);
 
         emit DealCreated(id, msg.sender);
 
@@ -164,6 +205,19 @@ contract SimpleTradeFile is
         return id;
     }
 
+    /**
+     * @notice Buy a file in a deal
+     *
+     * @param dealId ID of a deal
+     *
+     * Requirements:
+     *
+     * - Deal status must be OPEN
+     * - Cannot be called by seller
+     * -  msg.value must be equal `price`
+     * - `dateExpire` cannot be less then now
+     *
+     */
     function buy(uint256 dealId) external payable {
         SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
             dealId,
@@ -209,6 +263,18 @@ contract SimpleTradeFile is
         emit DealFinalized(deal.id);
     }
 
+    /**
+     * @notice Cancel a deal
+     *
+     * @param dealId ID of a deal
+     * @dev Collateral amount will be refund
+     *
+     * Requirements:
+     *
+     * - Deal status must be OPEN
+     * - Can only be called by seller
+     *
+     */
     function cancel(uint256 dealId) external {
         SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
             dealId,
@@ -234,10 +300,25 @@ contract SimpleTradeFile is
             dealId,
             address(0),
             seller,
-            _serviceFee
+            _serviceFee,
+            _storageFee
         );
     }
 
+    /**
+     * @notice Start a dispute
+     *
+     * @param dealId ID of a deal
+     * @dev If there are not enough notaries, then the dispute is impossible
+     *
+     * Requirements:
+     *
+     * - Deal status must be FINALIZE
+     * - Can only be called by buyer
+     * - The current date cannot be grater then `dateExpire` + `_periodDispute`
+     * - The buyer must pass the same collateral amount as the seller
+     *
+     */
     function dispute(uint256 dealId) external payable {
         SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
             dealId,
@@ -269,6 +350,57 @@ contract SimpleTradeFile is
         emit DisputeCreated(dealId);
     }
 
+    /**
+     * @notice Restart a dispute
+     *
+     * @param dealId ID of a deal
+     * @dev If there are not enough notaries, then the dispute is impossible
+     *
+     * Requirements:
+     *
+     * - Deal status must be DISPUTE
+     * - Can only be called by buyer
+     * - The current date cannot be grater then `dateExpire` + `_periodDispute`
+     *
+     */
+    function restartDispute(uint256 dealId) external payable {
+        SimpleTradeFileParams storage deal = _checkStatusAndGetDeal(
+            dealId,
+            SimpleTradeFileStatus.DISPUTE
+        );
+
+        require(deal.buyer == msg.sender, "AuctionFile: Caller is not a buyer");
+        require(
+            block.timestamp > deal.dateExpire + _periodDispute,
+            "AuctionFile: Time for dispute"
+        );
+
+        if (_notary.isDisputePossible()) {
+            _chat.sendSystemMessage(dealId, "Dispute restarted.");
+
+            _notary.restart(dealId);
+            deal.dateExpire = block.timestamp;
+
+            emit DisputeRestarted(dealId);
+        } else {
+            _notary.refundPenalty(dealId);
+            _chat.sendSystemMessage(dealId, "Dispute is not possible.");
+            _sendWin(deal, IIntegration.DisputeWinner.Seller);
+        }
+    }
+
+    /**
+     * @notice Finalize a dispute
+     *
+     * @param dealId ID of a deal
+     * @param winner Seller or Buyer
+     *
+     * Requirements:
+     *
+     * - Deal status must be DISPUTE
+     * - Can only be called by Notary contract
+     *
+     */
     function finalizeDispute(uint256 dealId, IIntegration.DisputeWinner winner)
         external
         onlyNotary
@@ -301,6 +433,13 @@ contract SimpleTradeFile is
         );
     }
 
+    /**
+     * @notice Receive reward
+     *
+     * @param dealId ID of a deal
+     * @dev This function transfers money to the seller and closes a deal
+     *
+     */
     function receiveReward(uint256 dealId) external {
         SimpleTradeFileParams storage deal = deals[dealId];
         require(deal.price != 0, "SimpleTradeFile: Id not found");
@@ -328,7 +467,8 @@ contract SimpleTradeFile is
                 deal.id,
                 deal.buyer,
                 deal.seller,
-                _serviceFee
+                _serviceFee,
+                _storageFee
             );
         } else {
             store.transferWinToBuyer(deal.id, deal.buyer);
