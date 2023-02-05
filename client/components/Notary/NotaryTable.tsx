@@ -18,7 +18,7 @@ const NotaryTable = ({ data }: IProps) => {
               <Td pl={0}>
                 <AddressCopy address={item.address} />
               </Td>
-              <Td fontFamily="Roboto Mono" pr={0} color="white" isNumeric>
+              <Td fontFamily="Roboto Mono" pr={0} color={item?.balance < 1 ? "#7c8091" : "white"} isNumeric>
                 {numberWithCommas(item?.balance)}&nbsp;FIL
               </Td>
             </Tr>

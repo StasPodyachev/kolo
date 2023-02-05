@@ -67,10 +67,6 @@ const Notary = () => {
     setMyNotaryBalance(balance);
   }, [notaryInfo, address])
 
-  if (notaryInfo.length) {
-    console.log('notary info', notaryInfo)
-  }
-
   const notaryCommunityBlocks: IBlock[] = [
     {
       title: "Active Notaries",
