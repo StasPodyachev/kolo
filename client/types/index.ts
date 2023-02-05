@@ -12,7 +12,7 @@ export interface INavlink {
   icon: JSX.Element;
 };
 
-interface IStatus {
+export interface IStatus {
   title: string;
   color: string;
 }

@@ -50,11 +50,9 @@ const ButtonContractWrite = ({ title, address, abi, method, parrams, isDisabled 
     }
   }, [data])
 
-  return isSuccess ? null : isLoading ? (
-    <Button textStyle="button">Loading...</Button>
-  ) : (
+  return (
     <Button
-      isDisabled={isDisabled}
+      isDisabled={isDisabled && isSuccess}
       textStyle="button"
       w="100%"
       minH="48px"
