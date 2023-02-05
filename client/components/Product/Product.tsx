@@ -13,7 +13,6 @@ import BuyNow from "./BuyNow";
 import { useEffect, useState } from "react";
 import Chat from "./Chat";
 import Dispute from "./Dispute";
-import lighthouse from "@lighthouse-web3/sdk";
 import Finalize from "./Finalize";
 import Vote from "./Vote";
 import Cancel from "./Cancel";
@@ -170,6 +169,8 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
               <Flex height={'48px'} justifyContent="space-between">
                 {
+                  item?.pastTime ?
+                  <Finalize id={item?.id} collateral={item?.collateral} /> :
                   item?.status?.title === "Open" && !isSeller ?
                     <>
                       <NumberInput
@@ -185,12 +186,10 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                       />
                     </>
                   : isBuyer && item?.id ?
-                  <Flex w="100%" justifyContent="space-between">
-                    <Dispute id={item?.id} collateral={item?.collateral} />
-
-                    {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
-                    </Flex> : isSeller && item?.status?.title === "Open" ?
-                  <Cancel id={item?.id} />  : isNotary && item?.status?.title === "Dispute" ? (
+                  <Dispute id={item?.id} collateral={item?.collateral} />
+                  : isSeller && item?.status?.title === "Open" ?
+                  <Cancel id={item?.id} /> 
+                  : isNotary && item?.status?.title === "Dispute" ? (
                     <Vote
                       id={item?.id}
                       mark={false}

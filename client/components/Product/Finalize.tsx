@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from "@chakra-ui/react";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import addresses from "@/contracts/addresses";
@@ -7,15 +8,17 @@ import { useEffect } from "react";
 import { BigNumber } from "ethers";
 interface IProps {
   id: number;
+  collateral: BigNumber
 }
 
-const Finalize = ({ id }: IProps) => {
+const Finalize = ({ id, collateral }: IProps) => {
+  console.log(collateral, 'collateral');
   const { onConfirm, onTransaction } = useTransactionManager()
   const { config: finalizeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: 'finalize',
-    args: [BigNumber.from(id)]
+    args: [id, {value: collateral}]
   });
 
   const { write, isLoading, isSuccess, data } = useContractWrite(finalizeConfig);
