@@ -6,11 +6,10 @@ import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
 import { useEffect } from "react";
 interface IProps {
-  id: number;
-  collateral: BigNumber
+  id: number
 }
 
-const Cancel = ({ id, collateral }: IProps) => {
+const Cancel = ({ id }: IProps) => {
   const { onConfirm, onTransaction } = useTransactionManager()
   const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,

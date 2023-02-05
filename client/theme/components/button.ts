@@ -12,6 +12,12 @@ const button = {
         bg: 'blue.hover',
       },
     },
+    darkBlue: {
+      bg: 'blue.secondaryDark',
+      _hover: {
+        bg: 'blue.active',
+      }
+    },
   }
 };
 

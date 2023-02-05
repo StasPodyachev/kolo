@@ -15,7 +15,7 @@ const NotaryTable: NextPage = () => {
                 <AddressCopy address={item.address} />
               </Td>
               <Td fontFamily="Roboto Mono" pr={0} color="white" isNumeric>
-                {numberWithCommas(item.balance)}&nbsp;FIL
+                {numberWithCommas(item?.balance)}&nbsp;FIL
               </Td>
             </Tr>
           ))}

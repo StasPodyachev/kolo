@@ -15,6 +15,10 @@ import Chat from "./Chat";
 import Dispute from "./Dispute";
 import lighthouse from "@lighthouse-web3/sdk";
 import Finalize from "./Finalize";
+import Vote from "./Vote";
+import Cancel from "./Cancel";
+import Link from "next/link";
+import { LinkIcon } from "@chakra-ui/icons";
 interface IProps {
   item: IAuctionItem,
   bid: string,
@@ -61,8 +65,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
   const [ isSeller, setIsSeller ] = useState(false);
   const [ isBuyer, setIsBuyer ] = useState(false);
-  const [ isNotary, setIsNotary ] = useState(false);
-
+  const [ isNotary, setIsNotary ] = useState(true);
 
   useEffect(() => {
     if (item?.buyer === address) setIsBuyer(true)
@@ -74,7 +77,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
   useEffect(() => {
     if (item?.cid) {
-     
+
     }
   }, [item])
 
@@ -168,7 +171,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
               <Flex height={'48px'} justifyContent="space-between">
                 {
-                  item?.status?.title === "Open" ?
+                  item?.status?.title === "Open" && !isSeller ?
                     <>
                       <NumberInput
                         value={bid}
@@ -187,7 +190,15 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                     <Dispute id={item?.id} collateral={item?.collateral} />
 
                     {/* <Finalize onClick={() => finalizeWrite?.()} /> */}
-                  </Flex> : null
+                    </Flex> : isSeller && item?.status?.title === "Open" ?
+                  <Cancel id={item?.id} />  : isNotary && item?.status?.title === "Dispute" ? (
+                    <Vote
+                      id={item?.id}
+                      mark={false}
+                      variant="blue"
+                      title="vote for seller"
+                    />
+                  ) : null
                 }
               </Flex>
           </Flex>
@@ -238,10 +249,25 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                   isDisabled={!signer || item?.ownedBy === address}
                   id={item?.id}
                   price={item?.priceEnd}
-                  /> : null
+                  /> :  isNotary && item?.status?.title === "Dispute" ? (
+                    <Vote
+                      id={item?.id}
+                      mark
+                      variant="darkBlue"
+                      title="vote for buyer"
+                      isNeededMarginTop
+                    /> 
+                  ) : null
               }
           </Flex>
         </Flex>
+      </Flex>
+      <Flex mt={5}>
+        <Link style={{"display" : "flex", "alignItems": "center"}} target="_blank" href={`https://files.lighthouse.storage/viewFile/${item?.cid}`}>
+          <Text color={"#ccc"} mr={2}>Cid Link:</Text>
+          <Text mr={2}> {item?.cid?.slice(0, 22)} ...</Text>
+          <LinkIcon />
+        </Link>
       </Flex>
       <Bids isDesktopHeader={isDesktopHeader} bidsAmount={bidsAmount}
         bidsTableData={bidsTableData} id={item?.id}
