@@ -259,7 +259,7 @@ const DaoIcon = createIcon({
   path: [
     <path
       fillRule="evenodd"
-      clip-rule="evenodd"
+      clipRule="evenodd"
       d="M13 14H11V18H9C8.44772 18 8 18.4477 8 19C8 19.5523 8.44772 20 9 20H11H13H15C15.5523 20 16 19.5523 16 19C16 18.4477 15.5523 18 15 18H13V14Z"
       fill="currentColor"
     />,
