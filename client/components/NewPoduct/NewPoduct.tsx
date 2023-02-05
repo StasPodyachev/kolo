@@ -163,16 +163,7 @@ const NewPoduct = () => {
       const { publicKey, signedMessage } : any = await encryptionSignature();
       const cidHex= web3.utils.asciiToHex(response?.data?.Hash).slice(2)
       const arrStr = ["0x" + cidHex.slice(0, 64), "0x" + cidHex.slice(64) + "000000000000000000000000000000000000"]
-      console.log({
-        item1: arrStr[0],
-        size: arrStr[0].length,
-      },
-      {
-        item1: arrStr[1],
-        size: arrStr[1].length,
-      }, {
-        size: (cidHex.length)/2 
-      });
+
       const conditions = [
         {
           id: 1,
@@ -407,7 +398,6 @@ const NewPoduct = () => {
                   type="file"
                   display="none"
                   onChange={(e) => {
-                    // deployEncrypted(e, false)
                   }}
                 />
                 {thubnailName ? (
@@ -440,9 +430,9 @@ const NewPoduct = () => {
                   collateral: myCollateral
                 }
               }
-              isDisabled={!access &&
-                (itemName && itemDescription && startPrice && forceStopPrice && stopDate && myCollateral && fileName
-                  ? false : true)}
+              isDisabled={
+                access  && startPrice && forceStopPrice && stopDate && myCollateral && fileName
+                && itemName?.length && itemDescription?.length ? false : true}
             />
           ) : null}
         </Box>
