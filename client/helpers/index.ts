@@ -61,5 +61,15 @@ export function convertStatus(status: number) {
         title: "Wait finalize",
         color: "#004DE5",
       }
+      case 5:
+        return {
+          title: "Buyed",
+          color: "#0E8C43",
+        }
+      case 5:
+        return {
+          title: "Wait Reward",
+          color: "#004DE5",
+        }
   }
 }

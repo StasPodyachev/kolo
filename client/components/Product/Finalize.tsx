@@ -12,7 +12,6 @@ interface IProps {
 }
 
 const Finalize = ({ id, collateral }: IProps) => {
-  console.log(collateral, 'collateral');
   const { onConfirm, onTransaction } = useTransactionManager()
   const { config: finalizeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,

@@ -10,12 +10,6 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import Sheet from "@/icons/cardImages/Sheet.svg";
-import Lamp from "@/icons/cardImages/lamp.svg";
-import Clouds from "@/icons/cardImages/clouds.svg";
-import Mountain from "@/icons/cardImages/mountain.svg";
-import Plant from "@/icons/cardImages/plant.svg";
-import Recycle from "@/icons/cardImages/recycle.svg";
 import AddressCopy from "../AddressCopy";
 import Link from "next/link";
 import { useState } from "react";
@@ -27,14 +21,11 @@ interface IProps {
   image?: ISvg;
 }
 
-const imagesArray = [Sheet, Lamp, Clouds, Mountain, Plant, Recycle];
-
 const AuctionItemAccordion = ({ deals, image }: IProps) => {
   const [accordionIndex, setAccordionIndex] = useState(-1);
   const [numberOfClicks, setNumberOfClicks] = useState(0);
   const isChangedAccordion = useMediaQuery("(max-width: 1000px)");
   const isAccordionTextInColumn = useMediaQuery("(max-width: 810px)");
-
 
   return (
     <Accordion mt="16px" index={accordionIndex}>

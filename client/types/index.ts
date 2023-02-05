@@ -30,10 +30,11 @@ export interface IAuctionItem {
   description: string;
   status: IStatus;
   totalBids?: number;
-  buyer?: string;
-  collateral: BigNumber;
-  cid?: string;
-  pastTime?: boolean;
+  buyer?: string
+  collateral: BigNumber
+  cid?: string
+  pastTime?: boolean
+  inDispute?: boolean
   icon?: ISvg;
 };
 
