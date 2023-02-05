@@ -20,15 +20,12 @@ contract Notary is INotary, Ownable {
     mapping(uint256 => mapping(address => bool)) private notaries;
     mapping(uint256 => address[]) private dealNotaries;
     mapping(address => uint256[]) private notaryDeals;
-    // mapping(uint256 => mapping(address => bool)) private votes;
-
     mapping(uint256 => address[]) private votesForBuyer;
     mapping(uint256 => address[]) private votesForSeller;
-
     mapping(address => INotary.VoteParams[]) private _notaryDeal;
+    mapping(address => uint256) private activeNotariesMap;
 
     address[] activeNotaries;
-    mapping(address => uint256) private activeNotariesMap;
 
     uint256 public _minDeposit = 1e18;
     uint256 public _consensusCount = 2;
@@ -217,10 +214,21 @@ contract Notary is INotary, Ownable {
     }
 
     function isDisputePossible(uint256 dealId) public view returns (bool) {
+        uint256 repeat = 0;
+
+        for (uint256 i = 0; i < votesForSeller[dealId].length; i++) {
+            if (activeNotariesMap[votesForSeller[dealId][i]] > 0) repeat++;
+        }
+
+        for (uint256 i = 0; i < votesForBuyer[dealId].length; i++) {
+            if (activeNotariesMap[votesForBuyer[dealId][i]] > 0) repeat++;
+        }
+
         return
             (votesForBuyer[dealId].length +
                 votesForSeller[dealId].length +
-                activeNotaries.length) >= _countInvaitedNotary;
+                activeNotaries.length -
+                repeat) >= _countInvaitedNotary;
     }
 
     function getDeals(address notary) external view returns (uint256[] memory) {
