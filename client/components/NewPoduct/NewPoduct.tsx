@@ -121,6 +121,8 @@ const NewPoduct = () => {
     // console.log(getDateTimeLocal(getTodaysDate()), 'getDateTimeLocal(getTodaysDate())');
     
     // setStopDate(getDateTimeLocal(getTodaysDate()))
+    console.log(getTodaysDate(), 'getTodaysDate');
+    
   }, [])
 
   const encryptionSignature = async () => {

@@ -18,8 +18,13 @@ interface IProps {
 
 const ButtonContractWrite = ({ title, address, abi, method, parrams, isDisabled }: IProps) => {
   const { name, description, priceStart, priceForceStop, dateExpire, cid, collateral} = parrams
+  console.log(dateExpire, 'dateExpire');
+  
   const date = new Date(dateExpire);
-  const newDateExpire = date.getTime();
+  console.log(date, 'date')
+  const newDateExpire = date.getTime() / 1000
+  console.log(newDateExpire, 'newDateExpire');
+  
   const { onConfirm,onTransaction } = useTransactionManager();
 
   const newPriceStart = BigInt(new BigDecimal(priceStart.length && priceStart).mul(BIG_1E18 + "").toFixed(0)) + ""
