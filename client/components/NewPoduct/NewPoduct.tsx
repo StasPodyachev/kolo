@@ -109,7 +109,7 @@ const NewPoduct = () => {
   const [startPrice, setStartPrice] = useState<string>("1");
   const [forceStopPrice, setForceStopPrice] = useState<string>("10");
   const [myCollateral, setMyCollateral] = useState("1");
-  const [stopDate, setStopDate] = useState<Date>(getTodaysDate());
+  const [stopDate, setStopDate] = useState<string>(getDateTimeLocal(getTodaysDate()));
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
   const [fileName, setFileName] = useState("");
@@ -312,9 +312,9 @@ const NewPoduct = () => {
                   borderRadius={0}
                   type="datetime-local"
                   min={getDateTimeLocal(getTodaysDate())}
-                  value={getDateTimeLocal(stopDate)}
+                  value={stopDate}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    setStopDate(new Date(event.target.value));
+                    setStopDate(event.target.value);
                   }}
                   px="16px"
                   minW="100%"
