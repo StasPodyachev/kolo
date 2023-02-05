@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from "@chakra-ui/react";
 import { useEffect } from "react";
 import BigDecimal from "decimal.js-light";
