@@ -4,7 +4,7 @@ import { main as deploy } from "./deploy"
 import { main as configure } from "./configure"
 
 async function main() {
-  // await deploy()
+  await deploy()
   await configure()
   // await verify()
 }

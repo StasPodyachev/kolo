@@ -1,44 +1,44 @@
 {
   "3141": {
     "Factory": {
-      "address": "0x79057B7d5342486a3197401aF64b3189D33baf2d",
-      "creationTime": 1675511974763
+      "address": "0xf6092B5b95F6d91aab8Ff05B0Ff0e2751b26e47A",
+      "creationTime": 1675622075561
     },
     "AuctionFile": {
-      "address": "0xe8e9AD50ECCc956b7bC6f7fbC92C886035cf4c76",
-      "creationTime": 1675512124994
+      "address": "0x95D8a76c158c8B5A3A4935F186f37D083f2516e9",
+      "creationTime": 1675622192747
     },
     "Notary": {
-      "address": "0x0779A70916Fa0CC76317Ae79eBf2402E3cab89f9",
-      "creationTime": 1675512244812
+      "address": "0xE906DE04D814b996314Ec618AE78A8f5be2702b4",
+      "creationTime": 1675622316177
     },
     "SimpleTradeFile": {
-      "address": "0xAD5CcBfab0D3554EeE9AFC0F1521f4eB1cE6f580",
-      "creationTime": 1675512183057
+      "address": "0xA234C2d634E4A41d994b4eE350c0dA8D696B0BdD",
+      "creationTime": 1675622254417
     },
     "Chat": {
-      "address": "0x94339E3Bb2ab9644C02E4C9B19e9Ee5ad34CbE27",
-      "creationTime": 1675512303848
+      "address": "0x2272449B126114cEBF3eC0e08DD95D4a1328e03B",
+      "creationTime": 1675622374463
     },
     "Treasury": {
-      "address": "0x3Ae730Cb337a971992459f3268978F59020e3A41",
-      "creationTime": 1675512032905
+      "address": "0x79820fb7816B8B19A6Ce7FCE86Bbfeab40774aa4",
+      "creationTime": 1675622133024
     },
     "KoloToken": {
-      "address": "0x9b6aCD65Abf1dD3D504050167d88Bc2A174fE1C6",
-      "creationTime": 1675512423644
+      "address": "0x1D47BdcAddAfAcFB9654636A8682464A111cDaA6",
+      "creationTime": 1675622493686
     },
     "TimeLock": {
-      "address": "0xD098d07193Ad760a9e2655f8011eCe67e58f4c8c",
-      "creationTime": 1675512486041
+      "address": "0xA0F24C7DF3aF2a076f27B9b1C7b1d17538bcD0BB",
+      "creationTime": 1675622555254
     },
     "GovernorContract": {
-      "address": "0x62CB43a5C47B7A1c711D6456EC396942D147e5a1",
-      "creationTime": 1675512543791
+      "address": "0x48D93649B4B4A7397CD28f8765FA673aD09079BC",
+      "creationTime": 1675622613014
     },
     "MockExchange": {
-      "address": "0xE39cdD99951476A381eA1A96E66a47C9C86E756C",
-      "creationTime": 1675512365577
+      "address": "0x1dD6F5a3e27090A8Cb7767559b58C767a997286B",
+      "creationTime": 1675622436031
     }
   }
 }

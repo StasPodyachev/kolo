@@ -30,7 +30,7 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     IChat public _chat;
     INotary public _notary;
 
-    uint256 public _periodDispute = 5 days;
+    uint256 public _periodDispute = 15 minutes;
 
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;

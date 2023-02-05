@@ -5,7 +5,13 @@ interface INotary {
     struct VoteParams {
         uint256 dealId;
         uint8 status; // 0 - no status, 1 - win, 2 - lose
-        uint8 mark; // 0 - no mark, 1 - yes, 2 - no
+        bool mark; // 0 - no mark, 1 - yes, 2 - no
+    }
+
+    struct NotaryParams {
+        address wallet;
+        uint256 balance; // 0 - no mark, 1 - yes, 2 - no
+        bool isActive; // 0 - no status, 1 - win, 2 - lose
     }
 
     function setPenalty(uint256 value) external;
@@ -24,10 +30,25 @@ interface INotary {
 
     function chooseNotaries(uint256 dealId) external;
 
-    function getDealIDbyNotary(address notary)
+    function getNotaries(uint256 dealId)
+        external
+        view
+        returns (address[] memory);
+
+    function getAllNotaries()
+        external
+        view
+        returns (NotaryParams[] memory notaries_);
+
+    function getVoteInfo(address notary)
         external
         view
         returns (INotary.VoteParams[] memory);
+
+    function getVoteInfoForDeal(uint256 dealId, address notary)
+        external
+        view
+        returns (INotary.VoteParams memory);
 
     function restart(uint256 dealId) external;
 
@@ -36,9 +57,4 @@ interface INotary {
     function refundPenalty(uint256 dealId) external;
 
     function getDeals(address notary) external view returns (uint256[] memory);
-
-    function getNotaries(uint256 dealId)
-        external
-        view
-        returns (address[] memory);
 }

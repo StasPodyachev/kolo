@@ -985,7 +985,7 @@ describe("AuctionFile", () => {
       const priceStart = 10000000000
       const priceForceStop = 100000000000
       const dateExpire = Date.now() + 1000
-      const dateDispute = dateExpire + time.duration.days(5)
+      const dateDispute = dateExpire + time.duration.minutes(15)
 
       const cid =
         "0x516d6264456d467533414b33674b6352504e6a576f3971646b74714772766a664d325a696577414e6b4855574d4b"
