@@ -29,7 +29,7 @@ export interface IAuctionItem {
   image?: string;
   description: string;
   status: IStatus;
-  totalBids: number;
+  totalBids?: number;
   buyer?: string
   collateral: BigNumber
   cid?: string

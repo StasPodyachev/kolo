@@ -171,7 +171,7 @@ const NewPoduct = () => {
         item1: arrStr[1],
         size: arrStr[1].length,
       }, {
-        size: (cidHex.length)/2 
+        size: (cidHex.length)/2
       });
       const conditions = [
         {
@@ -310,7 +310,7 @@ const NewPoduct = () => {
                 <CustomInput
                   borderRadius={0}
                   type="datetime-local"
-                  min={getTodaysDate()}
+                  min={getDateTimeLocal(getTodaysDate())}
                   value={getDateTimeLocal(stopDate)}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
                     setStopDate(new Date(event.target.value));

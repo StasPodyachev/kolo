@@ -117,19 +117,6 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                           {item.price}&nbsp;FIL
                         </Text>
                       </HStack>
-                      <HStack spacing={isAccordionTextInColumn[0] ? 0 : "24px"}>
-                        <Flex display={isChangedAccordion[0] ? "none" : "flex"}>
-                          <Text textStyle="smallText" color="gray.300">
-                            Bids:&nbsp;
-                          </Text>
-                          <Text
-                            fontFamily="Roboto Mono"
-                            textStyle="smallText"
-                            color="gray.300"
-                          >
-                            {item.totalBids}
-                          </Text>
-                        </Flex>
                         <Flex>
                           <Text textStyle="smallText" color="gray.300">
                             Sale ends:&nbsp;
@@ -142,7 +129,6 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                             {item.saleEndDate}
                           </Text>
                         </Flex>
-                      </HStack>
                     </Flex>
                   </Flex>
                   <AccordionButton

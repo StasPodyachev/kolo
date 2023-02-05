@@ -1,4 +1,3 @@
-import { MyStoreBlocks } from "@/constants/shared";
 import { IAuctionItem, IBlock } from "@/types";
 import { Heading, TabPanel } from "@chakra-ui/react";
 import AuctionItemsAccordion from "../ui/AuctionItemsAccordion";

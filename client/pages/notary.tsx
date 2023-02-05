@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { NotaryTabs } from "@/constants/shared";
-import { useAccount } from "wagmi";
+import { useAccount, useSigner } from "wagmi";
 
 import dynamic from 'next/dynamic'
 const Tabs = dynamic(() => import("@/components/ui/Tabs"), {
@@ -21,10 +21,10 @@ const NotaryCommunityPanel = dynamic(() => import("@/components/Notary/NotaryCom
 import Plug from "@/components/ui/Plug";
 
 const Notary = () => {
-  const { isConnected } = useAccount();
+  const signer = useSigner();
   return (
     <Layout pageTitle="Notary" isCenteredBlock={false}>
-      {isConnected ? (
+      {signer ? (
         <Tabs tabs={NotaryTabs}>
           <NotaryCommunityPanel />
           <MyVotesPanel />
