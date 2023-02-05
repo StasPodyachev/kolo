@@ -1,15 +1,20 @@
 import { NotaryCommunityBlocks } from "@/constants/shared";
+import { IBlock, INotaryData } from "@/types";
 import { Flex, Heading, TabPanel, Text } from "@chakra-ui/react";
-import { NextPage } from "next";
 import Block from "../ui/Block";
 import Blocks from "../ui/Blocks";
 import NotaryTable from "./NotaryTable";
 
-const NotaryCommunityPanel: NextPage = () => {
+interface IProps {
+  blocks: IBlock[];
+  notaryData: INotaryData[] | INotaryData;
+}
+
+const NotaryCommunityPanel = ({ blocks, notaryData }: IProps) => {
   return (
     <TabPanel p={0}>
       <Flex flexDir="column">
-        <Blocks items={NotaryCommunityBlocks} />
+        <Blocks items={blocks} />
         <Flex mt="28px" justifyContent="space-between" alignItems="center">
           <Heading variant="h3" color="white">
             List of Notaries
@@ -21,10 +26,17 @@ const NotaryCommunityPanel: NextPage = () => {
             top="2px"
             color="white"
           >
-            20/325
+            {Array.isArray(notaryData) ? (
+              notaryData.length < 10
+                ? `${notaryData.length}/${notaryData.length}`
+                : `10/${notaryData.length}`
+            ) : (
+              1/1
+            )}
+            {/* 10/{Array.isArray(notaryData) ? notaryData?.length : 1} */}
           </Heading>
         </Flex>
-        <NotaryTable />
+        <NotaryTable data={notaryData} />
       </Flex>
     </TabPanel>
   );
