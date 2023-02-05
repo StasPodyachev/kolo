@@ -75,7 +75,7 @@ const ProductPage: NextPage = () => {
       const collateral = result[0][6]
       const cid = web3?.utils?.hexToAscii(result[0][11])
       
-      const saleEndDateNew = status?.title == "Open" ? parseInt(result[0][9]?._hex, 16) : parseInt(result[0][9]?._hex, 16) * 1000
+      const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
       const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
       console.log(pastTime, 'pastTime');
       

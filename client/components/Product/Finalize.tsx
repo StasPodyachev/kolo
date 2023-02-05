@@ -18,7 +18,7 @@ const Finalize = ({ id, collateral }: IProps) => {
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: 'finalize',
-    args: [id, {value: collateral}]
+    args: [id]
   });
 
   const { write, isLoading, isSuccess, data } = useContractWrite(finalizeConfig);

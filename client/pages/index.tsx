@@ -34,7 +34,7 @@ const Home: NextPage = () => {
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const collateral = result[0][6]
         const status = result[0][12] && convertStatus(Number(result[0][12]));
-        const saleEndDateNew = status?.title == "Open" ? parseInt(result[0][9]?._hex, 16) : parseInt(result[0][9]?._hex, 16) * 1000
+        const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
         const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
         let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
         return {

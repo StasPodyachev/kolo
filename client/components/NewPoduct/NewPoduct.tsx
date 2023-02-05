@@ -1,4 +1,5 @@
-import { getDateTimeLocal, getTodaysDate } from "@/helpers";
+// import { getDateTimeLocal, getTodaysDate } from "@/helpers";
+import { getTodaysDate } from "@/helpers";
 import { SaleTypeMenuItems } from "@/constants/shared";
 import {
   Box,
@@ -109,12 +110,20 @@ const NewPoduct = () => {
   const [startPrice, setStartPrice] = useState<string>("1");
   const [forceStopPrice, setForceStopPrice] = useState<string>("10");
   const [myCollateral, setMyCollateral] = useState("1");
-  const [stopDate, setStopDate] = useState<string>(getDateTimeLocal(getTodaysDate()));
+  const [stopDate, setStopDate] = useState<string>();
   const [cid, setCid] = useState("");
   const [access, setAcces] = useState(false);
   const [fileName, setFileName] = useState("");
   const [thubnailName, setThubnailName] = useState("");
   const [isShownStartSell, setIsShownStartSell] = useState(false);
+
+  useEffect(() => {
+    // console.log(getDateTimeLocal(getTodaysDate()), 'getDateTimeLocal(getTodaysDate())');
+    
+    // setStopDate(getDateTimeLocal(getTodaysDate()))
+    console.log(getTodaysDate(), 'getTodaysDate');
+    
+  }, [])
 
   const encryptionSignature = async () => {
     if (typeof window !== "undefined" && window?.ethereum) {
@@ -209,7 +218,7 @@ const NewPoduct = () => {
   const isItemDescriptionError = itemDescription === '';
   const isStartPriceError = startPrice === '0' || startPrice === '';
   const isForceStopPriceError = forceStopPrice === '0' || forceStopPrice === '';
-  const isDateStopError = stopDate.toString().length === 0;
+  const isDateStopError = stopDate?.toString().length === 0;
 
   return (
     <Flex justifyContent="center">
@@ -311,7 +320,7 @@ const NewPoduct = () => {
                 <CustomInput
                   borderRadius={0}
                   type="datetime-local"
-                  min={getDateTimeLocal(getTodaysDate())}
+                  // min={getDateTimeLocal(getTodaysDate())}
                   value={stopDate}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
                     setStopDate(event.target.value);
