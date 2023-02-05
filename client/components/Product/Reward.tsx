@@ -1,26 +1,25 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from "@chakra-ui/react";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { BigNumber } from "ethers";
+import { useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
 import addresses from "@/contracts/addresses";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
 import { useEffect } from "react";
-import { BigNumber } from "ethers";
 interface IProps {
-  id: number;
-  collateral: BigNumber
+  id: number
 }
 
-const Finalize = ({ id, collateral }: IProps) => {
+const Reward = ({ id }: IProps) => {
   const { onConfirm, onTransaction } = useTransactionManager()
-  const { config: finalizeConfig } = usePrepareContractWrite({
+  const { config: disputeConfig } = usePrepareContractWrite({
     address: addresses[1].address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
-    functionName: 'finalize',
+    functionName: 'reciveReward',
     args: [id]
   });
 
-  const { write, isLoading, isSuccess, data } = useContractWrite(finalizeConfig);
+  const { write, isLoading, isSuccess, data } = useContractWrite(disputeConfig);
+
   useEffect(() => {
     if (isLoading) {
       onConfirm()
@@ -32,12 +31,13 @@ const Finalize = ({ id, collateral }: IProps) => {
       onTransaction(data?.hash)
       // push('/dashboard')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
   return (
     <Button minW="170px" variant="blue" onClick={() => write?.()}>
-      Finalize
+      Recive Reward
     </Button>
   );
 };
 
-export default Finalize;
+export default Reward;

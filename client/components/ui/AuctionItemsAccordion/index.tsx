@@ -3,27 +3,25 @@ import {
   AccordionButton,
   AccordionIcon,
   AccordionItem,
-  AccordionPanel,
   Box,
-  Button,
   Flex,
   HStack,
   Text,
   useMediaQuery,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import CardImage from "@/icons/cardImage.svg";
 import AddressCopy from "../AddressCopy";
 import Link from "next/link";
 import { useState } from "react";
-import { IAuctionItem } from "@/types";
+import { IAuctionItem, ISvg } from "@/types";
 import AuctionItemPanel from "./AuctionItemPanel";
 
 interface IProps {
   deals: IAuctionItem[];
+  image?: ISvg;
 }
 
-const AuctionItemAccordion = ({ deals }: IProps) => {
+const AuctionItemAccordion = ({ deals, image }: IProps) => {
   const [accordionIndex, setAccordionIndex] = useState(-1);
   const [numberOfClicks, setNumberOfClicks] = useState(0);
   const isChangedAccordion = useMediaQuery("(max-width: 1000px)");
@@ -52,6 +50,7 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
               <Link href={`/products/${item.id}`}>
                 <Flex
                   w="100%"
+                  h="10vh"
                   alignItems={isAccordionTextInColumn[0] ? "stretch" : "center"}
                 >
                   {item.image ? (
@@ -65,11 +64,13 @@ const AuctionItemAccordion = ({ deals }: IProps) => {
                     <Flex
                       justifyContent="center"
                       alignItems="center"
-                      minH="100%"
-                      minW="121px"
+                      h="100%"
+                      w="121px"
                       bg="gray.800"
                     >
-                      <Image src={CardImage} alt="card image" sizes="100%" />
+                      {item.icon ? (
+                        <Image src={item?.icon} alt="card image" sizes="100%" />
+                      ) : null}
                     </Flex>
                   )}
                   <Flex

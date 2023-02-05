@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { NotaryTabs } from "@/constants/shared";
-import { useAccount, useSigner } from "wagmi";
+import { useSigner } from "wagmi";
 
 import dynamic from 'next/dynamic'
 const Tabs = dynamic(() => import("@/components/ui/Tabs"), {
@@ -19,13 +19,17 @@ const NotaryCommunityPanel = dynamic(() => import("@/components/Notary/NotaryCom
 })
 
 import Plug from "@/components/ui/Plug";
+import { useState } from "react";
+
 
 const Notary = () => {
   const signer = useSigner();
+  const [index, setIndex] = useState(0);
+
   return (
     <Layout pageTitle="Notary" isCenteredBlock={false}>
       {signer ? (
-        <Tabs tabs={NotaryTabs}>
+        <Tabs tabs={NotaryTabs} defaultIndex={index} setIndex={setIndex}>
           <NotaryCommunityPanel />
           <MyVotesPanel />
           <DepositOrWithdrawPanel />

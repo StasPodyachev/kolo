@@ -39,7 +39,6 @@ const Deposit = ({ amount }: IProps) => {
       minW="48%"
       textStyle="button"
       onClick={() => {
-        console.log('value here', amount)
         write?.()
       }}
     >

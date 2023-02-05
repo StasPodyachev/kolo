@@ -2,7 +2,7 @@ import useDevice from "@/hooks/useDevice";
 import { IAuctionItem, IBidTableData } from "@/types";
 import { Box, Flex, Heading, HStack, Text, useMediaQuery } from "@chakra-ui/react";
 import Image from "next/image";
-import CardImage from "@/icons/cardImage.svg";
+import Sheet from "@/icons/cardImages/sheet.svg";
 import { FileIcon, UserIcon } from "@/icons";
 import AddressCopy from "../ui/AddressCopy";
 import NumberInput from "../ui/NumberInput/NumberInput";
@@ -18,6 +18,7 @@ import Vote from "./Vote";
 import Cancel from "./Cancel";
 import Link from "next/link";
 import { LinkIcon } from "@chakra-ui/icons";
+import Reward from "./Reward";
 interface IProps {
   item: IAuctionItem,
   bid: string,
@@ -74,6 +75,12 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
     }  else setIsSeller(false)
   }, [item, address])
 
+  useEffect(() => {
+    if(item) {
+      console.log(item?.isDispute, 'isDispute');
+    }
+  }, [item])
+
   return (
     <Flex margin={"0 auto 0"} flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
       <Flex
@@ -102,7 +109,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               w="336px"
               bg="gray.800"
             >
-              <Image src={CardImage} alt="card image" />
+              <Image src={Sheet} alt="card image" />
             </Flex>
           )}
           <Flex
@@ -164,8 +171,10 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
               <Flex height={'48px'} justifyContent="space-between">
                 {
-                  item?.pastTime ?
+                  item?.status?.title === "Wait finalize" ?
                   <Finalize id={item?.id} collateral={item?.collateral} /> :
+                  item?.status?.title === "Wait Reward" && isSeller ?
+                  <Reward id={item?.id} /> :
                   item?.status?.title === "Open" && !isSeller ?
                     <>
                       <NumberInput
@@ -180,9 +189,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                         isDisabled={!signer || isBidError || item?.ownedBy === address}
                       />
                     </>
-                  : isBuyer && item?.id ?
+                  : isBuyer && item?.status?.title === "Buyed" ?
                   <Dispute id={item?.id} collateral={item?.collateral} />
-                  : isSeller && item?.status?.title === "Open" ?
+                  : isSeller && item?.status?.title === "Open" && !bidsAmount ?
                   <Cancel id={item?.id} /> 
                   : isNotary && item?.status?.title === "Dispute" ? (
                     <Vote

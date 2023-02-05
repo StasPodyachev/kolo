@@ -29,10 +29,9 @@ const ProductPage: NextPage = () => {
   const minStep = 0.01
 
   useEffect(() => {
-    if (router.isReady) {
+    if (router?.isReady) {
       const productId = Number(router?.query?.productId);
       setFormattedId(convertExpNumberToNormal(productId));
-
       const fetchData = async () => {
         if (formattedId) {
           const data = await readContract({
@@ -71,13 +70,12 @@ const ProductPage: NextPage = () => {
       const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
       const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
       const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
-      const status = result[0][12] && convertStatus(Number(result[0][12]));
       const collateral = result[0][6]
       const cid = web3?.utils?.hexToAscii(result[0][11])
       
       const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
       const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
-      console.log(pastTime, 'pastTime');
+      const isDispute = Date.now() > new Date(parseInt(result[0][10]?._hex, 16)).getTime()
       
       let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
       if (bidsData && Array.isArray(bidsData)) {
@@ -87,6 +85,19 @@ const ProductPage: NextPage = () => {
         })
         setBidsAmount(decryptedBidData.length);
       }
+      const respStatus = Number(result[0][12]) 
+
+      const active =
+        respStatus === 0 && !pastTime ? 0 : // Open
+        respStatus === 0 && pastTime ? 4 : // Wait finalaze
+        respStatus === 3 ? 3 : // Dispute
+        respStatus === 1 ? 1 : // Canceled
+        respStatus === 2 ? 2 : // Close
+        respStatus === 4 && isDispute ? 5 : // Buyed
+        respStatus === 4 && !isDispute ? 6 : 0 // Wait Reward
+      console.log(active, 'active');
+      
+      const status = result[0][12] && convertStatus(active)
       const decryptedData = {
         id,
         title,
@@ -101,7 +112,8 @@ const ProductPage: NextPage = () => {
         buyer,
         collateral,
         cid,
-        pastTime
+        pastTime,
+        isDispute
       }
       const newBid = (price < priceStart ? priceStart + minStep : price + minStep).toFixed(2)
       setBid(newBid + '')
