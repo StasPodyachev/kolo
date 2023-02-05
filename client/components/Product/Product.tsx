@@ -67,18 +67,10 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   useEffect(() => {
     if (item?.buyer === address) {
       setIsBuyer(true)
-      console.log({
-        isBuyer: item?.buyer === address
-      });
-      console.log(item?.status?.title === "Wait finalize")
-      
     } else setIsBuyer(false)
 
     if (item?.ownedBy === address) {
       setIsSeller(true)
-      console.log({
-        isSeller: item?.ownedBy === address
-      });
     }  else setIsSeller(false)
   }, [item, address])
 
@@ -178,7 +170,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
               <Flex height={'48px'} justifyContent="space-between">
                 {
-                  item?.pastTime && item?.status?.title === "Wait finalize" ?
+                  item?.status?.title === "Wait finalize" ?
                   <Finalize id={item?.id} collateral={item?.collateral} /> :
                   item?.status?.title === "Open" && !isSeller ?
                     <>
@@ -194,9 +186,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                         isDisabled={!signer || isBidError || item?.ownedBy === address}
                       />
                     </>
-                  : isBuyer ?
+                  : isBuyer && item?.status?.title === "Buyed" ?
                   <Dispute id={item?.id} collateral={item?.collateral} />
-                  : isSeller && item?.status?.title === "Open" ?
+                  : isSeller && item?.status?.title === "Open" && !bidsAmount ?
                   <Cancel id={item?.id} /> 
                   : isNotary && item?.status?.title === "Dispute" ? (
                     <Vote

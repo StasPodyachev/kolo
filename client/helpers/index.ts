@@ -66,7 +66,7 @@ export function convertStatus(status: number) {
           title: "Buyed",
           color: "#0E8C43",
         }
-      case 5:
+      case 6:
         return {
           title: "Wait Reward",
           color: "#004DE5",
