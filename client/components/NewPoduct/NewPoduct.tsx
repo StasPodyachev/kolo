@@ -29,7 +29,7 @@ import web3 from "web3";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
 
 const API_KEY = "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d";
-const CustomInput = chakra(Input, {
+export const CustomInput = chakra(Input, {
   baseStyle: {
     bg: "gray.700",
     minH: "48px",

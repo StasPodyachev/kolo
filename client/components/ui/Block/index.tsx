@@ -1,3 +1,4 @@
+import { numberWithCommas } from "@/helpers";
 import { Flex, Heading, Text } from "@chakra-ui/react";
 
 interface IProps {
@@ -6,6 +7,10 @@ interface IProps {
 }
 
 const Block = ({ title, value }: IProps) => {
+  const filCondition = title.toLowerCase().includes("balance") ||
+  title.toLowerCase().includes("total revenue") ||
+  title.toLowerCase().includes("locked");
+  const greenPrimaryColor = title === "Notary Balance" || title === "My Notary Balance" || title === "Treasury balance" || title === "Total minted";
   return (
     <Flex
       minW="220px"
@@ -19,18 +24,19 @@ const Block = ({ title, value }: IProps) => {
         color={
           title === "My Status"
             ? "green.secondaryDark"
-            : title === "Notary Balance" || title === "My Notary Balance"
+            : greenPrimaryColor
             ? "green.primary"
             : "white"
         }
         variant="h5"
       >
-        {title.toLowerCase().includes("balance") ||
-        title.toLowerCase().includes("total") ||
-        title.toLowerCase().includes("locked") ? (
-          <Text>FIL {value}</Text>
+        {filCondition ? (
+          `FIL ${value}`
+        ) : title.toLowerCase().includes('total minted') ?
+        (
+          `KOLO ${value}`
         ) : (
-          <Text>{value}</Text>
+          value
         )}
       </Heading>
       <Text color="gray.500">{title}</Text>
