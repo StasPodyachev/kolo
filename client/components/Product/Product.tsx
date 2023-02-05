@@ -77,7 +77,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
   useEffect(() => {
     if(item) {
-      console.log(item?.isDispute, 'isDispute');
+      // console.log(item?.isDispute, 'isDispute');
     }
   }, [item])
 

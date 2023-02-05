@@ -209,11 +209,13 @@ const NewPoduct = () => {
     let mm = today.getMonth() + 1 as any;
     let yyyy = today.getFullYear() as any;
     //
-    let hh = today.getHours();
+    let hh = today.getHours() <= 9 ? "0" + today.getHours() : today.getHours;
     let m = today.getMinutes() <= 9 ? "0" + today.getMinutes() : today.getMinutes();
     if (dd < 10) { dd = '0' + dd;}
     if (mm < 10) { mm = '0' + mm}
     today = yyyy + "-" + mm + "-" + dd + "T" + hh + ":" + m
+    console.log(today, 'today');
+    
     setNowDate(today)
     setStopDate(today)
     
