@@ -241,7 +241,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
             >
               {item?.description}
             </Text>
-              {
+              { item?.pastTime ? null :
                 item?.status?.title == "Open" ?
                 <BuyNow
                   isDisabled={!signer || item?.ownedBy === address}
