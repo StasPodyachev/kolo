@@ -136,7 +136,10 @@ contract Factory is IFactory, StoreDeployer, AccessControl, Ownable {
      * @param addr Integration address
      *
      */
-    function registerIntegration(uint256 type_, address addr) external {
+    function registerIntegration(uint256 type_, address addr)
+        external
+        onlyOwner
+    {
         require(
             _integrations[type_] == address(0),
             "Factory: Integration type exist"

@@ -69,7 +69,6 @@ contract Notary is INotary, Ownable {
         );
 
         deposits[msg.sender] += msg.value;
-        console.log("deposit", deposits[msg.sender], msg.sender);
         _addNotary(msg.sender);
     }
 
