@@ -77,6 +77,19 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "DisputeRestarted",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
