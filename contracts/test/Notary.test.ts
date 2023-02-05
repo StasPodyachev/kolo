@@ -64,7 +64,7 @@ describe("Notary", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ; ({ auctionFile, factory, notary } = await loadFixture(async () => {
+    ;({ auctionFile, factory, notary } = await loadFixture(async () => {
       const { auctionFile, factory, notary, koloToken } =
         await auctionFileFixture()
 
@@ -131,9 +131,9 @@ describe("Notary", () => {
   describe("#vote", () => {
     it("should vote", async () => {
       await notary.deposit({ value: BIGNUM_1E18 })
-      // await notary.connect(other).deposit({ value: BIGNUM_1E18 })
-      // await notary.connect(buyer).deposit({ value: BIGNUM_1E18 })
-      // //await notary.connect(buyer1).deposit({ value: BIGNUM_1E18 })
+      await notary.connect(other).deposit({ value: BIGNUM_1E18 })
+      await notary.connect(buyer).deposit({ value: BIGNUM_1E18 })
+      await notary.connect(buyer1).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer2).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer3).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer4).deposit({ value: BIGNUM_1E18 })

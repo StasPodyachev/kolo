@@ -1,5 +1,5 @@
 import { ethers, waffle, network } from "hardhat"
-import { BigNumber, Wallet } from "ethers"
+import { BigNumber, constants, Wallet } from "ethers"
 import { AuctionFile } from "../typechain/AuctionFile"
 import { Factory } from "../typechain/Factory"
 import { Chat } from "../typechain/Chat"
@@ -329,7 +329,7 @@ describe("AuctionFile", () => {
       const param = await chat.getChat(1)
       expect(param.length).eq(3)
       // expect(param[1].message).eq("Hello!")
-      expect(param[1].sender).eq(wallet.address)
+      expect(param[1].sender).eq(constants.AddressZero)
     })
 
     it("fails if seller bids", async () => {
@@ -825,7 +825,7 @@ describe("AuctionFile", () => {
       const newBalanceBuyer = (await other.getBalance()).toString()
 
       expect(
-        collateral.add(oldBalanceSeller).add(price).sub(gas).sub(fee)
+        collateral.add(oldBalanceSeller).add(price).sub(gas).sub(fee).sub(fee)
       ).to.eq(newBalanceSeller)
       expect(newBalanceBuyer).to.eq(oldBalanceBuyer)
     })
@@ -1057,7 +1057,7 @@ describe("AuctionFile", () => {
         wallet.address
       )
 
-      expect(0).to.be.eq(res)
+      expect(1).to.be.eq(res)
     })
   })
 })

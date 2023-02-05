@@ -31,7 +31,7 @@ interface INotary {
 
     function restart(uint256 dealId) external;
 
-    function isDisputePossible() external view returns (bool);
+    function isDisputePossible(uint256 dealId) external view returns (bool);
 
     function refundPenalty(uint256 dealId) external;
 
