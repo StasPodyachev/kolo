@@ -14,7 +14,7 @@ const NotaryTable = ({ data }: IProps) => {
       <Table variant="simple">
         <Tbody>
           {Array.isArray(data) ? data.map((item) => (
-            <Tr key={item.balance}>
+            <Tr key={item.address}>
               <Td pl={0}>
                 <AddressCopy address={item.address} />
               </Td>
