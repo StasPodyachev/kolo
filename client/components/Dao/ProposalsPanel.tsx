@@ -1,10 +1,15 @@
 import { ProposalsBlocks, ProposalsItems } from "@/constants/shared";
 import { IProposalItem } from "@/types";
 import { Button, Flex, Heading, TabPanel } from "@chakra-ui/react";
+import { Dispatch, SetStateAction } from "react";
 import Blocks from "../ui/Blocks";
 import ProposalItem from "./ProposalItem";
 
-const ProposalsPanel = () => {
+interface IProps {
+  setIndex: Dispatch<SetStateAction<number>>;
+}
+
+const ProposalsPanel = ({ setIndex }: IProps) => {
   return (
     <TabPanel p={0}>
       <Flex flexDir="column" gap="20px">
@@ -25,6 +30,7 @@ const ProposalsPanel = () => {
           variant="blue"
           minW="272px"
           m="24px auto 0"
+          onClick={() => setIndex(1)}
         >
           create proposal
         </Button>

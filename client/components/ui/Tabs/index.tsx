@@ -1,13 +1,15 @@
 import { Tabs as ChakraTabs, TabList, Tab, TabPanels } from "@chakra-ui/react";
+import { useEffect } from "react";
 
 interface IProps {
   tabs: string[];
+  defaultIndex: number;
   children: JSX.Element[];
 }
 
-const Tabs = ({ tabs, children }: IProps) => {
+const Tabs = ({ tabs, children, defaultIndex }: IProps) => {
   return (
-    <ChakraTabs>
+    <ChakraTabs index={defaultIndex}>
       <TabList>
         {tabs.map((tab) => (
           <Tab
