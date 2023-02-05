@@ -14,7 +14,7 @@ const Dao = () => {
   return (
     <Layout pageTitle="DAO">
       {signer ?
-        <Tabs tabs={DaoTabs} defaultIndex={index}>
+        <Tabs tabs={DaoTabs} defaultIndex={index} setIndex={setIndex}>
           <ProposalsPanel setIndex={setIndex} />
           <CreatePanel />
           <AboutKoloPanel />

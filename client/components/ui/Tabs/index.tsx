@@ -4,12 +4,13 @@ import { useEffect } from "react";
 interface IProps {
   tabs: string[];
   defaultIndex: number;
+  setIndex: (value: number) => void;
   children: JSX.Element[];
 }
 
-const Tabs = ({ tabs, children, defaultIndex }: IProps) => {
+const Tabs = ({ tabs, children, defaultIndex, setIndex }: IProps) => {
   return (
-    <ChakraTabs index={defaultIndex}>
+    <ChakraTabs index={defaultIndex} onChange={(event) => setIndex(event)}>
       <TabList>
         {tabs.map((tab) => (
           <Tab

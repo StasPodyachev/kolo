@@ -19,14 +19,17 @@ const NotaryCommunityPanel = dynamic(() => import("@/components/Notary/NotaryCom
 })
 
 import Plug from "@/components/ui/Plug";
+import { useState } from "react";
 
 
 const Notary = () => {
   const signer = useSigner();
+  const [index, setIndex] = useState(0);
+
   return (
     <Layout pageTitle="Notary" isCenteredBlock={false}>
       {signer ? (
-        <Tabs tabs={NotaryTabs} defaultIndex={0}>
+        <Tabs tabs={NotaryTabs} defaultIndex={index} setIndex={setIndex}>
           <NotaryCommunityPanel />
           <MyVotesPanel />
           <DepositOrWithdrawPanel />

@@ -140,10 +140,12 @@ const Dashboard: NextPage = () => {
     }
   ];
 
+  const [index, setIndex] = useState(0);
+
   return (
     <Layout pageTitle="Dashboard" isCenteredBlock={signer ? false : true}>
       {signer ? (
-        <Tabs tabs={DashboardTabs} defaultIndex={0}>
+        <Tabs tabs={DashboardTabs} defaultIndex={index} setIndex={setIndex}>
           <MyStorePanel deals={dealsBySeller} blocks={storeBlocks} image={imagesArray[randomImage]} />
           <MyPurchasesPanel purchases={purchases} bids={bids} blocks={purchasesBlocks} />
         </Tabs>
