@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { NotaryTabs } from "@/constants/shared";
-import { useSigner } from "wagmi";
+import { useContractRead, useSigner } from "wagmi";
 
 import dynamic from 'next/dynamic'
 const Tabs = dynamic(() => import("@/components/ui/Tabs"), {
@@ -19,12 +19,23 @@ const NotaryCommunityPanel = dynamic(() => import("@/components/Notary/NotaryCom
 })
 
 import Plug from "@/components/ui/Plug";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import addresses from "@/contracts/addresses";
+import ABI_NOTARY from "@/contracts/abi/Notary.json";
+
 
 
 const Notary = () => {
   const signer = useSigner();
   const [index, setIndex] = useState(0);
+  const { data } = useContractRead({
+    address: addresses[2].address as `0x${string}`,
+    abi: ABI_NOTARY,
+    functionName: 'getAllNotaries',
+  });
+  useEffect(() => {
+    console.log('data', data)
+  }, [data])
 
   return (
     <Layout pageTitle="Notary" isCenteredBlock={false}>
