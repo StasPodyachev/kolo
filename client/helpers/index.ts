@@ -38,27 +38,27 @@ export function convertStatus(status: number) {
   switch(status) {
     case 0:
       return {
-        title: "Open",
+        title: "0",
         color: "#0E8C43"
       }
     case 1:
       return {
-        title: "Canceled",
+        title: "1",
         color: "#BABDCC"
       }
     case 2:
       return {
-        title: "Closed",
+        title: "2",
         color: "#964B00",
       }
     case 3:
       return {
-        title: "Dispute",
+        title: "3",
         color: "#E52E2E",
       }
     case 4:
       return {
-        title: "Wait finalize",
+        title: "4",
         color: "#004DE5",
       }
   }

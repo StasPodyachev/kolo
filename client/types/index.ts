@@ -34,6 +34,7 @@ export interface IAuctionItem {
   collateral: BigNumber
   cid?: string
   pastTime?: boolean
+  isDispute?: boolean
 };
 
 export interface IBidTableData {
