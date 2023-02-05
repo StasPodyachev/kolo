@@ -27,7 +27,7 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
     uint256 public _collateralAmount = 1e17;
     uint256 public _collateralPercent = 1e17;
     uint256 public _serviceFee = 2e16;
-    uint256 public _storageFee = 1e16;
+    uint256 public _storageFee = 2e16;
 
     mapping(uint256 => AuctionFileParams) private deals;
     mapping(uint256 => mapping(address => uint256)) private bids;
@@ -384,11 +384,10 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
         address storeAddress = _factory.getStore(deal.seller);
         IStore(storeAddress).depositBuyerCollateral{value: msg.value}(dealId);
 
-        deal.status = AuctionStatus.DISPUTE;
-
-        if (_notary.isDisputePossible()) {
+        if (_notary.isDisputePossible(dealId)) {
             _notary.chooseNotaries(dealId);
             _chat.sendSystemMessage(dealId, "Dispute started.");
+            deal.status = AuctionStatus.DISPUTE;
 
             emit DisputeCreated(dealId);
         } else {
@@ -422,7 +421,7 @@ contract AuctionFile is IAuctionFile, IIntegration, ControlAccess, Ownable {
             "AuctionFile: Time for dispute"
         );
 
-        if (_notary.isDisputePossible()) {
+        if (_notary.isDisputePossible(dealId)) {
             _chat.sendSystemMessage(dealId, "Dispute restarted.");
 
             _notary.restart(dealId);
