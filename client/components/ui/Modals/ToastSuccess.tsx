@@ -25,8 +25,8 @@ export default function ToastSuccess({
     >
       <CheckCircleIcon flexShrink={0} mr={4} boxSize="20px" color="#84BF40" />
       <Box flexGrow={1}>
-        {title && <Box fontWeight={600}>{title}</Box>}
-        {description && <Box>{description}</Box>}
+        {title && <Box fontWeight={600} color="white">{title}</Box>}
+        {description && <Box color="white">{description}</Box>}
         <Box>
           {address && (
             <Link
