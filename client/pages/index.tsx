@@ -11,15 +11,7 @@ import { BigNumber, ethers } from "ethers";
 import { convertStatus } from "@/helpers";
 
 const Home: NextPage = () => {
-  const [ startCount, setStartCount ] = useState(0);
-  const [ endCount, setEndCount ] = useState(5);
   const [ items, setItems ] = useState<IAuctionItem[] | []>([]);
-  const [ hasMore, setHasMore ] = useState(true);
-
-  useEffect(() => {
-    setStartCount(5);
-    setEndCount(10);
-  }, []);
 
   const { data } = useContractRead({
     address: addresses[0].address as `0x${string}`,
@@ -60,7 +52,11 @@ const Home: NextPage = () => {
           collateral 
         };
       });
-      setItems(decryptedData?.reverse());
+      setItems(decryptedData?.filter(item => {
+        if (item?.status?.title !== "Canceled" && item?.status?.title !== "Closed") {
+          return item
+        }
+      })?.reverse());
     }
   }, [data]);
 

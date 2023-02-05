@@ -4,9 +4,11 @@ import {
 } from "@/constants/shared";
 import { Button, Flex, HStack, TabPanel } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Blocks from "../ui/Blocks";
 import NumberInput from "../ui/NumberInput/NumberInput";
+import Deposit from "./Deposit";
+import Withdraw from "./Withdraw";
 
 const DepositOrWithdrawPanel: NextPage = () => {
   const [value, setValue] = useState("10");
@@ -17,25 +19,8 @@ const DepositOrWithdrawPanel: NextPage = () => {
         <Flex flexDir="column" gap="28px" maxW="576px">
           <NumberInput value={value} setValue={setValue} />
           <HStack spacing="20px">
-            {DepositAndWithdrawButtons.map((btn) => (
-              <Button
-                key={btn.title}
-                minH="48px"
-                bg={btn.isDepositBtn ? "blue.primary" : "blue.secondaryDark"}
-                minW="48%"
-                color="white"
-                textStyle="button"
-                transition="all .3s"
-                borderRadius={0}
-                _hover={
-                  btn.isDepositBtn
-                    ? { bg: "blue.hover" }
-                    : { bg: "blue.active" }
-                }
-              >
-                {btn.title}
-              </Button>
-            ))}
+            <Deposit amount={+value} />
+            <Withdraw amount={+value} />
           </HStack>
         </Flex>
       </Flex>
