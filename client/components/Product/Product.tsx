@@ -67,12 +67,26 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   useEffect(() => {
     if (item?.buyer === address) {
       setIsBuyer(true)
+      console.log({
+        isBuyer: item?.buyer === address
+      });
+      console.log(item?.status?.title === "Wait finalize")
+      
     } else setIsBuyer(false)
 
     if (item?.ownedBy === address) {
       setIsSeller(true)
+      console.log({
+        isSeller: item?.ownedBy === address
+      });
     }  else setIsSeller(false)
   }, [item, address])
+
+  useEffect(() => {
+    if(item) {
+      console.log(item?.isDispute, 'isDispute');
+    }
+  }, [item])
 
   return (
     <Flex margin={"0 auto 0"} flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
@@ -164,7 +178,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
 
               <Flex height={'48px'} justifyContent="space-between">
                 {
-                  item?.pastTime ?
+                  item?.pastTime && item?.status?.title === "Wait finalize" ?
                   <Finalize id={item?.id} collateral={item?.collateral} /> :
                   item?.status?.title === "Open" && !isSeller ?
                     <>
@@ -180,7 +194,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                         isDisabled={!signer || isBidError || item?.ownedBy === address}
                       />
                     </>
-                  : isBuyer && item?.id ?
+                  : isBuyer ?
                   <Dispute id={item?.id} collateral={item?.collateral} />
                   : isSeller && item?.status?.title === "Open" ?
                   <Cancel id={item?.id} />

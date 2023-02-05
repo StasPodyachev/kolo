@@ -116,6 +116,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "DisputeRestarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -172,6 +185,19 @@
   },
   {
     "inputs": [],
+    "name": "_extraStoragePeriod",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "_factory",
     "outputs": [
       {
@@ -212,6 +238,19 @@
   {
     "inputs": [],
     "name": "_serviceFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_storageFee",
     "outputs": [
       {
         "internalType": "uint256",
@@ -558,6 +597,19 @@
         "internalType": "uint256",
         "name": "dealId",
         "type": "uint256"
+      }
+    ],
+    "name": "restartDispute",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "dealId",
+        "type": "uint256"
       },
       {
         "internalType": "string",
@@ -612,6 +664,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "setExtraStoragePeriod",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "contract INotary",
         "name": "notary",
         "type": "address"
@@ -644,6 +709,19 @@
       }
     ],
     "name": "setServiceFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "setStorageFee",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

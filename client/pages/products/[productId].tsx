@@ -29,10 +29,9 @@ const ProductPage: NextPage = () => {
   const minStep = 0.01
 
   useEffect(() => {
-    if (router.isReady) {
+    if (router?.isReady) {
       const productId = Number(router?.query?.productId);
       setFormattedId(convertExpNumberToNormal(productId));
-
       const fetchData = async () => {
         if (formattedId) {
           const data = await readContract({
@@ -77,7 +76,7 @@ const ProductPage: NextPage = () => {
       
       const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
       const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
-      console.log(pastTime, 'pastTime');
+      const isDispute =  Date.now() > new Date(parseInt(result[0][10]?._hex, 16) * 1000).getTime()
       
       let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
       if (bidsData && Array.isArray(bidsData)) {
@@ -101,7 +100,8 @@ const ProductPage: NextPage = () => {
         buyer,
         collateral,
         cid,
-        pastTime
+        pastTime,
+        isDispute
       }
       const newBid = (price < priceStart ? priceStart + minStep : price + minStep).toFixed(2)
       setBid(newBid + '')

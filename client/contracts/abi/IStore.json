@@ -225,6 +225,11 @@
         "internalType": "uint256",
         "name": "serviceFee",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "storageFee",
+        "type": "uint256"
       }
     ],
     "name": "transferWinToSeller",
