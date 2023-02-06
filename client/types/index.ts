@@ -51,8 +51,8 @@ export interface IAuctionItem {
   pastTime?: boolean
   isDispute?: boolean
   icon?: ISvg;
-  activeContract: string
-  type: number
+  activeContract?: string
+  type?: number
 };
 
 export interface IBidTableData {
@@ -99,7 +99,7 @@ export interface IChatMessage {
 
 export interface IProposalItem {
   title: string;
-  id: string;
+  id: BigNumber;
   buttonText?: string;
   status: IStatus;
 }

@@ -1,15 +1,46 @@
+import addresses from "@/contracts/addresses";
 import { ShareIcon } from "@/icons";
 import { Button, Flex, FormControl, FormLabel, Heading, Switch, TabPanel } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { CustomInput } from "../NewPoduct/NewPoduct";
+import ABI_GOVERNER from "contracts/abi/GovernorContract.json";
+import { useTransactionManager } from "@/context/TransactionManageProvider";
+import { BigNumber } from "ethers";
+
 
 interface IProps {
   title: string;
+  id: string;
 }
 
-const VotePanel = ({ title }: IProps) => {
+const VotePanel = ({ title, id }: IProps) => {
+  const { onConfirm, onTransaction } = useTransactionManager()
   const [switchValue, setSwitchValue] = useState(-1);
   const [comment, setComment] = useState("");
+  const funcName = comment.length ? 'castVoteWithReason' : 'castVote';
+  const argsArray = comment.length ? [id, switchValue, comment] : [id, switchValue];
+  const { config } = usePrepareContractWrite({
+    address: addresses[8].address as `0x${string}`,
+    abi: ABI_GOVERNER,
+    functionName: funcName,
+    args: argsArray,
+  });
+  const { data, isLoading, isSuccess, write } = useContractWrite(config);
+
+  useEffect(() => {
+    if (isLoading) {
+      onConfirm()
+    }
+  }, [isLoading, onConfirm])
+
+  useEffect(() => {
+    if (data && isSuccess) {
+      onTransaction(data?.hash)
+      // push('/dashboard')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
   return (
     <TabPanel p={0}>
       <Flex flexDir="column" w="585px" m="0 auto" gap="16px">
@@ -18,7 +49,9 @@ const VotePanel = ({ title }: IProps) => {
         </Heading>
         <Flex flexDir="column" gap="32px">
           <Flex gap="16px" alignItems="center">
-            <Heading variant="h5">Proposal #1</Heading>
+            <Heading variant="h5">
+              {title}
+            </Heading>
             <ShareIcon boxSize="24px" />
           </Flex>
           <FormControl display="flex" gap="8px" alignItems="center">
@@ -61,7 +94,13 @@ const VotePanel = ({ title }: IProps) => {
               onChange={(event: any) => setComment(event.target.value)}
             />
           </FormControl>
-          <Button variant="blue" textStyle="button" w="100%" isDisabled={switchValue === -1 ? true : false}>
+          <Button
+            variant="blue"
+            textStyle="button"
+            w="100%"
+            isDisabled={switchValue === -1 ? true : false}
+            onClick={() => write?.()}
+          >
             submit your vote
           </Button>
         </Flex>

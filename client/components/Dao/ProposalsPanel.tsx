@@ -20,8 +20,9 @@ interface IProps {
 
 const ProposalsPanel = ({ setIndex }: IProps) => {
   const [proposals, setProposals] = useState([] as any);
-  const [activeVotePage, setActiveVotePage] = useState(true);
+  const [activeVotePage, setActiveVotePage] = useState(false);
   const [currentVoteTitle, setCurrentVoteTitle] = useState("");
+  const [currentId, setCurrentId] = useState("");
   const [treasuryBalance, setTreasuryBalance] = useState(0);
   const [totalMinted, setTotalMinted] = useState(0);
 
@@ -46,7 +47,7 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
     }
   }, [tokenData])
 
-
+  console.log("proposals", proposals)
   useEffect(() => {
     const getBalance = async () => {
         try {
@@ -133,11 +134,13 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
           });
         }
         setProposals(arr);
+        console.log('arr', arr)
       }
     };
 
     go();
   }, [data]);
+
 
   const blocksProposals: IBlock[] = [
     {
@@ -161,7 +164,7 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
   return (
     <TabPanel p={0}>
       {activeVotePage ? (
-        <VotePanel title={currentVoteTitle} />
+        <VotePanel title={currentVoteTitle} id={currentId} />
       ) : (
         <Flex flexDir="column" gap="20px">
           <Blocks items={blocksProposals} />
@@ -169,13 +172,14 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
           <Flex flexDir="column" gap="36px">
             {proposals.map((item: IProposalItem) => (
               <ProposalItem
-                key={item.id}
+                key={item.id.toString()}
                 title={item.title}
-                id={"ID " + item.id}
+                id={item.id}
                 buttonText={item.buttonText}
                 status={item.status}
                 onClickHandler={setActiveVotePage}
                 setVoteTitle={setCurrentVoteTitle}
+                setId={setCurrentId}
               />
             ))}
           </Flex>

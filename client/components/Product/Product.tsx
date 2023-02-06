@@ -37,7 +37,7 @@ const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id, address, type} : 
       mt={isDesktopHeader[0] ? "36px" : "52px"}
         >
         {
-          type === 0 ? 
+          type === 0 ?
           <Box minW="400px">
           <Flex justify="space-between" w="100%">
             <Heading variant="h6" color="white">
@@ -53,7 +53,7 @@ const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id, address, type} : 
           <BidsTable data={bidsTableData} />
         </Box> : null
         }
-        
+
         <Chat type={type} addressContract={address} id={id} />
     </Flex>
   )
@@ -190,17 +190,17 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                         width="200px"
                       />
                       <PlaceBid
-                        type={item?.type}
-                        address={item?.activeContract}
+                        type={item?.type!}
+                        address={item?.activeContract!}
                         id={item?.id}
                         price={bid}
                         isDisabled={!signer || isBidError || item?.ownedBy === address}
                       />
                     </>
                   : isBuyer && item?.status?.title === "Buyed" ?
-                  <Dispute type={item?.type} address={item?.activeContract} id={item?.id} collateral={item?.collateral} />
+                  <Dispute type={item?.type!} address={item?.activeContract!} id={item?.id} collateral={item?.collateral} />
                   : isSeller && item?.status?.title === "Open" && !bidsAmount ?
-                  <Cancel type={item?.type} address={item?.activeContract} id={item?.id} /> 
+                  <Cancel type={item?.type!} address={item?.activeContract!} id={item?.id} />
                   : isNotary && item?.status?.title === "Dispute" ? (
                     <Vote
                       id={item?.id}
@@ -256,8 +256,8 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               { 
                 !item?.pastTime && item?.status?.title == "Open" && !isSeller ?
                 <BuyNow
-                  type={item?.type}
-                  address={item?.activeContract}
+                  type={item?.type!}
+                  address={item?.activeContract!}
                   isDisabled={!signer || item?.ownedBy === address}
                   id={item?.id}
                   price={item?.priceEnd ? item?.priceEnd : item?.price}

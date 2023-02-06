@@ -26,7 +26,7 @@ export default function TransactionModal({ address, isOpen, onClose, onOpen }: P
          <ModalCloseButton />
          <ModalBody py={4} display="flex" flexDir="column">
            <Box fontSize="lg" fontWeight={600} my={4} color="white">
-             Your contract is submitted!
+             Your transaction is submitted!
            </Box>
            {address && (
              <Link
