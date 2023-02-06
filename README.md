@@ -1,9 +1,4 @@
-# Kolo V1
-
-[![Lint]TBD
-[![Tests]TBD
-[![Fuzz Testing]TBD
-[![Mythx]TBD
+# Kolo 
 
 This repository contains smart contracts and developer tools for Kolo which powers [https://kolo.vercel.app/]
 
@@ -14,7 +9,7 @@ This repository contains smart contracts and developer tools for Kolo which powe
 
 #### Whitepaper: in progress
 
-For more comprehensive information about Kolo you can read our whitepaper and project description on our [Notion Documentation](https://deforex-docs.gitbook.io/kolo-fevm-hackathon/welcome/kolo-dao-auction-for-sensitive-information).
+For more comprehensive information about Kolo you can read our whitepaper and project description on our [Documentation](https://deforex-docs.gitbook.io/kolo-fevm-hackathon/welcome/kolo-dao-auction-for-sensitive-information).
 
 #### Technical Documentation
 
