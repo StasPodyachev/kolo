@@ -99,7 +99,7 @@ export interface IChatMessage {
 
 export interface IProposalItem {
   title: string;
-  id: string;
+  id: BigNumber;
   buttonText?: string;
   status: IStatus;
 }

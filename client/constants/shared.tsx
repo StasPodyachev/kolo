@@ -329,35 +329,6 @@ export const ProposalsBlocks = [
   },
 ];
 
-export const ProposalsItems: IProposalItem[] = [
-  {
-    title: "Proposal #36  Change parameter _countInvaitedNotary",
-    id: "ID 37827523216.....4212",
-    buttonText: "vote",
-    status: {
-      title: "open for vote",
-      color: "#1DA1F2",
-    },
-  },
-  {
-    title: "Proposal #35  Change parameter _minDeposit in Notary",
-    id: "ID 37827523216.....4218",
-    buttonText: "execute",
-    status: {
-      title: "queued",
-      color: "#FBBC05",
-    },
-  },
-  {
-    title: "Proposal #34  Change parameter _minDeposit in Notary",
-    id: "ID 37827523216.....4218",
-    status: {
-      title: "executed",
-      color: "#34A853",
-    },
-  },
-];
-
 export const AboutKoloData: IAboutKolo[] = [
   {
     title: "Simple Summary",

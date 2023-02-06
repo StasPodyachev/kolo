@@ -47,7 +47,7 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
     }
   }, [tokenData])
 
-
+  console.log("proposals", proposals)
   useEffect(() => {
     const getBalance = async () => {
         try {
@@ -134,11 +134,13 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
           });
         }
         setProposals(arr);
+        console.log('arr', arr)
       }
     };
 
     go();
   }, [data]);
+
 
   const blocksProposals: IBlock[] = [
     {
@@ -170,9 +172,9 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
           <Flex flexDir="column" gap="36px">
             {proposals.map((item: IProposalItem) => (
               <ProposalItem
-                key={item.id}
+                key={item.id.toString()}
                 title={item.title}
-                id={"ID " + item.id}
+                id={item.id}
                 buttonText={item.buttonText}
                 status={item.status}
                 onClickHandler={setActiveVotePage}

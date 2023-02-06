@@ -6,6 +6,7 @@ import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { CustomInput } from "../NewPoduct/NewPoduct";
 import ABI_GOVERNER from "contracts/abi/GovernorContract.json";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
+import { BigNumber } from "ethers";
 
 
 interface IProps {
