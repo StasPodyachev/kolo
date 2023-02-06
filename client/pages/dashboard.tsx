@@ -103,9 +103,9 @@ const Dashboard: NextPage = () => {
       setBuyerWaitForPaymentCount(waitForPaymentItemsCountBuyer);
       const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Dispute").length;
       setBuyerDisputCount(itemsInDisputCountBuyer);
-      const buyerPurchases = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize" || item?.status?.title === "Closed");
+      const buyerPurchases = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait reward" || item?.status?.title === "Closed" || item?.status?.title === "Dispute" || item?.status?.title === "Buyed");
       setPurchases(buyerPurchases);
-      const buyerBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Open");
+      const buyerBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Open" || item?.status?.title === "Wait finalize");
       setBids(buyerBids);
       const lockedMoneyInBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status.title !== "Wait finalize").reduce((a, b) => a + b.price, 0);
       setLockedInBids(lockedMoneyInBids);
