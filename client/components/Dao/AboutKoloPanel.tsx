@@ -10,7 +10,7 @@ const AboutKoloPanel = () => {
         </Heading>
         <Flex flexDir="column" gap="20px" mt="40px">
           {AboutKoloData.map((item) => (
-            <Flex flexDir="column" gap="4px">
+            <Flex key={item.title} flexDir="column" gap="4px">
               <Text textStyle="bigText" color="white">
                 {item.title}
               </Text>
@@ -19,6 +19,12 @@ const AboutKoloPanel = () => {
               </Text>
             </Flex>
           ))}
+          <Text mt="36px">
+            Kolo is a cutting-edge project being developed by the defx team for the FVM Space Warp. It aims to create a fair and censorship-resistant platform for trading sensitive information, leveraging the power of the Filecoin network and governed by the DAO - community of KOLO tokenholders.
+
+            Any KOLO token holder can initiate a discussion about the protocol development or terms and conditions changes. For instance, one can propose to decrease the system fee to make the protocol more accessible for users. Or change the minimal collateral amount.
+            To start the discussion, a token holder has to submit it via special form at the website or directly to the Filecoin blockchain and sign in Metamask or another wallet.
+          </Text>
         </Flex>
       </Flex>
     </TabPanel>
