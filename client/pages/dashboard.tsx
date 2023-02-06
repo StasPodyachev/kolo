@@ -94,22 +94,22 @@ const Dashboard: NextPage = () => {
       const filteredDealsBySeller = decryptedData.filter((item: IAuctionItem) => item?.ownedBy === address);
       const filteredDealsByBuyer = decryptedData.filter((item: IAuctionItem) => item?.buyerAddress === address);
       setSellerActiveItemsCount(filteredDealsBySeller.length);
-      const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize").length;
+      const waitForPaymentItemsCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Wait Reward").length;
       setSellerWaitForPaymentCount(waitForPaymentItemsCountSeller);
       const itemsInDisputCountSeller = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Dispute").length;
       setSellerDisputCount(itemsInDisputCountSeller);
-      setBuyerActiveItemsCount(filteredDealsByBuyer.length);
       const waitForPaymentItemsCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize").length;
       setBuyerWaitForPaymentCount(waitForPaymentItemsCountBuyer);
       const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Dispute").length;
       setBuyerDisputCount(itemsInDisputCountBuyer);
-      const buyerPurchases = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait reward" || item?.status?.title === "Closed" || item?.status?.title === "Dispute" || item?.status?.title === "Buyed");
+      const buyerPurchases = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait Reward" || item?.status?.title === "Closed" || item?.status?.title === "Dispute" || item?.status?.title === "Buyed");
       setPurchases(buyerPurchases);
       const buyerBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Open" || item?.status?.title === "Wait finalize");
       setBids(buyerBids);
-      const lockedMoneyInBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status.title !== "Wait finalize").reduce((a, b) => a + b.price, 0);
+      setBuyerActiveItemsCount(buyerBids.length);
+      const lockedMoneyInBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status.title !== "Closed" && item?.status?.title !== "Cancelled").reduce((a, b) => a + b.price, 0);
       setLockedInBids(lockedMoneyInBids);
-      const totalRevenue = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize").reduce((a, b) => a + b.price, 0);
+      const totalRevenue = filteredDealsBySeller.filter((item: IAuctionItem) => item?.status?.title === "Closed").reduce((a, b) => a + b.price, 0);
       setSellerRevenue(totalRevenue);
       setDealsBySeller(filteredDealsBySeller);
     }
@@ -140,7 +140,7 @@ const Dashboard: NextPage = () => {
       value: buyerActiveItemsCount,
     },
     {
-      title: "Wait to send payment",
+      title: "Wait finalize",
       value: buyerWaitForPaymentCount,
     },
     {

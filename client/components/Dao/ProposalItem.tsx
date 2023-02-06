@@ -1,14 +1,18 @@
+import { sliceVoteId } from "@/helpers";
 import { IStatus } from "@/types";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Dispatch, SetStateAction } from "react";
 
 interface IProps {
   title: string;
   id: string;
   status?: IStatus;
   buttonText?: string;
+  onClickHandler: Dispatch<SetStateAction<boolean>>;
+  setVoteTitle: Dispatch<SetStateAction<string>>;
 }
 
-const ProposalItem = ({ title, id, status, buttonText }: IProps) => {
+const ProposalItem = ({ title, id, status, buttonText, onClickHandler, setVoteTitle }: IProps) => {
   return (
     <Flex flexDir="column">
       <Box
@@ -31,13 +35,20 @@ const ProposalItem = ({ title, id, status, buttonText }: IProps) => {
       >
         <Flex flexDir="column" gap="12px">
           <Text textStyle="bigText" color="white">{title}</Text>
-          <Text textStyle="smallText" color="gray.300">{id}</Text>
+          <Text textStyle="smallText" color="gray.300">{sliceVoteId(id)}</Text>
         </Flex>
         {buttonText ?
           <Button variant="blue" textStyle="button" w="272px">
             {buttonText}
           </Button>
-          : <Box minW="272px" />
+          : buttonText === "vote" && onClickHandler
+            ? <Button variant="blue" textStyle="button" w="272px" onClick={() => {
+                setVoteTitle(title);
+                onClickHandler(true);
+              }}>
+                {buttonText}
+              </Button>
+            : <Box minW="272px" />
         }
       </Flex>
     </Flex>
