@@ -13,15 +13,17 @@ import { convertStatus } from "@/helpers";
 const Home: NextPage = () => {
   const [ items, setItems ] = useState<IAuctionItem[]|[]>([]);
   const [fetchedData, setFetchedData] = useState<unknown>([]);
-  const fetchData = async () => {
-    const data = await readContract({
-      address: addresses[0].address as `0x${string}`,
-      abi: ABI_FACTORY,
-      functionName: "getAllDeals",
-    })
-    setFetchedData(data)
-  }
-  fetchData();
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await readContract({
+        address: addresses[0].address as `0x${string}`,
+        abi: ABI_FACTORY,
+        functionName: "getAllDeals",
+      })
+      setFetchedData(data)
+    }
+    fetchData();
+  }, [])
   useInterval(() => {
     const fetchData = async () => {
       const data = await readContract({

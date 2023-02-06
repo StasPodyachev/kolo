@@ -36,18 +36,19 @@ const Dashboard: NextPage = () => {
   const [bids, setBids] = useState<IAuctionItem[] | []>([]);
   const [lockedInBids, setLockedInBids] = useState(0);
   const [sellerRevenue, setSellerRevenue] = useState(0);
-  const randomImage = Math.floor(Math.random() * (imagesArray.length));
   const signer = useSigner();
   const { address } = useAccount();
-  const fetchData = async () => {
-    const data = await readContract({
-      address: addresses[0].address as `0x${string}`,
-      abi: ABI_FACTORY,
-      functionName: "getAllDeals",
-    });
-    setFetchedData(data);
-  }
-  fetchData();
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await readContract({
+        address: addresses[0].address as `0x${string}`,
+        abi: ABI_FACTORY,
+        functionName: "getAllDeals",
+      });
+      setFetchedData(data);
+    }
+    fetchData();
+  }, [])
   useInterval(() => {
     const fetchData = async () => {
       const data = await readContract({
@@ -77,8 +78,6 @@ const Dashboard: NextPage = () => {
         const buyerAddress = result[0][8]
         const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
         let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
-        const randomIndex = Math.floor(Math.random() * (imagesArray.length))
-        const icon = imagesArray[randomIndex]
         const respStatus = Number(result[0][12])
         const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
         const isDispute = Date.now() < new Date(parseInt(result[0][10]?._hex, 16)).getTime() * 1000
@@ -106,7 +105,6 @@ const Dashboard: NextPage = () => {
           description,
           status,
           collateral,
-          icon,
           type: 0,
           activeContract: "",
         };
@@ -179,7 +177,7 @@ const Dashboard: NextPage = () => {
     <Layout pageTitle="Dashboard" isCenteredBlock={signer ? false : true}>
       {signer ? (
         <Tabs tabs={DashboardTabs} defaultIndex={index} setIndex={setIndex}>
-          <MyStorePanel deals={dealsBySeller} blocks={storeBlocks} image={imagesArray[randomImage]} />
+          <MyStorePanel deals={dealsBySeller} blocks={storeBlocks} image={Sheet} />
           <MyPurchasesPanel purchases={purchases} bids={bids} blocks={purchasesBlocks} />
         </Tabs>
       ) : (

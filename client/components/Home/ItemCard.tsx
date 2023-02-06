@@ -41,7 +41,7 @@ const ItemCard = ({
             h="240px"
             bg="gray.800"
           >
-            <Image src={imagesArray[randomImage]} alt="card image" />
+            <Image src={Sheet} alt="card image" />
           </Flex>
         )}
         <Flex

@@ -2,12 +2,10 @@ import addresses from "@/contracts/addresses";
 import { ShareIcon } from "@/icons";
 import { Button, Flex, FormControl, FormLabel, Heading, Switch, TabPanel } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { CustomInput } from "../NewPoduct/NewPoduct";
 import ABI_GOVERNER from "contracts/abi/GovernorContract.json";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
-import { BigNumber } from "ethers";
-
 
 interface IProps {
   title: string;
@@ -15,6 +13,7 @@ interface IProps {
 }
 
 const VotePanel = ({ title, id }: IProps) => {
+  const { address } = useAccount();
   const { onConfirm, onTransaction } = useTransactionManager()
   const [switchValue, setSwitchValue] = useState(-1);
   const [comment, setComment] = useState("");
