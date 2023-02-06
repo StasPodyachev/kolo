@@ -1,10 +1,10 @@
 import { NextPage } from "next";
-import { Grid } from "@chakra-ui/react";
+import { Grid, useInterval } from "@chakra-ui/react";
 import ItemCard from "@/components/Home/ItemCard";
 import Layout from "@/components/Layout";
 import { useEffect, useState } from "react";
 import { IAuctionItem } from "@/types";
-import { useContractRead } from "wagmi";
+import { readContract } from '@wagmi/core';
 import ABI_FACTORY from "../contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
 import { BigNumber, ethers } from "ethers";
@@ -12,16 +12,31 @@ import { convertStatus } from "@/helpers";
 
 const Home: NextPage = () => {
   const [ items, setItems ] = useState<IAuctionItem[]|[]>([]);
-  const { data } = useContractRead({
-    address: addresses[0].address as `0x${string}`,
-    abi: ABI_FACTORY,
-    functionName: "getAllDeals",
-  })
-
+  const [fetchedData, setFetchedData] = useState<unknown>([]);
+  const fetchData = async () => {
+    const data = await readContract({
+      address: addresses[0].address as `0x${string}`,
+      abi: ABI_FACTORY,
+      functionName: "getAllDeals",
+    })
+    setFetchedData(data)
+  }
+  fetchData();
+  useInterval(() => {
+    const fetchData = async () => {
+      const data = await readContract({
+        address: addresses[0].address as `0x${string}`,
+        abi: ABI_FACTORY,
+        functionName: "getAllDeals",
+      })
+      setFetchedData(data)
+    }
+    fetchData();
+  }, 5000)
 
   useEffect(() => {
-    if (Array.isArray(data)) {
-      const decryptedData = data?.map((item: any) => {
+    if (Array.isArray(fetchedData)) {
+      const decryptedData = fetchedData?.map((item: any) => {
         const coder = ethers?.utils?.defaultAbiCoder;
         const result = coder?.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
@@ -61,7 +76,7 @@ const Home: NextPage = () => {
         }
       })?.reverse());
     }
-  }, [data]);
+  }, [fetchedData]);
 
   return (
     <Layout pageTitle="Market">

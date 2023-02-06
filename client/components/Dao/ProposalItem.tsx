@@ -15,6 +15,7 @@ interface IProps {
 }
 
 const ProposalItem = ({ title, id, status, buttonText, onClickHandler, setVoteTitle, setId }: IProps) => {
+  console.log('id', id)
   return (
     <Flex flexDir="column">
       <Box

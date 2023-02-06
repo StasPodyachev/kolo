@@ -5,6 +5,7 @@ import Tabs from "@/components/ui/Tabs";
 import MyPurchasesPanel from "@/components/Dashboard/MyPurchasesPanel";
 import MyStorePanel from "@/components/Dashboard/MyStorePanel";
 import { useAccount, useContractRead, useSigner } from "wagmi";
+import { readContract } from '@wagmi/core';
 import Plug from "@/components/ui/Plug";
 import addresses from "@/contracts/addresses";
 import ABI_FACTORY from "../contracts/abi/Factory.json";
@@ -18,10 +19,12 @@ import Mountain from "@/icons/cardImages/mountain.svg";
 import Plant from "@/icons/cardImages/plant.svg";
 import Recycle from "@/icons/cardImages/recycle.svg";
 import Sheet from "@/icons/cardImages/sheet.svg";
+import { useInterval } from "@chakra-ui/react";
 
 const imagesArray = [Sheet, Lamp, Clouds, Mountain, Plant, Recycle];
 
 const Dashboard: NextPage = () => {
+  const [fetchedData, setFetchedData] = useState<unknown>([]);
   const [dealsBySeller, setDealsBySeller] = useState<IAuctionItem[] | []>([]);
   const [sellerActiveItemsCount, setSellerActiveItemsCount] = useState(0);
   const [sellerWaitForPaymentCount, setSellerWaitForPaymentCount] = useState(0);
@@ -36,14 +39,29 @@ const Dashboard: NextPage = () => {
   const randomImage = Math.floor(Math.random() * (imagesArray.length));
   const signer = useSigner();
   const { address } = useAccount();
-  const { data } = useContractRead({
-    address: addresses[0].address as `0x${string}`,
-    abi: ABI_FACTORY,
-    functionName: "getAllDeals",
-  });
+  const fetchData = async () => {
+    const data = await readContract({
+      address: addresses[0].address as `0x${string}`,
+      abi: ABI_FACTORY,
+      functionName: "getAllDeals",
+    });
+    setFetchedData(data);
+  }
+  fetchData();
+  useInterval(() => {
+    const fetchData = async () => {
+      const data = await readContract({
+        address: addresses[0].address as `0x${string}`,
+        abi: ABI_FACTORY,
+        functionName: "getAllDeals",
+      });
+      setFetchedData(data);
+    }
+    fetchData();
+  }, 5000)
   useEffect(() => {
-    if (Array.isArray(data)) {
-      const decryptedData = data?.map((item: any) => {
+    if (Array.isArray(fetchedData)) {
+      const decryptedData = fetchedData?.map((item: any) => {
         const coder = ethers?.utils?.defaultAbiCoder;
         const result = coder?.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
@@ -89,6 +107,8 @@ const Dashboard: NextPage = () => {
           status,
           collateral,
           icon,
+          type: 0,
+          activeContract: "",
         };
       });
       const filteredDealsBySeller = decryptedData.filter((item: IAuctionItem) => item?.ownedBy === address);
@@ -113,7 +133,7 @@ const Dashboard: NextPage = () => {
       setSellerRevenue(totalRevenue);
       setDealsBySeller(filteredDealsBySeller);
     }
-  }, [data, address]);
+  }, [fetchedData, address]);
 
   const storeBlocks = [
     {
