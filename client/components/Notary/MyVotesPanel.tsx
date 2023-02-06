@@ -24,7 +24,7 @@ const MyVotesPanel = ({ blocks }: IProps) => {
   return (
     <TabPanel p={0}>
       <Blocks items={blocks} />
-      <Heading mt="28px" variant="h3">
+      <Heading mt="28px" variant="h3" color="white">
         My Votes
       </Heading>
       {myVotes.length ? (

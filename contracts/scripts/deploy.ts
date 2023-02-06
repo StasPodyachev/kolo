@@ -7,6 +7,9 @@ import "hardhat-deploy-ethers"
 import { deployNames } from "./constants"
 import { writeDeployData } from "./utils"
 
+declare var ethers: any
+declare var network: any
+
 const CHAIN_ID: string = network.config.chainId
 const WALLET = new ethers.Wallet(network.config.accounts[0], ethers.provider)
 
@@ -21,7 +24,7 @@ const getArgs = () => [
   deployments[CHAIN_ID][deployNames.KOLO_TOKEN].address,
   deployments[CHAIN_ID][deployNames.TIME_LOCK].address,
   51,
-  45818,
+  5,
   1,
 ]
 
@@ -30,37 +33,37 @@ const getFactoryArgs = () => [
 ]
 
 const contracts: ContractDeploy[] = [
-  {
-    contractName: deployNames.FACTORY,
-  },
-  {
-    contractName: deployNames.TREASURY,
-    args: getFactoryArgs,
-  },
-  {
-    contractName: deployNames.AUCTION_FILE,
-    args: getFactoryArgs,
-  },
-  {
-    contractName: deployNames.SIMPLE_TRADE_FILE,
-    args: getFactoryArgs,
-  },
-  {
-    contractName: deployNames.NOTARY,
-    args: getFactoryArgs,
-  },
-  {
-    contractName: deployNames.CHAT,
-    args: getFactoryArgs,
-  },
-  {
-    contractName: deployNames.MOCK_EXCHANGE,
-  },
+  // {
+  //   contractName: deployNames.FACTORY,
+  // },
+  // {
+  //   contractName: deployNames.TREASURY,
+  //   args: getFactoryArgs,
+  // },
+  // {
+  //   contractName: deployNames.AUCTION_FILE,
+  //   args: getFactoryArgs,
+  // },
+  // {
+  //   contractName: deployNames.SIMPLE_TRADE_FILE,
+  //   args: getFactoryArgs,
+  // },
+  // {
+  //   contractName: deployNames.NOTARY,
+  //   args: getFactoryArgs,
+  // },
+  // {
+  //   contractName: deployNames.CHAT,
+  //   args: getFactoryArgs,
+  // },
+  // {
+  //   contractName: deployNames.MOCK_EXCHANGE,
+  // },
 
-  // dao
-  {
-    contractName: deployNames.KOLO_TOKEN,
-  },
+  // // dao
+  // {
+  //   contractName: deployNames.KOLO_TOKEN,
+  // },
   {
     contractName: deployNames.TIME_LOCK,
     args: [1000, [], [], "0xF552f5223D3f7cEB580fA92Fe0AFc6ED8c09179b"],
