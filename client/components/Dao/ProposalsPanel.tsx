@@ -20,8 +20,9 @@ interface IProps {
 
 const ProposalsPanel = ({ setIndex }: IProps) => {
   const [proposals, setProposals] = useState([] as any);
-  const [activeVotePage, setActiveVotePage] = useState(true);
+  const [activeVotePage, setActiveVotePage] = useState(false);
   const [currentVoteTitle, setCurrentVoteTitle] = useState("");
+  const [currentId, setCurrentId] = useState("");
   const [treasuryBalance, setTreasuryBalance] = useState(0);
   const [totalMinted, setTotalMinted] = useState(0);
 
@@ -161,7 +162,7 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
   return (
     <TabPanel p={0}>
       {activeVotePage ? (
-        <VotePanel title={currentVoteTitle} />
+        <VotePanel title={currentVoteTitle} id={currentId} />
       ) : (
         <Flex flexDir="column" gap="20px">
           <Blocks items={blocksProposals} />
@@ -176,6 +177,7 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
                 status={item.status}
                 onClickHandler={setActiveVotePage}
                 setVoteTitle={setCurrentVoteTitle}
+                setId={setCurrentId}
               />
             ))}
           </Flex>

@@ -10,9 +10,10 @@ interface IProps {
   buttonText?: string;
   onClickHandler: Dispatch<SetStateAction<boolean>>;
   setVoteTitle: Dispatch<SetStateAction<string>>;
+  setId: Dispatch<SetStateAction<string>>;
 }
 
-const ProposalItem = ({ title, id, status, buttonText, onClickHandler, setVoteTitle }: IProps) => {
+const ProposalItem = ({ title, id, status, buttonText, onClickHandler, setVoteTitle, setId }: IProps) => {
   return (
     <Flex flexDir="column">
       <Box
@@ -43,6 +44,7 @@ const ProposalItem = ({ title, id, status, buttonText, onClickHandler, setVoteTi
           </Button>
           : buttonText === "vote" && onClickHandler
             ? <Button variant="blue" textStyle="button" w="272px" onClick={() => {
+                setId(id);
                 setVoteTitle(title);
                 onClickHandler(true);
               }}>
