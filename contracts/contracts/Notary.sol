@@ -354,6 +354,8 @@ contract Notary is INotary, Ownable {
             if (activeNotariesMap[votesForBuyer[dealId][i]] > 0) repeat++;
         }
 
+        console.log(repeat, activeNotaries.length, _countInvaitedNotary);
+
         return
             (votesForBuyer[dealId].length +
                 votesForSeller[dealId].length +
