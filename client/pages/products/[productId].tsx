@@ -28,6 +28,7 @@ const ProductPage: NextPage = () => {
   const [bidDate, setBidDate] = useState("");
   const [bidsTableData, setBidsTableData] = useState<IBidTableData[]>([])
   const router = useRouter();
+  const [ notaryList, setNotaryList] = useState<any>([])
   const minStep = 0.01
 
   const {address} = useAccount()
@@ -57,6 +58,7 @@ const ProductPage: NextPage = () => {
             functionName: 'getNotaries',
             args: [BigNumber.from(router?.query?.productId)]
           })
+          setNotaryList(notary)
           console.log(notary, 'notary')
         }
       }
@@ -224,6 +226,7 @@ const ProductPage: NextPage = () => {
     item.id ?
     <Layout pageTitle="Item">
       <Product
+        notary={notaryList}
         item={item}
         bid={bid}
         setBid={setBid}

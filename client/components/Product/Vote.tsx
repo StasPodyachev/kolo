@@ -36,12 +36,11 @@ const Vote = ({ id, mark, title, variant, isNeededMarginTop }: IProps) => {
   }, [data])
   return (
     <Button
-      mt={isNeededMarginTop ? "auto": 0}
+      mt="auto"
       w="100%"
       textStyle="button"
       variant={variant}
-      onClick={() => write?.()}
-    >
+      onClick={() => write?.()}>
       {title}
     </Button>
   );
