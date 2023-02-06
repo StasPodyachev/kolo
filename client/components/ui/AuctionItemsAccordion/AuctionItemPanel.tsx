@@ -90,18 +90,6 @@ const AuctionItemPanel = ({ item, isChangedAccordion }: IProps) => {
             </Flex>
           </Flex>
         </Flex>
-        <Button
-          mt="36px"
-          bg="blue.primary"
-          color="white"
-          textStyle="button"
-          minW="272px"
-          alignSelf={isChangedAccordion ? "center" : "flex-end"}
-          transition="all .3s"
-          _hover={{ bg: "blue.hover" }}
-        >
-          vote
-        </Button>
       </Flex>
     </AccordionPanel>
   );

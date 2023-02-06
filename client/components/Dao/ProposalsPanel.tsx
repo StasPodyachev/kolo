@@ -8,6 +8,7 @@ import ProposalItem from "./ProposalItem";
 import { useContractWrite, useContractRead } from "wagmi";
 
 import ABI from "contracts/abi/GovernorContract.json";
+import VotePanel from "./VotePanel";
 
 interface IProps {
   setIndex: Dispatch<SetStateAction<number>>;
@@ -15,14 +16,14 @@ interface IProps {
 
 const ProposalsPanel = ({ setIndex }: IProps) => {
   const [proposals, setProposals] = useState([] as any);
+  const [activeVotePage, setActiveVotePage] = useState(false);
+  const [currentVoteTitle, setCurrentVoteTitle] = useState("");
 
   const { data } = useContractRead({
     address: "0x5f5337939298e199A361c284d5e0Dad3518b144a",
     abi: ABI,
     functionName: "getProposes",
   });
-
-  console.log({ data });
 
   useEffect(() => {
     const go = async () => {
@@ -103,30 +104,36 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
 
   return (
     <TabPanel p={0}>
-      <Flex flexDir="column" gap="20px">
-        <Blocks items={ProposalsBlocks} />
-        <Heading variant="h3" color="white">Recent Proposals</Heading>
-        <Flex flexDir="column" gap="36px">
-          {proposals.map((item: IProposalItem) => (
-            <ProposalItem
-              key={item.id}
-              title={item.title}
-              id={"ID " + item.id}
-              buttonText={item.buttonText}
-              status={item.status}
-            />
-          ))}
+      {activeVotePage ? (
+        <VotePanel />
+      ) : (
+        <Flex flexDir="column" gap="20px">
+          <Blocks items={ProposalsBlocks} />
+          <Heading variant="h3" color="white">Recent Proposals</Heading>
+          <Flex flexDir="column" gap="36px">
+            {proposals.map((item: IProposalItem) => (
+              <ProposalItem
+                key={item.id}
+                title={item.title}
+                id={"ID " + item.id}
+                buttonText={item.buttonText}
+                status={item.status}
+                onClickHandler={setActiveVotePage}
+                setVoteTitle={setCurrentVoteTitle}
+              />
+            ))}
+          </Flex>
+          <Button
+            textStyle="button"
+            variant="blue"
+            minW="272px"
+            m="24px auto 0"
+            onClick={() => setIndex(1)}
+          >
+            create proposal
+          </Button>
         </Flex>
-        <Button
-          textStyle="button"
-          variant="blue"
-          minW="272px"
-          m="24px auto 0"
-          onClick={() => setIndex(1)}
-        >
-          create proposal
-        </Button>
-      </Flex>
+      )}
     </TabPanel>
   );
 };

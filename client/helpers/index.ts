@@ -24,7 +24,7 @@ export function getTodaysDate() {
   return new Date(result);
 }
 
-export function getDateTimeLocal(date: Date) {  
+export function getDateTimeLocal(date: Date) {
   return date?.toISOString()?.slice(0, 16)
 }
 
@@ -72,4 +72,10 @@ export function convertStatus(status: number) {
           color: "#004DE5",
         }
   }
+}
+
+export const sliceVoteId = (id: string) => {
+  const start = id.slice(0, 11);
+  const end = id.slice(-4);
+  return [start, end].join('...');
 }

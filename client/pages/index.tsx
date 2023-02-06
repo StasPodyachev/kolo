@@ -28,7 +28,7 @@ const Home: NextPage = () => {
         const id = +result[0][0]?.toString();
         const title = result[0][1]
         const description = result[0][2]
-        const price = +ethers?.utils?.formatEther(BigNumber?.from(result[0][4]));
+        const price = +ethers?.utils?.formatEther(BigNumber?.from(result[0][3]));
         const ownedBy = result[0][7]
         const priceStart = +ethers.utils.formatEther(BigNumber?.from(result[0][4]));
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
@@ -40,7 +40,7 @@ const Home: NextPage = () => {
         return {
           id,
           title,
-          price: price < priceStart ? priceStart : price,
+          price,
           ownedBy,
           saleEndDate,
           priceStart,
