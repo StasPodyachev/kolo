@@ -9,17 +9,7 @@ const AboutKoloPanel = () => {
           KOLO Governance
         </Heading>
         <Flex flexDir="column" gap="20px" mt="40px">
-          {AboutKoloData.map((item) => (
-            <Flex key={item.title} flexDir="column" gap="4px">
-              <Text textStyle="bigText" color="white">
-                {item.title}
-              </Text>
-              <Text textStyle="smallText" color="gray.500">
-                {item.subtitle}
-              </Text>
-            </Flex>
-          ))}
-          <Text mt="36px">
+          <Text mt="36px" color="white">
             Kolo is a cutting-edge project being developed by the defx team for the FVM Space Warp. It aims to create a fair and censorship-resistant platform for trading sensitive information, leveraging the power of the Filecoin network and governed by the DAO - community of KOLO tokenholders.
 
             Any KOLO token holder can initiate a discussion about the protocol development or terms and conditions changes. For instance, one can propose to decrease the system fee to make the protocol more accessible for users. Or change the minimal collateral amount.

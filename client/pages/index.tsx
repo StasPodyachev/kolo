@@ -18,7 +18,6 @@ const Home: NextPage = () => {
     functionName: "getAllDeals",
   })
 
-
   useEffect(() => {
     if (Array.isArray(data)) {
       const decryptedData = data?.map((item: any) => {
