@@ -79,7 +79,7 @@ const Dashboard: NextPage = () => {
         return {
           id,
           title,
-          price,
+          price: price < priceStart ? priceStart : price,
           ownedBy,
           buyerAddress,
           saleEndDate,

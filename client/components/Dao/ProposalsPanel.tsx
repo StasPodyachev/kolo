@@ -5,14 +5,14 @@ import Blocks from "../ui/Blocks";
 import ProposalItem from "./ProposalItem";
 
 import { useContractRead } from "wagmi";
-import web3 from "web3";
 import addresses from "@/contracts/addresses";
 
 import ABI from "contracts/abi/GovernorContract.json";
 import ABI_KOLO_TOKEN from "contracts/abi/KoloToken.json";
-import ABI_TREASURY from "contracts/abi/Treasury.json";
 import VotePanel from "./VotePanel";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
+
+const provider = ethers.getDefaultProvider();
 
 interface IProps {
   setIndex: Dispatch<SetStateAction<number>>;
@@ -20,7 +20,7 @@ interface IProps {
 
 const ProposalsPanel = ({ setIndex }: IProps) => {
   const [proposals, setProposals] = useState([] as any);
-  const [activeVotePage, setActiveVotePage] = useState(false);
+  const [activeVotePage, setActiveVotePage] = useState(true);
   const [currentVoteTitle, setCurrentVoteTitle] = useState("");
   const [treasuryBalance, setTreasuryBalance] = useState(0);
   const [totalMinted, setTotalMinted] = useState(0);
@@ -37,35 +37,27 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
     functionName: "totalSupply",
   });
 
-  const { data: treasuryData } = useContractRead({
-    address: addresses[5].address as `0x${string}`,
-    abi: ABI_TREASURY,
-    functionName: "getBalance",
-  })
-
   useEffect(() => {
-    console.log('treasury data', treasuryData);
-  }, [treasuryData])
-
-  useEffect(() => {
+    console.log('tokendata', tokenData)
     if (typeof tokenData === 'object') {
+      // @ts-ignore
       const amountMinted = +ethers.utils.formatEther(tokenData?._hex)
       setTotalMinted(amountMinted)
     }
   }, [tokenData])
 
 
-//   useEffect(() => {
-//     const getBalance = async () => {
-//         try {
-//           const balance = await web3.eth.getBalance(addresses[0].address);
-//           setTreasuryBalance(balance);
-//         } catch(error) {
-//           console.log(error);
-//         }
-//     };
-//     getBalance();
-// }, []);
+  useEffect(() => {
+    const getBalance = async () => {
+        try {
+          const balance = await provider.getBalance(addresses[5].address);
+          setTreasuryBalance(+ethers.utils.formatEther(balance));
+        } catch(error) {
+          console.log(error);
+        }
+    };
+    getBalance();
+}, []);
 
   useEffect(() => {
     const go = async () => {
@@ -135,6 +127,9 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
             buttonText,
             status,
             isVoted: res[i].isVoted,
+            contracts: attr[1],
+            values: attr[2],
+            calldatas: attr[3],
           });
         }
         setProposals(arr);
@@ -159,7 +154,7 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
     },
     {
       title: "Treasury balance",
-      value: 1969314,
+      value: treasuryBalance,
     },
   ]
 

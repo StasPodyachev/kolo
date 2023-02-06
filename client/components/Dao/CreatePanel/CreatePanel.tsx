@@ -35,6 +35,12 @@ const CreatePanel = () => {
 
   const { onConfirm, onTransaction } = useTransactionManager();
 
+  console.log('parrams', validateParam.contracts,
+  validateParam.values,
+  validateParam.calldatas,
+  description,
+  validateParam.cid)
+
   const { config } = usePrepareContractWrite({
     address: addresses[8].address as `0x${string}`,
     abi: ABI,
