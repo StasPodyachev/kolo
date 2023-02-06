@@ -61,6 +61,8 @@ const Dashboard: NextPage = () => {
         const buyerAddress = result[0][8]
         const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
         let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
+        const randomIndex = Math.floor(Math.random() * (imagesArray.length))
+        const icon = imagesArray[randomIndex]
         const respStatus = Number(result[0][12])
         const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
         const isDispute = Date.now() < new Date(parseInt(result[0][10]?._hex, 16)).getTime() * 1000
@@ -88,6 +90,7 @@ const Dashboard: NextPage = () => {
           description,
           status,
           collateral,
+          icon,
           type: 0,
           activeContract: "",
         };
