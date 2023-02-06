@@ -19,6 +19,8 @@ interface IProps {
 const ButtonContractWrite = ({ title, address, abi, method, parrams, isDisabled }: IProps) => {
   const { name, description, priceStart, priceForceStop, dateExpire, cid, collateral} = parrams
   const date = new Date(dateExpire);
+  console.log(dateExpire, 'dateExpire');
+  
   const newDateExpire = date.getTime() / 1000
   
   const { onConfirm,onTransaction } = useTransactionManager();

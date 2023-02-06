@@ -9,12 +9,14 @@ const Product = dynamic(() => import("@/components/Product/Product"), {
 
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
 import ABI_FACTORY from "@/contracts/abi/Factory.json";
+import ABI_NOTARY from "@/contracts/abi/Notary.json";
 import addresses from "@/contracts/addresses";
 import { useEffect, useState } from "react";
 import { BigNumber, ethers } from "ethers";
 import { IAuctionItem, IBidTableData } from "@/types";
 import { convertExpNumberToNormal, convertStatus } from "@/helpers";
 import web3 from "web3";
+import { useAccount } from "wagmi";
 
 const ProductPage: NextPage = () => {
   const [item, setItem] = useState<IAuctionItem>({} as IAuctionItem);
@@ -28,8 +30,9 @@ const ProductPage: NextPage = () => {
   const router = useRouter();
   const minStep = 0.01
 
+  const {address} = useAccount()
   useEffect(() => {
-    if (router?.isReady) {
+    if (router?.isReady && address) {
       const productId = Number(router?.query?.productId);
       setFormattedId(convertExpNumberToNormal(productId));
       const fetchData = async () => {
@@ -48,11 +51,18 @@ const ProductPage: NextPage = () => {
             args: [ BigNumber.from(router?.query?.productId) ],
           })
           setBidsData(totalBids);
+          const notary = await readContract({
+            address: addresses[2].address as `0x${string}`,
+            abi: ABI_NOTARY,
+            functionName: 'getVoteInfo',
+            args: ['0x548BEbCb845BD6Df3AC105BebbA60918Fd322bFd']
+          })
+          // console.log(notary, 'notary')
         }
       }
       fetchData();
     }
-  }, [router?.query?.productId, router?.isReady, formattedId])
+  }, [router?.query?.productId, router?.isReady, formattedId, address])
 
   useEffect(() => {
     if (fetchedData && typeof fetchedData === 'object') {
@@ -75,7 +85,8 @@ const ProductPage: NextPage = () => {
       
       const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
       const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
-      const isDispute = Date.now() > new Date(parseInt(result[0][10]?._hex, 16)).getTime()
+      const isDispute = Date.now() < new Date(parseInt(result[0][10]?._hex, 16)).getTime() * 1000
+      console.log(new Date(parseInt(result[0][9]?._hex, 16) * 1000));
       
       let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
       if (bidsData && Array.isArray(bidsData)) {
@@ -86,7 +97,7 @@ const ProductPage: NextPage = () => {
         setBidsAmount(decryptedBidData.length);
       }
       const respStatus = Number(result[0][12]) 
-
+      
       const active =
         respStatus === 0 && !pastTime ? 0 : // Open
         respStatus === 0 && pastTime ? 4 : // Wait finalaze
@@ -95,7 +106,6 @@ const ProductPage: NextPage = () => {
         respStatus === 2 ? 2 : // Close
         respStatus === 4 && isDispute ? 5 : // Buyed
         respStatus === 4 && !isDispute ? 6 : 0 // Wait Reward
-      console.log(active, 'active');
       
       const status = result[0][12] && convertStatus(active)
       const decryptedData = {
@@ -124,7 +134,7 @@ const ProductPage: NextPage = () => {
         const currentBid = ethers.utils.formatEther(BigNumber?.from(item?.bid?._hex))
         setBid((+currentBid + minStep).toString());
         const buyerAddress = item.buyer;
-        const bidDate = new Date(item.timestamp._hex * 1000).toDateString();
+        const bidDate = new Date(item?.timestamp?._hex * 1000).toDateString();
         const slicedDate = bidDate.slice(4).split(' ');
         const formattedDate = [slicedDate[1], slicedDate[0], slicedDate[2]]?.join(" ");
         setBidDate(formattedDate);

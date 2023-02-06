@@ -97,3 +97,9 @@ export interface ISvg {
   height: number;
   width: number;
 };
+
+export interface INotaryData {
+  address: `0x${string}`;
+  isActive: boolean;
+  balance: number;
+}
