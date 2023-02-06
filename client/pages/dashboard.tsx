@@ -38,31 +38,14 @@ const Dashboard: NextPage = () => {
   const [sellerRevenue, setSellerRevenue] = useState(0);
   const signer = useSigner();
   const { address } = useAccount();
+  const { data } = useContractRead({
+    address: addresses[0].address as `0x${string}`,
+    abi: ABI_FACTORY,
+    functionName: "getAllDeals",
+  })
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await readContract({
-        address: addresses[0].address as `0x${string}`,
-        abi: ABI_FACTORY,
-        functionName: "getAllDeals",
-      });
-      setFetchedData(data);
-    }
-    fetchData();
-  }, [])
-  useInterval(() => {
-    const fetchData = async () => {
-      const data = await readContract({
-        address: addresses[0].address as `0x${string}`,
-        abi: ABI_FACTORY,
-        functionName: "getAllDeals",
-      });
-      setFetchedData(data);
-    }
-    fetchData();
-  }, 5000)
-  useEffect(() => {
-    if (Array.isArray(fetchedData)) {
-      const decryptedData = fetchedData?.map((item: any) => {
+    if (Array.isArray(data)) {
+      const decryptedData = data?.map((item: any) => {
         const coder = ethers?.utils?.defaultAbiCoder;
         const result = coder?.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
@@ -131,7 +114,7 @@ const Dashboard: NextPage = () => {
       setSellerRevenue(totalRevenue);
       setDealsBySeller(filteredDealsBySeller);
     }
-  }, [fetchedData, address]);
+  }, [data, address]);
 
   const storeBlocks = [
     {

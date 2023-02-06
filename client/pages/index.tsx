@@ -9,36 +9,19 @@ import ABI_FACTORY from "../contracts/abi/Factory.json";
 import addresses from "@/contracts/addresses";
 import { BigNumber, ethers } from "ethers";
 import { convertStatus } from "@/helpers";
+import { useContractRead } from "wagmi";
 
 const Home: NextPage = () => {
   const [ items, setItems ] = useState<IAuctionItem[]|[]>([]);
-  const [fetchedData, setFetchedData] = useState<unknown>([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await readContract({
-        address: addresses[0].address as `0x${string}`,
-        abi: ABI_FACTORY,
-        functionName: "getAllDeals",
-      })
-      setFetchedData(data)
-    }
-    fetchData();
-  }, [])
-  useInterval(() => {
-    const fetchData = async () => {
-      const data = await readContract({
-        address: addresses[0].address as `0x${string}`,
-        abi: ABI_FACTORY,
-        functionName: "getAllDeals",
-      })
-      setFetchedData(data)
-    }
-    fetchData();
-  }, 5000)
+  const { data } = useContractRead({
+    address: addresses[0].address as `0x${string}`,
+    abi: ABI_FACTORY,
+    functionName: "getAllDeals",
+  })
 
   useEffect(() => {
-    if (Array.isArray(fetchedData)) {
-      const decryptedData = fetchedData?.map((item: any) => {
+    if (Array.isArray(data)) {
+      const decryptedData = data?.map((item: any) => {
         const coder = ethers?.utils?.defaultAbiCoder;
         const result = coder?.decode([
           "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
@@ -78,7 +61,7 @@ const Home: NextPage = () => {
         }
       })?.reverse());
     }
-  }, [fetchedData]);
+  }, [data]);
 
   return (
     <Layout pageTitle="Market">
