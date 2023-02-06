@@ -91,7 +91,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount, not
     }
     // if (element === address) {
     //   setIsNotary(true)
-    // } else 
+    // } else
   }, [notary, address])
 
   useEffect(() => {
@@ -160,7 +160,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount, not
         >
           <Flex flexDir="column" gap="6px" minW="380px" maxH="240px" justifyContent="space-between">
             <Heading variant="h4" color="white" display="flex">
-              <div style={{"marginRight" : "12px"}}>{item?.title}</div>
+              <div style={{"marginRight" : "12px"}}>{item?.title.slice(0, 22)}</div>
               <div style={{"color" : "gray"}}>#{item?.id}</div>
             </Heading>
             <HStack spacing="16px">
