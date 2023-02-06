@@ -17,35 +17,82 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
   const [proposals, setProposals] = useState([] as any);
 
   const { data } = useContractRead({
-    address: "0xb8C36F3477D62380b992311F4c1DB0c06565f76c",
+    address: "0x5f5337939298e199A361c284d5e0Dad3518b144a",
     abi: ABI,
-    functionName: "getVotesCid",
+    functionName: "getProposes",
   });
+
+  console.log({ data });
 
   useEffect(() => {
     const go = async () => {
       if (data) {
         const arr = [];
-        const res = data as string[];
+        const res = data as any;
         for (let i = 0; i < res.length; i++) {
-          if (res[i] != "") {
-            const response = await fetch(
-              `https://gateway.lighthouse.storage/ipfs/${res[i]}`
-            );
-            const propose = await response.text();
+          const response = await fetch(
+            `https://gateway.lighthouse.storage/ipfs/${res[i].cid}`
+          );
+          const propose = await response.text();
 
-            const attr = propose.split("\n");
+          const attr = propose.split("\n");
 
-            arr.push({
-              id: i + 1,
-              title: attr[0],
-              buttonText: "vote",
-              status: {
+          let status;
+          let buttonText;
+
+          switch (res[i].state) {
+            case 0:
+              buttonText = "cancel";
+              status = {
+                title: "pending",
+                color: "#1DA1F2",
+              };
+              break;
+
+            case 1:
+              buttonText = "vote";
+              status = {
                 title: "open for vote",
                 color: "#1DA1F2",
-              },
-            });
+              };
+              break;
+
+            case 2:
+              status = {
+                title: "canceled",
+                color: "#1DA1F2",
+              };
+              break;
+
+            case 3:
+              status = {
+                title: "defeated",
+                color: "#1DA1F2",
+              };
+              break;
+
+            case 5:
+              buttonText = "execute";
+              status = {
+                title: "queued",
+                color: "#FBBC05",
+              };
+
+            default:
+              buttonText = "undefined";
+              status = {
+                title: "undefined",
+                color: "#FBBC05",
+              };
           }
+
+          arr.push({
+            id: res[i].id,
+            title: attr[0],
+            buttonText,
+            status,
+            isVoted: res[i].isVoted,
+          });
         }
         setProposals(arr);
       }

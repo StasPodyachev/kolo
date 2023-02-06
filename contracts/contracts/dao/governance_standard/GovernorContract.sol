@@ -16,6 +16,13 @@ contract GovernorContract is
     GovernorVotesQuorumFraction,
     GovernorTimelockControl
 {
+    struct ProposeParam {
+        string cid;
+        uint256 id;
+        ProposalState state;
+        bool isVoted;
+    }
+
     constructor(
         IVotes _token,
         TimelockController _timelock,
@@ -34,10 +41,19 @@ contract GovernorContract is
         GovernorTimelockControl(_timelock)
     {}
 
-    string[] private _votesCid;
+    ProposeParam[] private _proposes;
 
-    function getVotesCid() external view returns (string[] memory) {
-        return _votesCid;
+    function getProposes()
+        external
+        view
+        returns (ProposeParam[] memory result)
+    {
+        uint256 size = _proposes.length;
+        result = _proposes;
+        for (uint256 i = 0; i < size; i++) {
+            result[i].state = super.state(result[i].id);
+            result[i].isVoted = super.hasVoted(result[i].id, msg.sender);
+        }
     }
 
     function votingDelay()
@@ -93,8 +109,9 @@ contract GovernorContract is
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        string memory description
-    ) public override(Governor, IGovernor) returns (uint256) {
+        string memory description,
+        string calldata cid
+    ) external returns (uint256) {
         uint256 proposeId = super.propose(
             targets,
             values,
@@ -102,7 +119,14 @@ contract GovernorContract is
             description
         );
 
-        _votesCid.push(description);
+        _proposes.push(
+            ProposeParam({
+                id: proposeId,
+                cid: cid,
+                state: ProposalState.Pending,
+                isVoted: false
+            })
+        );
 
         return proposeId;
     }

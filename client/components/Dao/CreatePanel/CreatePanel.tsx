@@ -8,24 +8,58 @@ import { useEffect, useState } from "react";
 import ABI from "contracts/abi/GovernorContract.json";
 import { useRouter } from "next/router";
 
-declare var window: any;
-
 const ContractWrite = ({ params, isEnabled }: any) => {
-  const [done, setDone] = useState(false);
-  const { contracts, values, calldatas, cid } = params;
+  // #1 Add new integration
+  // ["0xf6092B5b95F6d91aab8Ff05B0Ff0e2751b26e47A"]
+  // [0]
+  // 0x4c287EFC6804304790A45beE0c85A98EA49EC0EF
+  // const result = await fetch(
+  //   `https://gateway.lighthouse.storage/ipfs/${response.data.Hash}`
+  // );
+  // console.log(await result.text());
+  //["0xc6ae157a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095d8a76c158c8b5a3a4935f186f37d083f2516e9"]
+};
+
+const CreatePanel = () => {
+  const [description, setDescription] = useState("#1 Add new integration");
+  const [contracts, setContracts] = useState(
+    '["0xf6092B5b95F6d91aab8Ff05B0Ff0e2751b26e47A"]'
+  );
+  const [values, setValues] = useState("[0]");
+  const [calldatas, setCalldatas] = useState(
+    '["0xc6ae157a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095d8a76c158c8b5a3a4935f186f37d083f2516e9"]'
+  );
+  const [validateParam, setValidateParam] = useState({} as any);
+  const [isTx, setIsTx] = useState(false);
+
   const { onConfirm, onTransaction } = useTransactionManager();
 
-  console.log({ params, done });
-
   const { config } = usePrepareContractWrite({
-    address: "0xb8C36F3477D62380b992311F4c1DB0c06565f76c",
+    address: "0x5f5337939298e199A361c284d5e0Dad3518b144a",
     abi: ABI,
     functionName: "propose",
-    args: [contracts, values, calldatas, cid],
+    args: [
+      validateParam.contracts,
+      validateParam.values,
+      validateParam.calldatas,
+      description,
+      validateParam.cid,
+    ],
+    // enabled: validateParam.validate,
   });
+
+  console.log({ config });
 
   const { data, isLoading, isSuccess, write } = useContractWrite(config);
   const { push } = useRouter();
+
+  useEffect(() => {
+    if (isLoading || isSuccess || isTx) return;
+    if (write) {
+      setIsTx(true);
+      write?.();
+    }
+  }, [isLoading, isSuccess, isTx, write]);
 
   useEffect(() => {
     if (isLoading) {
@@ -38,33 +72,7 @@ const ContractWrite = ({ params, isEnabled }: any) => {
       onTransaction(data?.hash);
       push("/dashboard");
     }
-  }, [data]);
-
-  // #1 Add new integration
-  // ["0xf6092B5b95F6d91aab8Ff05B0Ff0e2751b26e47A"]
-  // [0]
-  // 0x4c287EFC6804304790A45beE0c85A98EA49EC0EF
-
-  // const result = await fetch(
-  //   `https://gateway.lighthouse.storage/ipfs/${response.data.Hash}`
-  // );
-  // console.log(await result.text());
-  //["0xc6ae157a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000095d8a76c158c8b5a3a4935f186f37d083f2516e9"]
-
-  if (isEnabled && !done) {
-    write?.();
-    setDone(true);
-  }
-
-  return <></>;
-};
-
-const CreatePanel = () => {
-  const [description, setDescription] = useState("");
-  const [contracts, setContracts] = useState("");
-  const [values, setValues] = useState("");
-  const [calldatas, setCalldatas] = useState("");
-  const [validateParam, setValidateParam] = useState({} as any);
+  }, [data, isSuccess, onTransaction, push]);
 
   const validate = () => {
     const params = {} as any;
@@ -92,6 +100,7 @@ const CreatePanel = () => {
   }, [description, contracts, values, calldatas]);
 
   const uploadText = async () => {
+    setIsTx(false);
     if (!validateParam.description) return;
     // else if (validateParam.cid?.length > 0) setValidateParam({});
 
@@ -103,13 +112,14 @@ ${values}
 ${calldatas}`,
       "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d"
     );
-    console.log(response);
+    console.log({ response });
 
     const params = validate();
 
     if (params.validate) {
       params.cid = response.data.Hash;
       params.description = undefined;
+
       setValidateParam(params);
     }
   };
@@ -167,12 +177,6 @@ ${calldatas}`,
           >
             {"create propose"}
           </Button>
-          {validateParam.validate && (
-            <ContractWrite
-              params={validateParam}
-              isEnabled={validateParam.validate}
-            />
-          )}
         </Flex>
       </Flex>
     </TabPanel>

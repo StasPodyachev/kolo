@@ -7,6 +7,9 @@ import "hardhat-deploy-ethers"
 import { deployNames } from "./constants"
 import { writeDeployData } from "./utils"
 
+declare var ethers: any
+declare var network: any
+
 const CHAIN_ID: string = network.config.chainId
 const WALLET = new ethers.Wallet(network.config.accounts[0], ethers.provider)
 
@@ -21,7 +24,7 @@ const getArgs = () => [
   deployments[CHAIN_ID][deployNames.KOLO_TOKEN].address,
   deployments[CHAIN_ID][deployNames.TIME_LOCK].address,
   51,
-  45818,
+  5,
   1,
 ]
 
