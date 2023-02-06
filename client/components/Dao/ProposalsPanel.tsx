@@ -64,7 +64,7 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
             <ProposalItem
               key={item.id}
               title={item.title}
-              id={item.id}
+              id={"ID " + item.id}
               buttonText={item.buttonText}
               status={item.status}
             />
