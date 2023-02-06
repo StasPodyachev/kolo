@@ -41,7 +41,7 @@ const Home: NextPage = () => {
         return {
           id,
           title,
-          price,
+          price: price < priceStart ? priceStart : price,
           ownedBy,
           saleEndDate,
           priceStart,

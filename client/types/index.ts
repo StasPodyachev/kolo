@@ -120,3 +120,8 @@ export interface INotaryData {
   isActive: boolean;
   balance: number;
 }
+
+export interface ITokenData {
+  _hex: string;
+  _isBigNumber: boolean;
+}

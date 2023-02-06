@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import ABI from "contracts/abi/GovernorContract.json";
 import { useRouter } from "next/router";
+import addresses from "@/contracts/addresses";
 
 const ContractWrite = ({ params, isEnabled }: any) => {
   // #1 Add new integration
@@ -34,8 +35,14 @@ const CreatePanel = () => {
 
   const { onConfirm, onTransaction } = useTransactionManager();
 
+  console.log('parrams', validateParam.contracts,
+  validateParam.values,
+  validateParam.calldatas,
+  description,
+  validateParam.cid)
+
   const { config } = usePrepareContractWrite({
-    address: "0x5f5337939298e199A361c284d5e0Dad3518b144a",
+    address: addresses[8].address as `0x${string}`,
     abi: ABI,
     functionName: "propose",
     args: [
@@ -106,7 +113,7 @@ const CreatePanel = () => {
 
     // const { publicKey, signedMessage }: any = await encryptionSignature();
     const response = await lighthouse.uploadText(
-      `${description} 
+      `${description}
 ${values}
 ${values}
 ${calldatas}`,

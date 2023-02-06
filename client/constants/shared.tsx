@@ -61,11 +61,6 @@ export const navLinks: INavlink[] = [
     title: "FAQ",
     icon: <FaqIcon boxSize="24px" color="white" />,
   },
-  {
-    url: "/livepeer",
-    title: "Livepeer",
-    icon: <FaqIcon boxSize="24px" color="white" />,
-  },
 ];
 
 export const BidsTableData: IBidTableData[] = [

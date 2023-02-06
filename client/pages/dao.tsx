@@ -1,7 +1,6 @@
 import AboutKoloPanel from "@/components/Dao/AboutKoloPanel";
 import CreatePanel from "@/components/Dao/CreatePanel/CreatePanel";
 import ProposalsPanel from "@/components/Dao/ProposalsPanel";
-import VotePanel from "@/components/Dao/VotePanel";
 import Layout from "@/components/Layout";
 import Plug from "@/components/ui/Plug";
 import Tabs from "@/components/ui/Tabs";
@@ -19,7 +18,6 @@ const Dao = () => {
           <ProposalsPanel setIndex={setIndex} />
           <CreatePanel />
           <AboutKoloPanel />
-          <VotePanel />
         </Tabs>
       : <Plug title="to see your info" isNeedConnectBtn />}
     </Layout>

@@ -1,14 +1,18 @@
-import { ProposalsBlocks, ProposalsItems } from "@/constants/shared";
-import { IProposalItem } from "@/types";
+import { IBlock, IProposalItem } from "@/types";
 import { Button, Flex, Heading, TabPanel } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Blocks from "../ui/Blocks";
 import ProposalItem from "./ProposalItem";
 
-import { useContractWrite, useContractRead } from "wagmi";
+import { useContractRead } from "wagmi";
+import addresses from "@/contracts/addresses";
 
 import ABI from "contracts/abi/GovernorContract.json";
+import ABI_KOLO_TOKEN from "contracts/abi/KoloToken.json";
 import VotePanel from "./VotePanel";
+import { ethers } from "ethers";
+
+const provider = ethers.getDefaultProvider();
 
 interface IProps {
   setIndex: Dispatch<SetStateAction<number>>;
@@ -16,14 +20,44 @@ interface IProps {
 
 const ProposalsPanel = ({ setIndex }: IProps) => {
   const [proposals, setProposals] = useState([] as any);
-  const [activeVotePage, setActiveVotePage] = useState(false);
+  const [activeVotePage, setActiveVotePage] = useState(true);
   const [currentVoteTitle, setCurrentVoteTitle] = useState("");
+  const [treasuryBalance, setTreasuryBalance] = useState(0);
+  const [totalMinted, setTotalMinted] = useState(0);
 
   const { data } = useContractRead({
-    address: "0x5f5337939298e199A361c284d5e0Dad3518b144a",
+    address: addresses[8].address as `0x${string}`,
     abi: ABI,
     functionName: "getProposes",
   });
+
+  const { data: tokenData } = useContractRead({
+    address: addresses[6].address as `0x${string}`,
+    abi: ABI_KOLO_TOKEN,
+    functionName: "totalSupply",
+  });
+
+  useEffect(() => {
+    console.log('tokendata', tokenData)
+    if (typeof tokenData === 'object') {
+      // @ts-ignore
+      const amountMinted = +ethers.utils.formatEther(tokenData?._hex)
+      setTotalMinted(amountMinted)
+    }
+  }, [tokenData])
+
+
+  useEffect(() => {
+    const getBalance = async () => {
+        try {
+          const balance = await provider.getBalance(addresses[5].address);
+          setTreasuryBalance(+ethers.utils.formatEther(balance));
+        } catch(error) {
+          console.log(error);
+        }
+    };
+    getBalance();
+}, []);
 
   useEffect(() => {
     const go = async () => {
@@ -93,6 +127,9 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
             buttonText,
             status,
             isVoted: res[i].isVoted,
+            contracts: attr[1],
+            values: attr[2],
+            calldatas: attr[3],
           });
         }
         setProposals(arr);
@@ -102,13 +139,32 @@ const ProposalsPanel = ({ setIndex }: IProps) => {
     go();
   }, [data]);
 
+  const blocksProposals: IBlock[] = [
+    {
+      title: "Active Proposals",
+      value: proposals.filter((item: IProposalItem) => item?.status?.title === "open for vote").length,
+    },
+    {
+      title: "Total Proposals",
+      value: proposals?.length,
+    },
+    {
+      title: "Total minted",
+      value: totalMinted,
+    },
+    {
+      title: "Treasury balance",
+      value: treasuryBalance,
+    },
+  ]
+
   return (
     <TabPanel p={0}>
       {activeVotePage ? (
-        <VotePanel />
+        <VotePanel title={currentVoteTitle} />
       ) : (
         <Flex flexDir="column" gap="20px">
-          <Blocks items={ProposalsBlocks} />
+          <Blocks items={blocksProposals} />
           <Heading variant="h3" color="white">Recent Proposals</Heading>
           <Flex flexDir="column" gap="36px">
             {proposals.map((item: IProposalItem) => (

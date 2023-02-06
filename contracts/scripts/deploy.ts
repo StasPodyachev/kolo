@@ -33,37 +33,37 @@ const getFactoryArgs = () => [
 ]
 
 const contracts: ContractDeploy[] = [
-  // {
-  //   contractName: deployNames.FACTORY,
-  // },
-  // {
-  //   contractName: deployNames.TREASURY,
-  //   args: getFactoryArgs,
-  // },
-  // {
-  //   contractName: deployNames.AUCTION_FILE,
-  //   args: getFactoryArgs,
-  // },
-  // {
-  //   contractName: deployNames.SIMPLE_TRADE_FILE,
-  //   args: getFactoryArgs,
-  // },
-  // {
-  //   contractName: deployNames.NOTARY,
-  //   args: getFactoryArgs,
-  // },
-  // {
-  //   contractName: deployNames.CHAT,
-  //   args: getFactoryArgs,
-  // },
-  // {
-  //   contractName: deployNames.MOCK_EXCHANGE,
-  // },
+  {
+    contractName: deployNames.FACTORY,
+  },
+  {
+    contractName: deployNames.TREASURY,
+    args: getFactoryArgs,
+  },
+  {
+    contractName: deployNames.AUCTION_FILE,
+    args: getFactoryArgs,
+  },
+  {
+    contractName: deployNames.SIMPLE_TRADE_FILE,
+    args: getFactoryArgs,
+  },
+  {
+    contractName: deployNames.NOTARY,
+    args: getFactoryArgs,
+  },
+  {
+    contractName: deployNames.CHAT,
+    args: getFactoryArgs,
+  },
+  {
+    contractName: deployNames.MOCK_EXCHANGE,
+  },
 
-  // // dao
-  // {
-  //   contractName: deployNames.KOLO_TOKEN,
-  // },
+  // dao
+  {
+    contractName: deployNames.KOLO_TOKEN,
+  },
   {
     contractName: deployNames.TIME_LOCK,
     args: [1000, [], [], "0xF552f5223D3f7cEB580fA92Fe0AFc6ED8c09179b"],
