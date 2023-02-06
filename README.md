@@ -32,11 +32,13 @@ Perhaps most importantly, we power our platform with transparent notary mechanic
 
 Notaries will be chosen randomly from a list of DAO participants who deposited a notary collateral. If the seller is confident in the high quality of his goods or service, he can offer a guarantee deposit, which will be used as a payment to notaries if the buyer will initiate a dispute and win it. 
 
-Check our full Documentation [here](https://deforex-docs.gitbook.io/kolo-fevm-hackathon/product/notary-system)
+[Check our Notary Documentation here](https://deforex-docs.gitbook.io/kolo-fevm-hackathon/product/notary-system)
 
 ## DAO
 
 Open reputation system lets everyone see any participant’s actions’ history and reviews, but decisions about its design will be made by DAO in the future.
+
+[Check our DAO Documentation here](https://deforex-docs.gitbook.io/kolo-fevm-hackathon/result/dao)
 
 ## Summary
 
