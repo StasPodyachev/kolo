@@ -253,8 +253,8 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
             >
               {item?.description}
             </Text>
-              { item?.pastTime ? null :
-                item?.status?.title == "Open" && !isSeller ?
+              { 
+                !item?.pastTime && item?.status?.title == "Open" && !isSeller ?
                 <BuyNow
                   type={item?.type}
                   address={item?.activeContract}
@@ -262,13 +262,12 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                   id={item?.id}
                   price={item?.priceEnd ? item?.priceEnd : item?.price}
                   />
-                :  isNotary && item?.status?.title === "Dispute" ? (
+                  : isNotary && item?.status?.title === "Dispute" ? (
                     <Vote
                       id={item?.id}
-                      mark
-                      variant="darkBlue"
-                      title="vote for buyer"
-                      isNeededMarginTop
+                      mark={false}
+                      variant="blue"
+                      title="vote for seller"
                     />
                   ) : null
               }
