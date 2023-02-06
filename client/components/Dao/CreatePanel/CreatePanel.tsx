@@ -107,7 +107,7 @@ const CreatePanel = () => {
     // const { publicKey, signedMessage }: any = await encryptionSignature();
     const response = await lighthouse.uploadText(
       `${description} 
-${calldatas}
+${values}
 ${values}
 ${calldatas}`,
       "bb3be099-f338-4c1f-9f0c-a7eeb5caf65d"
