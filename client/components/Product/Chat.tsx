@@ -6,11 +6,12 @@ import { useEffect, useState } from "react";
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite } from "wagmi";
 import AddressCopy from "../ui/AddressCopy";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
+import ABI_SIMPLE from "@/contracts/abi/SimpleTradeFile.json";
 import ABI_CHAT from "@/contracts/abi/Chat.json";
 import { SendIcon } from "@/icons";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
 
-const Chat = ({ id }: {id: number}) => {
+const Chat = ({ id, addressContract, type}: {id: number, addressContract: string, type: number}) => {
   const { onConfirm, onTransaction } = useTransactionManager()
   const { isDesktopHeader } = useDevice();
   const [chatMessages, setChatMessages] = useState<IChatMessage[] | []>([]);
@@ -26,8 +27,8 @@ const Chat = ({ id }: {id: number}) => {
   });
 
   const { config } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
+    address: addressContract as `0x${string}`,
+    abi: type === 0 ? ABI_AUCTION_FILE : ABI_SIMPLE,
     functionName: "sendMessage",
     args: [id, message ? message : " "],
   })

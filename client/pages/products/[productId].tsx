@@ -65,9 +65,79 @@ const ProductPage: NextPage = () => {
   }, [router?.query?.productId, router?.isReady, formattedId, address])
 
   useEffect(() => {
-    if (fetchedData && typeof fetchedData === 'object') {
-      const coder = ethers.utils.defaultAbiCoder;
-      const result = coder.decode([
+    // console.log(fetchedData, 'fetchedData');
+    // @ts-ignore
+    if (fetchedData && typeof fetchedData === 'object' && Number(fetchedData?._type) !== 0) { 
+      // @ts-ignore
+      const type =  Number(fetchedData?._type) 
+      const coder = ethers?.utils?.defaultAbiCoder;
+      const result = coder?.decode([
+        "tuple(uint256, string, string, uint256, uint256, address, address, uint256, uint256, bytes, uint256)",
+        // @ts-ignore
+      ], fetchedData?.data);
+      const id = +result[0][0].toString();
+      const title = result[0][1];
+      const description = result[0][2]
+      const ownedBy = result[0][5]
+      const buyer = result[0][6]
+     
+      const price = +ethers.utils.formatEther(BigNumber?.from(result[0][3]));
+      const collateral = result[0][6]
+      const cid = web3?.utils?.hexToAscii(result[0][9])
+      
+      const saleEndDateNew = parseInt(result[0][7]?._hex, 16) * 1000
+      const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
+      const isDispute = Date.now() < new Date(parseInt(result[0][10]?._hex, 16)).getTime() * 1000
+      
+      let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
+      if (bidsData && Array.isArray(bidsData)) {
+        const decryptedBidData = bidsData.map((item) => {
+          const currentBid = ethers.utils.formatEther(BigNumber?.from(item.bid._hex));
+          return currentBid;
+        })
+        setBidsAmount(decryptedBidData.length);
+      }
+      const respStatus = Number(result[0][10]) 
+      
+      const active =
+        respStatus === 0 && !pastTime ? 0 : // Open
+        respStatus === 0 && pastTime ? 4 : // Wait finalaze
+        respStatus === 3 ? 3 : // Dispute
+        respStatus === 1 ? 1 : // Canceled
+        respStatus === 2 ? 2 : // Close
+        respStatus === 4 && isDispute ? 5 : // Buyed
+        respStatus === 4 && !isDispute ? 6 : 0 // Wait Reward
+      
+      const status = result[0][10] && convertStatus(active)
+      const decryptedData = {
+        id,
+        title,
+        price,
+        ownedBy,
+        saleEndDate,
+        description,
+        status,
+        totalBids: bidsAmount,
+        buyer,
+        collateral,
+        cid,
+        pastTime,
+        isDispute,
+        activeContract: addresses[3]?.address,
+        type
+      }
+      setItem(decryptedData)
+    }
+  }, [fetchedData, bidsData, bidsAmount]);
+
+  useEffect(() => {
+    // console.log(fetchedData, 'fetchedData');
+    // @ts-ignore
+    if (fetchedData && typeof fetchedData === 'object' && Number(fetchedData?._type) !== 1) {
+       // @ts-ignore
+      const type =  Number(fetchedData?._type)    
+      const coder = ethers?.utils?.defaultAbiCoder;
+      const result = coder?.decode([
         "tuple(uint256, string, string, uint256, uint256, uint256, uint256, address, address, uint256, uint256, bytes, uint256)"
         // @ts-ignore
       ], fetchedData?.data);
@@ -123,7 +193,9 @@ const ProductPage: NextPage = () => {
         collateral,
         cid,
         pastTime,
-        isDispute
+        isDispute,
+        activeContract: addresses[1]?.address,
+        type
       }
       const newBid = (price < priceStart ? priceStart + minStep : price + minStep).toFixed(2)
       setBid(newBid + '')

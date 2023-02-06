@@ -28,7 +28,7 @@ interface IProps {
   bidsAmount: number;
 }
 
-const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id} : any) => {
+const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id, address, type} : any) => {
   return (
     <Flex
       justifyContent={isDesktopHeader[0] ? "space-between" : "normal"}
@@ -36,7 +36,9 @@ const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id} : any) => {
       gap={isDesktopHeader[0] ? 0 : "52px"}
       mt={isDesktopHeader[0] ? "36px" : "52px"}
         >
-        <Box minW="400px">
+        {
+          type === 0 ? 
+          <Box minW="400px">
           <Flex justify="space-between" w="100%">
             <Heading variant="h6" color="white">
               Bids
@@ -49,8 +51,10 @@ const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id} : any) => {
             </Flex>
           </Flex>
           <BidsTable data={bidsTableData} />
-        </Box>
-        <Chat id={id} />
+        </Box> : null
+        }
+        
+        <Chat type={type} addressContract={address} id={id} />
     </Flex>
   )
 }
@@ -160,14 +164,16 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                 {item?.price}&nbsp;FIL
               </Heading>
             </Flex>
-            <Flex justifyContent="space-between">
+            {
+              item?.priceEnd ? <Flex justifyContent="space-between">
               <Heading variant="h6" color="gray.200">
                 Price end
               </Heading>
               <Heading fontFamily="Roboto Mono" variant="h6" color="gray.200">
                 {item?.priceEnd}&nbsp;FIL
               </Heading>
-            </Flex>
+            </Flex> : null
+            }
 
               <Flex height={'48px'} justifyContent="space-between">
                 {
@@ -184,15 +190,17 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
                         width="200px"
                       />
                       <PlaceBid
+                        type={item?.type}
+                        address={item?.activeContract}
                         id={item?.id}
                         price={bid}
                         isDisabled={!signer || isBidError || item?.ownedBy === address}
                       />
                     </>
                   : isBuyer && item?.status?.title === "Buyed" ?
-                  <Dispute id={item?.id} collateral={item?.collateral} />
+                  <Dispute type={item?.type} address={item?.activeContract} id={item?.id} collateral={item?.collateral} />
                   : isSeller && item?.status?.title === "Open" && !bidsAmount ?
-                  <Cancel id={item?.id} /> 
+                  <Cancel type={item?.type} address={item?.activeContract} id={item?.id} /> 
                   : isNotary && item?.status?.title === "Dispute" ? (
                     <Vote
                       id={item?.id}
@@ -248,9 +256,11 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               { item?.pastTime ? null :
                 item?.status?.title == "Open" && !isSeller ?
                 <BuyNow
+                  type={item?.type}
+                  address={item?.activeContract}
                   isDisabled={!signer || item?.ownedBy === address}
                   id={item?.id}
-                  price={item?.priceEnd}
+                  price={item?.priceEnd ? item?.priceEnd : item?.price}
                   />
                 :  isNotary && item?.status?.title === "Dispute" ? (
                     <Vote
@@ -272,7 +282,8 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
           <LinkIcon />
         </Link>
       </Flex>
-      <Bids isDesktopHeader={isDesktopHeader} bidsAmount={bidsAmount}
+      <Bids address={item?.activeContract} type={item?.type}
+        isDesktopHeader={isDesktopHeader} bidsAmount={bidsAmount}
         bidsTableData={bidsTableData} id={item?.id}
         />
     </Flex>

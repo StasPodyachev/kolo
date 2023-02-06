@@ -292,6 +292,7 @@ const NewPoduct = () => {
               </FormControl>
             </Box>
             {activeItem.title !== "SIMPLE TRADES OF FILES" ? (<Box w={isDesktop[0] || isDesktopHeader[0] ? "48%" : "100%"}>
+              { activeItem.title !== "SIMPLE TRADES OF FILES" ?
               <FormControl isRequired isInvalid={(isForceStopPriceError && access)}>
                 <CustomFormLabel>
                   Price Force Stop
@@ -301,8 +302,9 @@ const NewPoduct = () => {
                   setValue={setForceStopPrice}
                   isNeededMarginTop
                   errorMessage="Price Force Stop is required"
-                />
-              </FormControl>
+                /> 
+              </FormControl> : null
+              }
             </Box>) : null}
           </Flex>
           <Flex
@@ -435,10 +437,11 @@ const NewPoduct = () => {
           ) : null}
           {isConnected && access && isShownStartSell ? (
             <ButtonContractWrite
-              address={activeItem.address}
+              address={activeItem?.address}
               abi={activeItem.abi}
               method="create"
               title="start sell"
+              type={activeItem?.title}
               parrams={
                 {
                   name: itemName,

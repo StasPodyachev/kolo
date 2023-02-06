@@ -11,11 +11,11 @@ import {
 import { useTransactionManager } from "@/context/TransactionManageProvider";
 import { useEffect } from "react";
 
-const PlaceBid = ({isDisabled, price, id}:{isDisabled: boolean, price: string, id: number}) => {
+const PlaceBid = ({isDisabled, price, id, address, type}:{isDisabled: boolean, price: string, id: number, address: string, type: number}) => {
   const { onConfirm, onTransaction } = useTransactionManager()
   const bidValue = BigInt(new BigDecimal(price.length && price).mul(BIG_1E18 + "").toString()) + ""
   const { config } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
+    address: address as `0x${string}`,
     abi: ABI_AUCTION_FILE,
     functionName: 'bid',
     args: [BigNumber.from(id), {value: bidValue}]

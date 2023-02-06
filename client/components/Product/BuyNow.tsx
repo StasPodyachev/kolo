@@ -5,19 +5,21 @@ import { BigNumber } from "ethers";
 import BigDecimal from "decimal.js-light";
 import { BIG_1E18 } from "@/helpers/misc";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
-import addresses from "@/contracts/addresses";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
+import ABI_SIMPLE from "@/contracts/abi/SimpleTradeFile.json";
+
 import { useTransactionManager } from "../../context/TransactionManageProvider";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 
-const BuyNow = ({isDisabled, id, price}:{isDisabled: boolean,id: number, price: number}) => {
+const BuyNow = ({isDisabled, id, price, address, type}:
+  {isDisabled: boolean,id: number, price: number, address: string, type: number}) => {
   const { onConfirm, onTransaction } = useTransactionManager()
   const priceValue = BigInt(new BigDecimal(price).mul(BIG_1E18 + "").toFixed(0)) + ""
   const { config } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
-    functionName: 'bid',
+    address: address as `0x${string}`,
+    abi: type === 0 ? ABI_AUCTION_FILE : ABI_SIMPLE,
+    functionName: type === 0 ? 'bid' : "buy",
     args: [BigNumber.from(id), {value: priceValue}]
   })
   const { write, isLoading, data, isSuccess } = useContractWrite(config)

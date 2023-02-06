@@ -16,7 +16,8 @@ const Home: NextPage = () => {
     address: addresses[0].address as `0x${string}`,
     abi: ABI_FACTORY,
     functionName: "getAllDeals",
-  });
+  })
+
 
   useEffect(() => {
     if (Array.isArray(data)) {
@@ -49,7 +50,9 @@ const Home: NextPage = () => {
           status,
           totalBids: 20,
           collateral,
-          pastTime
+          pastTime,
+          activeContract: '',
+          type: 1
         };
       });
       setItems(decryptedData?.filter(item => {

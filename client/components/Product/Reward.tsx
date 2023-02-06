@@ -3,6 +3,7 @@ import { BigNumber } from "ethers";
 import { useContractWrite, usePrepareContractWrite, useSigner } from "wagmi";
 import addresses from "@/contracts/addresses";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
+import ABI_SIMPLE from "@/contracts/abi/SimpleTradeFile.json";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
 import { useEffect } from "react";
 interface IProps {

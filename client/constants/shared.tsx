@@ -23,6 +23,7 @@ import {
 } from "@/types";
 
 import ABI_FILE from "../contracts/abi/AuctionFile.json";
+import ABI_SIMPLE from "../contracts/abi/SimpleTradeFile.json";
 
 export const navLinks: INavlink[] = [
   {
@@ -261,20 +262,20 @@ export const SaleTypeMenuItems: ISaleTypeMenuItem[] = [
   },
   {
     id: 2,
+    title: "SIMPLE TRADES OF FILES",
+    address: addresses[3].address,
+    abi: ABI_SIMPLE,
+  },
+  {
+    id: 3,
     title: "AUCTION OF LIVEPEER",
     address: "0x49bD7e073c52cb831cBFebfc894A751a09c3521D",
     abi: ABI_FILE,
   },
   {
-    id: 3,
+    id: 4,
     title: "AUCTION OF HUDDLE",
     address: "0x49bD7e073c52cb831cBFebfc894A751a09c3521D",
-    abi: ABI_FILE,
-  },
-  {
-    id: 4,
-    title: "SIMPLE TRADES OF FILES",
-    address: addresses[3].address,
     abi: ABI_FILE,
   },
 ];

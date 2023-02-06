@@ -3,6 +3,7 @@ import { Button } from "@chakra-ui/react";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import addresses from "@/contracts/addresses";
 import ABI_AUCTION_FILE from "@/contracts/abi/AuctionFile.json";
+import ABI_SIMPLE from "@/contracts/abi/SimpleTradeFile.json";
 import { useTransactionManager } from "@/context/TransactionManageProvider";
 import { useEffect } from "react";
 import { BigNumber } from "ethers";

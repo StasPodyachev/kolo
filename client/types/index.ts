@@ -17,6 +17,21 @@ export interface IStatus {
   color: string;
 }
 
+
+// id,
+// title,
+// price,
+// ownedBy,
+// saleEndDate,
+// priceEnd,
+// description,
+// status,
+// totalBids: bidsAmount,
+// buyer,
+// collateral,
+// cid,
+// pastTime,
+// isDispute
 export interface IAuctionItem {
   id: number;
   title: string;
@@ -24,8 +39,8 @@ export interface IAuctionItem {
   ownedBy: string;
   buyerAddress?: string;
   saleEndDate: string;
-  priceStart: number;
-  priceEnd: number;
+  priceStart?: number;
+  priceEnd?: number;
   image?: string;
   description: string;
   status: IStatus;
@@ -36,6 +51,8 @@ export interface IAuctionItem {
   pastTime?: boolean
   isDispute?: boolean
   icon?: ISvg;
+  activeContract: string
+  type: number
 };
 
 export interface IBidTableData {

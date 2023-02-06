@@ -14,28 +14,33 @@ interface IProps {
   method: string;
   parrams: any;
   isDisabled: boolean;
+  type: string
 }
 
-const ButtonContractWrite = ({ title, address, abi, method, parrams, isDisabled }: IProps) => {
+const ButtonContractWrite = ({ title, address, abi, method, parrams, isDisabled, type }: IProps) => {
   const { name, description, priceStart, priceForceStop, dateExpire, cid, collateral} = parrams
   const date = new Date(dateExpire);
-  console.log(dateExpire, 'dateExpire');
-  
   const newDateExpire = date.getTime() / 1000
-  
   const { onConfirm,onTransaction } = useTransactionManager();
-
   const newPriceStart = BigInt(new BigDecimal(priceStart.length && priceStart).mul(BIG_1E18 + "").toFixed(0)) + ""
   const newForceStop = BigInt(new BigDecimal(priceForceStop.length && priceForceStop).mul(BIG_1E18 + "").toFixed(0)) + ""
   const newCollateral = BigInt(new BigDecimal(collateral.length && collateral).mul(BIG_1E18 + "").toFixed(0)) + ""
 
-  let newCid = web3.utils.asciiToHex(cid)
+  let newCid = web3?.utils.asciiToHex(cid)
+ 
+  
+  console.log({
+    name, description, newPriceStart, newDateExpire, newCid,
+  }, type);
+
+  const args = type === "SIMPLE TRADES OF FILES" ? [ name, description, newPriceStart, newDateExpire, newCid, {value: newCollateral}] : [name, description, newPriceStart, newForceStop, newDateExpire, newCid, {value: newCollateral}]
+  console.log(args, 'args');
+  console.log(address, 'address');
   const { config } = usePrepareContractWrite({
     address,
     abi,
     functionName: method,
-    args: [name, description, newPriceStart, newForceStop, newDateExpire, newCid,
-      {value: newCollateral}],
+    args
   })
 
   const { data, isLoading, isSuccess, write } = useContractWrite(config)
