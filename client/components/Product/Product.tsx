@@ -253,7 +253,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
             >
               {item?.description}
             </Text>
-              { 
+              {
                 !item?.pastTime && item?.status?.title == "Open" && !isSeller ?
                 <BuyNow
                   type={item?.type!}

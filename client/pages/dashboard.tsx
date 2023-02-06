@@ -89,6 +89,8 @@ const Dashboard: NextPage = () => {
           status,
           collateral,
           icon,
+          type: 0,
+          activeContract: "",
         };
       });
       const filteredDealsBySeller = decryptedData.filter((item: IAuctionItem) => item?.ownedBy === address);
