@@ -214,11 +214,8 @@ const NewPoduct = () => {
     if (dd < 10) { dd = '0' + dd;}
     if (mm < 10) { mm = '0' + mm}
     today = yyyy + "-" + mm + "-" + dd + "T" + hh + ":" + m
-    console.log(today, 'today');
-    
     setNowDate(today)
     setStopDate(today)
-    
   }, [])
 
   return (
