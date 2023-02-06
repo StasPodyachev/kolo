@@ -29,12 +29,12 @@
       "creationTime": 1675622493686
     },
     "TimeLock": {
-      "address": "0xA0F24C7DF3aF2a076f27B9b1C7b1d17538bcD0BB",
-      "creationTime": 1675622555254
+      "address": "0x6B564626764a3605F32790f75e33e5811aF795eC",
+      "creationTime": 1675637464983
     },
     "GovernorContract": {
-      "address": "0x48D93649B4B4A7397CD28f8765FA673aD09079BC",
-      "creationTime": 1675622613014
+      "address": "0xb8C36F3477D62380b992311F4c1DB0c06565f76c",
+      "creationTime": 1675637522923
     },
     "MockExchange": {
       "address": "0x1dD6F5a3e27090A8Cb7767559b58C767a997286B",

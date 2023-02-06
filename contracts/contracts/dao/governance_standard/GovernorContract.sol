@@ -34,6 +34,12 @@ contract GovernorContract is
         GovernorTimelockControl(_timelock)
     {}
 
+    string[] private _votesCid;
+
+    function getVotesCid() external view returns (string[] memory) {
+        return _votesCid;
+    }
+
     function votingDelay()
         public
         view
@@ -81,13 +87,24 @@ contract GovernorContract is
         return super.state(proposalId);
     }
 
+    // cid
+
     function propose(
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
     ) public override(Governor, IGovernor) returns (uint256) {
-        return super.propose(targets, values, calldatas, description);
+        uint256 proposeId = super.propose(
+            targets,
+            values,
+            calldatas,
+            description
+        );
+
+        _votesCid.push(description);
+
+        return proposeId;
     }
 
     function proposalThreshold()
