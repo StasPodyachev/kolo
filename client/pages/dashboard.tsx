@@ -57,11 +57,24 @@ const Dashboard: NextPage = () => {
         const priceEnd = + ethers.utils.formatEther(BigNumber?.from(result[0][5]));
         const collateral = result[0][6]
         const buyerAddress = result[0][8]
-        const status = result[0][12] && convertStatus(Number(result[0][12]));
         const saleEndDateNew = parseInt(result[0][9]?._hex, 16) * 1000
         let saleEndDate = new Date(+saleEndDateNew).toLocaleDateString()
         const randomIndex = Math.floor(Math.random() * (imagesArray.length))
         const icon = imagesArray[randomIndex]
+        const respStatus = Number(result[0][12])
+        const pastTime = Date.now() > new Date(+saleEndDateNew).getTime()
+        const isDispute = Date.now() < new Date(parseInt(result[0][10]?._hex, 16)).getTime() * 1000
+
+        const active =
+          respStatus === 0 && !pastTime ? 0 : // Open
+          respStatus === 0 && pastTime ? 4 : // Wait finalaze
+          respStatus === 3 ? 3 : // Dispute
+          respStatus === 1 ? 1 : // Canceled
+          respStatus === 2 ? 2 : // Close
+          respStatus === 4 && isDispute ? 5 : // Buyed
+          respStatus === 4 && !isDispute ? 6 : 0 // Wait Reward
+
+        const status = result[0][12] && convertStatus(active)
 
         return {
           id,
@@ -90,7 +103,7 @@ const Dashboard: NextPage = () => {
       setBuyerWaitForPaymentCount(waitForPaymentItemsCountBuyer);
       const itemsInDisputCountBuyer = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Dispute").length;
       setBuyerDisputCount(itemsInDisputCountBuyer);
-      const buyerPurchases = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize");
+      const buyerPurchases = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Wait finalize" || item?.status?.title === "Closed");
       setPurchases(buyerPurchases);
       const buyerBids = filteredDealsByBuyer.filter((item: IAuctionItem) => item?.status?.title === "Open");
       setBids(buyerBids);

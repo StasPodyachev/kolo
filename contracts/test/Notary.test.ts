@@ -134,7 +134,7 @@ describe("Notary", () => {
       await notary.connect(other).deposit({ value: BIGNUM_1E18 })
       await notary.connect(buyer).deposit({ value: BIGNUM_1E18 })
       await notary.connect(buyer1).deposit({ value: BIGNUM_1E18 })
-      // await notary.connect(buyer2).deposit({ value: BIGNUM_1E18 })
+      await notary.connect(buyer2).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer3).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer4).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer5).deposit({ value: BIGNUM_1E18 })

@@ -29,9 +29,14 @@ const getArgs = () => [
 export async function main() {
   const factory = (await getKnowContractAt(deployNames.FACTORY)) as Factory
 
-  const res = await factory.getDeal(35)
+  const calldata = factory.interface.encodeFunctionData("registerIntegration", [
+    0,
+    "0x95D8a76c158c8B5A3A4935F186f37D083f2516e9",
+  ])
 
-  //console.log(res)
+  console.log(calldata)
+
+  const res = await factory.getDeal(35)
 
   const item = utils.defaultAbiCoder.decode(
     [
@@ -39,7 +44,6 @@ export async function main() {
     ],
     res.data
   )[0]
-
 
   // console.log(item)
   console.log(item[3].toString())
