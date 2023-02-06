@@ -8,13 +8,17 @@ import { useTransactionManager } from "@/context/TransactionManageProvider";
 import { useEffect } from "react";
 interface IProps {
   id: number
+  address: string
+  type: number
 }
 
-const Reward = ({ id }: IProps) => {
+const Reward = ({ id, address, type }: IProps) => {
+  console.log(id, address, type, 'id, address, type');
+  
   const { onConfirm, onTransaction } = useTransactionManager()
   const { config: disputeConfig } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
+    address: address as `0x${string}`,
+    abi: type === 0 ? ABI_AUCTION_FILE : ABI_SIMPLE,
     functionName: 'receiveReward',
     args: [id]
   });

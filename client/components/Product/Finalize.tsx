@@ -9,14 +9,15 @@ import { useEffect } from "react";
 import { BigNumber } from "ethers";
 interface IProps {
   id: number;
-  collateral: BigNumber
+  address: string
+  type: number
 }
 
-const Finalize = ({ id, collateral }: IProps) => {
+const Finalize = ({ id, address, type }: IProps) => {
   const { onConfirm, onTransaction } = useTransactionManager()
   const { config: finalizeConfig } = usePrepareContractWrite({
-    address: addresses[1].address as `0x${string}`,
-    abi: ABI_AUCTION_FILE,
+    address: address as `0x${string}`,
+    abi: type === 0 ? ABI_AUCTION_FILE : ABI_SIMPLE,
     functionName: 'finalize',
     args: [id]
   });

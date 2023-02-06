@@ -178,10 +178,10 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
               <Flex height={'48px'} justifyContent="space-between">
                 {
                   item?.status?.title === "Wait finalize" ?
-                  <Finalize id={item?.id} collateral={item?.collateral} /> :
+                  <Finalize id={item?.id} type={item?.type} address={item?.activeContract} /> :
                   item?.status?.title === "Wait Reward" && isSeller ?
-                  <Reward id={item?.id} /> :
-                  item?.status?.title === "Open" && !isSeller ?
+                  <Reward type={item?.type} address={item?.activeContract} id={item?.id} /> :
+                  item?.status?.title === "Open" && !isSeller && item?.type === 0?
                     <>
                       <NumberInput
                         value={bid}

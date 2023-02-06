@@ -54,10 +54,10 @@ const ProductPage: NextPage = () => {
           const notary = await readContract({
             address: addresses[2].address as `0x${string}`,
             abi: ABI_NOTARY,
-            functionName: 'getVoteInfo',
-            args: ['0x548BEbCb845BD6Df3AC105BebbA60918Fd322bFd']
+            functionName: 'getNotaries',
+            args: [BigNumber.from(router?.query?.productId)]
           })
-          // console.log(notary, 'notary')
+          console.log(notary, 'notary')
         }
       }
       fetchData();
