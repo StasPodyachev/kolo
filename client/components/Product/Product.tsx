@@ -26,6 +26,7 @@ interface IProps {
   currentBid: number,
   bidsTableData: IBidTableData[];
   bidsAmount: number;
+  notary: any
 }
 
 const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id, address, type} : any) => {
@@ -59,7 +60,7 @@ const Bids = ({isDesktopHeader, bidsAmount, bidsTableData, id, address, type} : 
   )
 }
 
-const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: IProps) => {
+const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount, notary }: IProps) => {
   const { isDesktopHeader } = useDevice();
   const isItemsInColumn = useMediaQuery("(max-width: 899px)");
   const signer = useSigner();
@@ -67,7 +68,7 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   const { address } = useAccount();
   const [ isSeller, setIsSeller ] = useState(false);
   const [ isBuyer, setIsBuyer ] = useState(false);
-  const [ isNotary, setIsNotary ] = useState(true);
+  const [ isNotary, setIsNotary ] = useState(false);
 
   useEffect(() => {
     if (item?.buyer === address) {
@@ -80,10 +81,22 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount }: I
   }, [item, address])
 
   useEffect(() => {
-    if(item) {
-      // console.log(item?.isDispute, 'isDispute');
+    if(notary) {
+      const is = notary?.filter((element : any) => {
+        if (element == address) {
+          return element
+        }
+      });
+      setIsNotary(is?.length ? true : false)
     }
-  }, [item])
+    // if (element === address) {
+    //   setIsNotary(true)
+    // } else 
+  }, [notary, address])
+
+  useEffect(() => {
+    console.log(isNotary, 'isNotary')
+  }, [isNotary])
 
   return (
     <Flex margin={"0 auto 0"} flexDir="column" w={isDesktopHeader[0] ? "fit-content" : "100%"}>
