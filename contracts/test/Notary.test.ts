@@ -31,6 +31,7 @@ describe("Notary", () => {
   let chat: Chat
   let notary: Notary
   const BIGNUM_1E18 = BigNumber.from("1000000000000000000")
+  const BIGNUM_1E16 = BigNumber.from("10000000000000000")
 
   let loadFixture: ReturnType<typeof createFixtureLoader>
 
@@ -64,7 +65,7 @@ describe("Notary", () => {
   })
 
   beforeEach("deploy fixture", async () => {
-    ;({ auctionFile, factory, notary } = await loadFixture(async () => {
+    ; ({ auctionFile, factory, notary } = await loadFixture(async () => {
       const { auctionFile, factory, notary, koloToken } =
         await auctionFileFixture()
 
@@ -128,13 +129,17 @@ describe("Notary", () => {
     })
   })
 
+
   describe("#vote", () => {
-    it("should vote", async () => {
+    it("should choose notaries dispute with notaries", async () => {
       await notary.deposit({ value: BIGNUM_1E18 })
       await notary.connect(other).deposit({ value: BIGNUM_1E18 })
       await notary.connect(buyer).deposit({ value: BIGNUM_1E18 })
       await notary.connect(buyer1).deposit({ value: BIGNUM_1E18 })
-      await notary.connect(buyer2).deposit({ value: BIGNUM_1E18 })
+
+
+
+      //await notary.connect(buyer2).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer3).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer4).deposit({ value: BIGNUM_1E18 })
       // await notary.connect(buyer5).deposit({ value: BIGNUM_1E18 })
@@ -162,11 +167,120 @@ describe("Notary", () => {
       await time.increase(time.duration.hours(1))
       await auctionFile.finalize(1)
 
-      await auctionFile.connect(other).dispute(1, {
+
+      const tx = await auctionFile.connect(other).dispute(1, {
         value: BigNumber.from("100000000000000000"),
       })
+      await expect(tx).to.emit(auctionFile, "DisputeCreated").withArgs(1)
 
-      await notary.vote(1, true)
+      const notaries = await notary.getNotaries(1)
+      console.log(notaries)
+
+      //await notary.vote(1, true)
+      // await notary.connect(other).vote(1, true)
+      // await notary.connect(buyer).vote(1, true)
+      // //await notary.connect(buyer1).vote(1, true)
+      // await notary.connect(buyer2).vote(1, true)
+      // await notary.connect(buyer3).vote(1, true)
+      // await notary.connect(buyer4).vote(1, false)
+      // await notary.connect(buyer5).vote(1, false)
+    })
+
+    it("should choose notaries dispute with notaries", async () => {
+      await notary.deposit({ value: BIGNUM_1E18 })
+      await notary.connect(other).deposit({ value: BIGNUM_1E18 })
+
+      const ts = await time.latest()
+      await auctionFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000"),
+      })
+
+      await time.increase(time.duration.hours(1))
+      await auctionFile.finalize(1)
+
+
+      const tx = await auctionFile.connect(other).dispute(1, {
+        value: BigNumber.from("100000000000000000"),
+      })
+      await expect(tx).to.emit(auctionFile, "DealClosed").withArgs(1)
+    })
+
+    it("should choose notaries dispute with notaries", async () => {
+      await notary.deposit({ value: BIGNUM_1E18 })
+      await notary.connect(other).deposit({ value: BIGNUM_1E18 })
+      await notary.connect(buyer).deposit({ value: BIGNUM_1E18 })
+      await notary.connect(buyer1).deposit({ value: BIGNUM_1E18 })
+
+      await notary.withdraw(BIGNUM_1E16)
+      await notary.connect(other).withdraw(BIGNUM_1E16)
+
+      const ts = await time.latest()
+      await auctionFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000"),
+      })
+
+      await time.increase(time.duration.hours(1))
+      await auctionFile.finalize(1)
+
+
+      const tx = await auctionFile.connect(other).dispute(1, {
+        value: BigNumber.from("100000000000000000"),
+      })
+      await expect(tx).to.emit(auctionFile, "DealClosed").withArgs(1)
+    })
+
+    it("should close dispute with no notaries", async () => {
+      const ts = await time.latest()
+      await auctionFile.create(
+        "NAME",
+        "DESCRIPTION",
+        10000000000,
+        100000000000,
+        ts + 2000,
+        "0x",
+        {
+          value: BigNumber.from("100000000000000000"),
+        }
+      )
+
+      await auctionFile.connect(other).bid(1, {
+        value: BigNumber.from("10000000000"),
+      })
+
+      await time.increase(time.duration.hours(1))
+      await auctionFile.finalize(1)
+
+
+      const tx = await auctionFile.connect(other).dispute(1, {
+        value: BigNumber.from("100000000000000000"),
+      })
+      await expect(tx).to.emit(auctionFile, "DealClosed").withArgs(1)
+
+      //await notary.vote(1, true)
       // await notary.connect(other).vote(1, true)
       // await notary.connect(buyer).vote(1, true)
       // //await notary.connect(buyer1).vote(1, true)
