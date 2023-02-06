@@ -1,43 +1,43 @@
 const addresses = [
   {
     name: "Factory",
-    address: "0xf6092B5b95F6d91aab8Ff05B0Ff0e2751b26e47A"
+    address: "0xF7c854b3F487909fc3A58AcB8B2181342E2D91b4"
   },
   {
     name: "AuctionFile",
-    address: "0x95D8a76c158c8B5A3A4935F186f37D083f2516e9"
+    address: "0x65F7Fdbb52d9CE3027b8251Fd4d6d5A273D9bB29"
   },
   {
     name: "Notary",
-    address: "0xE906DE04D814b996314Ec618AE78A8f5be2702b4"
+    address: "0xb31deE4b4bA80637757DbB7ADedA7132fDe1fb10"
   },
   {
     name: "SimpleTradeFile",
-    address: "0xA234C2d634E4A41d994b4eE350c0dA8D696B0BdD"
+    address: "0xD6ddDF27496feB5e1e4d1e31a85F9D41ae6F1374"
   },
   {
     name: "Chat",
-    address: "0x2272449B126114cEBF3eC0e08DD95D4a1328e03B"
+    address: "0x390A6C64E99C62Ef1691fA28DdcFAe9C18711959"
   },
   {
     name: "Treasury",
-    address: "0x79820fb7816B8B19A6Ce7FCE86Bbfeab40774aa4"
+    address: "0x2282D1D7B3377C3E875c7512C29CD85e36D2D01C"
   },
   {
     name: "KoloToken",
-    address: "0x1D47BdcAddAfAcFB9654636A8682464A111cDaA6"
+    address: "0x22BDe55E3bde1a6525C354357D553Bf304B19909"
   },
   {
     name: "TimeLock",
-    address: "0xA0F24C7DF3aF2a076f27B9b1C7b1d17538bcD0BB"
+    address: "0xb1De2abdF3F902B1Fd98Ac5C7bE9787c1F05C03B"
   },
   {
     name: "GovernorContract",
-    address: "0x48D93649B4B4A7397CD28f8765FA673aD09079BC"
+    address: "0x98785438092ED0C8a6b4ec8D8F98064C11D49e04"
   },
   {
     name: "MockExchange",
-    address: "0x1dD6F5a3e27090A8Cb7767559b58C767a997286B"
+    address: "0x1F6bf815E687390A4551Da50295057e2134BCE69"
   }
 ]
 export default addresses
