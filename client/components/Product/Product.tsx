@@ -217,9 +217,9 @@ const Product = ({ item, bid, setBid, currentBid, bidsTableData, bidsAmount, not
                   : isNotary && item?.status?.title === "Dispute" ? (
                     <Vote
                       id={item?.id}
-                      mark={false}
+                      mark={true}
                       variant="blue"
-                      title="vote for seller"
+                      title="vote for buyer"
                     />
                   ) : null
                 }
